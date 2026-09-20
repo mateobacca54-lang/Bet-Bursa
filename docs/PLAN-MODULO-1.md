@@ -479,7 +479,7 @@ validar; hay que reemplazarlo por backend antes de tener usuarios reales.
 > - **`FeedbackOverlay`** se trae a la vista solo (`scrollIntoView`) porque la barra fija de la lección lo tapaba.
 > - **Base móvil** (skill `mobile-native`): sin resaltado al tocar, `touch-action: manipulation`, `:hover` solo con puntero
 >   fino, `dvh` en el shell, `viewport-fit=cover`.
-> - **Landing (`/`):** imágenes de `Proyecto Bursa\Fotos` — se usaron 8 de 19 (ver `public/landing/`). Se descartaron las que tienen
+> - **Landing (`/`):** imágenes de `Bursa\Fotos` (fuera del repo) — se usaron 8 de 19 (ver `public/landing/`). Se descartaron las que tienen
 >   groserías, marcas de terceros (Goldman Sachs, BlackRock, "JP Morgan" mal escrito, marca de agua de pollinations.ai) o el
 >   rostro de personas reales (Buffett, actores). Tamaños "display" = múltiplos de `--font-size-4xl` (no hay tokens mayores: **pendiente
 >   confirmar con Claude Design**). Sin cifras de usuarios ni testimonios inventados. Las capturas del producto se regeneran con Playwright.
