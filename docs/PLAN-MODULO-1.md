@@ -449,8 +449,8 @@ validar; hay que reemplazarlo por backend antes de tener usuarios reales.
 ## 9. Fases de ejecución
 
 > **Estado (2026-09-20):** Fases 0, 1, 2 y 3 hechas y verificadas en navegador real: las lecciones 1, 2 y 3 se recorren
-> de principio a fin (`/modulo/1` → `/modulo/1/leccion/N`) y el camino llega al nodo 4. Falta la Fase 4 (landing `/`
-> con la gramática del camino, revisión de movimiento en móvil real) y las lecciones 4–10.
+> de principio a fin (`/modulo/1` → `/modulo/1/leccion/N`) y el camino llega al nodo 4. Fase 4: landing `/` hecha; falta la
+> revisión de movimiento en móvil real y las lecciones 4–10.
 > Pruebas: `/dev/camino?done=2&name=1` (estados: `done=0..10`, `late=1`, `name=1`) y `/modulo/1` con el progreso real.
 >
 > **Dónde me aparté de este plan, y por qué:**
@@ -479,6 +479,11 @@ validar; hay que reemplazarlo por backend antes de tener usuarios reales.
 > - **`FeedbackOverlay`** se trae a la vista solo (`scrollIntoView`) porque la barra fija de la lección lo tapaba.
 > - **Base móvil** (skill `mobile-native`): sin resaltado al tocar, `touch-action: manipulation`, `:hover` solo con puntero
 >   fino, `dvh` en el shell, `viewport-fit=cover`.
+> - **Landing (`/`):** imágenes de `Proyecto Bursa\Fotos` — se usaron 8 de 19 (ver `public/landing/`). Se descartaron las que tienen
+>   groserías, marcas de terceros (Goldman Sachs, BlackRock, "JP Morgan" mal escrito, marca de agua de pollinations.ai) o el
+>   rostro de personas reales (Buffett, actores). Tamaños "display" = múltiplos de `--font-size-4xl` (no hay tokens mayores: **pendiente
+>   confirmar con Claude Design**). Sin cifras de usuarios ni testimonios inventados. Las capturas del producto se regeneran con Playwright.
+>   Derechos de las fotos por verificar antes de publicar. Con reduced-motion no hay sticky ni parallax.
 
 Cada fase termina en algo que se puede ver en el navegador. No avanzar sin cerrar la anterior.
 
@@ -515,8 +520,8 @@ Cada fase termina en algo que se puede ver en el navegador. No avanzar sin cerra
 - **Listo cuando:** las 3 lecciones se completan end-to-end y el camino llega al nodo 4.
 
 ### Fase 4 — Pulido
-- [ ] Rehacer `/` como landing con la gramática de movimiento del camino
-- [ ] Pasada de a11y en Storybook
+- [x] Rehacer `/` como landing (héroe con centro fijo y columnas laterales en parallax, manifiesto que se lee con el scroll, producto real en piezas, lección incrustada, camino, franja del mercado). `src/components/landing/`
+- [x] Pasada de a11y (`axe-core`: 0 violaciones en la landing y en 11 estados de las lecciones)
 - [ ] Revisión de movimiento en móvil real (no solo en el simulador)
 
 ---
