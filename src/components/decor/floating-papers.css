@@ -1,0 +1,45 @@
+/* ============================================================
+   floating-papers.css — posición de los papeles y cuándo se ocultan.
+   Solo valores de tokens.css.
+
+   Los papeles deciden según el ANCHO DEL HÉROE (container query), no el de la
+   ventana: con la barra lateral abierta el héroe mide 260 px menos que la pantalla,
+   y una media query de ventana los dejaría encima del saludo.
+   ============================================================ */
+
+.bursa-hero {
+  position: relative;
+  container-type: inline-size;
+}
+
+.bursa-papers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bursa-paper {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.bursa-paper--statement { left: 0;   top: 0; }
+.bursa-paper--bill      { left: 2%;  top: 64%; }
+.bursa-paper--candles   { right: 0;  top: 0; }
+.bursa-paper--receipt   { right: 2%; top: 54%; }
+.bursa-paper--headline  { left: 24%; top: 90%; }
+
+/* Con menos de 1050 px de héroe solo caben los tres papeles de los lados */
+@container (max-width: 1049px) {
+  .bursa-paper--bill,
+  .bursa-paper--headline {
+    display: none;
+  }
+}
+
+/* Con menos de 780 px taparían el saludo */
+@container (max-width: 779px) {
+  .bursa-papers {
+    display: none;
+  }
+}
