@@ -1,0 +1,99 @@
+/* ============================================================
+   tokens.css — Design System de Bursa
+   FUENTE ÚNICA DE VERDAD. No editar a mano — cualquier cambio
+   debe documentarse en el design system y reflejarse aquí.
+   ============================================================ */
+
+:root {
+  /* ─── Brand Scale ─── */
+  --brand-50:  #FFF4EE;
+  --brand-100: #FFE4D6;
+  --brand-200: #FFC9AD;
+  --brand-300: #FFAD84;
+  --brand-400: #FF915B;
+  --brand-500: #F96A34;
+  --brand-600: #F4501B;
+  --brand-700: #B93A10;
+  --brand-800: #8A2B0C;
+  --brand-900: #5C1D08;
+
+  /* ─── Feedback (indirección obligatoria) ───
+     Hoy viven dentro de la escala naranja.
+     El día que se añadan verde/rojo, se cambian
+     SOLO estos dos valores y todos los widgets
+     se actualizan automáticamente.               */
+  --feedback-correct: var(--brand-600);
+  --feedback-wrong:   var(--brand-800);
+
+  /* ─── Superficies ─── */
+  --surface:        #F2F4F7;
+  --surface-raised: #FFFFFF;
+
+  /* ─── Tinta ─── */
+  --ink:           #0A0F1C;
+  --ink-secondary: #5B6478;
+  --on-brand:      #0A0F1C;
+
+  /* ─── Bordes ─── */
+  --border: #D7DCE3;
+
+  /* ─── Radios ─── */
+  --radius-sm:   8px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-pill: 999px;
+
+  /* ─── Sombras ─── */
+  --shadow-sm: 0 1px 2px rgba(10, 15, 28, 0.08);
+  --shadow-md: 0 8px 24px rgba(10, 15, 28, 0.12);
+
+  /* ─── Espaciado ─── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Tipografía ─── */
+  --font-family: 'Montserrat', sans-serif;
+  --font-size-xs:   0.75rem;   /* 12px */
+  --font-size-sm:   0.875rem;  /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg:   1.125rem;  /* 18px */
+  --font-size-xl:   1.25rem;   /* 20px */
+  --font-size-2xl:  1.5rem;    /* 24px */
+  --font-size-3xl:  2rem;      /* 32px */
+  --font-size-4xl:  2.5rem;    /* 40px */
+
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --line-height-tight:  1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose:  1.75;
+
+  /* ─── Tracking (mayúscula sostenida) ─── */
+  --tracking-wide: 0.05em;
+
+  /* ─── Transiciones ─── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* ─── Touch target mínimo ─── */
+  --touch-min: 44px;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast:   0ms;
+    --transition-normal: 0ms;
+    --transition-slow:   0ms;
+  }
+}
