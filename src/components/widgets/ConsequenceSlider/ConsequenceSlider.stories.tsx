@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import ConsequenceSlider from './ConsequenceSlider';
 import { leccion02Config } from '@/content/modulo-1/leccion-02-inflacion';
 

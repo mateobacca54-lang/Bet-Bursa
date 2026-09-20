@@ -37,9 +37,9 @@ export const TEMARIO_MODULO_1: readonly TemarioEntry[] = [
     title: '¿Qué es el dinero y por qué existe?',
     hook: '¿Por qué un billete de $50.000 vale algo si no se puede comer ni vestir?',
     keyConcept: 'El dinero es un acuerdo social de confianza, no un objeto con valor propio',
-    // ⏳ DECISIÓN PENDIENTE (PLAN-MODULO-1.md §6): el texto libre no se puede
-    // evaluar sin un LLM. Se propuso reemplazarlo por clasificar intercambios.
-    // No implementar la lección 1 hasta que se resuelva.
+    // Nota: la lección 1 NO usa este texto libre (no se puede corregir sin un LLM). Se implementó
+    // el reemplazo propuesto en PLAN-MODULO-1.md §6: clasificar intercambios (leccion-01-dinero.ts).
+    // El texto del docx se conserva tal cual.
     practice: 'Explica con tus palabras por qué el trueque dejó de funcionar',
     topic: 'qué es el dinero',
   },

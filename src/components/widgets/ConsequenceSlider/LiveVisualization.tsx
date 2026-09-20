@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { formatCOP } from '@/lib/format';
 import type { DataPoint } from '@/lib/types';
 
@@ -44,10 +45,10 @@ export default function LiveVisualization({
   currentYear,
   currentPrice,
 }: LiveVisualizationProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = usePrefersReducedMotion();
 
   // Escalar datos al viewport SVG
-  const { maxY, scaleX, scaleY, bars } = useMemo(() => {
+  const { scaleY, bars } = useMemo(() => {
     const maxPrice = Math.max(
       ...dataPoints.map((d) => d.y),
       targetPrice * 1.1
@@ -66,7 +67,7 @@ export default function LiveVisualization({
       price: point.y,
     }));
 
-    return { maxY: maxPrice, scaleX: sX, scaleY: sY, bars: b };
+    return { scaleY: sY, bars: b };
   }, [dataPoints, targetPrice]);
 
   // Línea de referencia del precio base
@@ -122,10 +123,9 @@ export default function LiveVisualization({
       <svg
         viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
         width="100%"
-        height="auto"
         role="img"
         aria-label={`Gráfico de precios del almuerzo: ${formatCOP(currentPrice)} en ${currentYear}`}
-        style={{ display: 'block' }}
+        style={{ display: 'block', height: 'auto' }}
       >
         {/* Eje Y — líneas de referencia */}
         {/* Línea de precio base */}
@@ -209,7 +209,8 @@ export default function LiveVisualization({
                 initial={shouldReduceMotion ? false : { scaleY: 0 }}
                 animate={{ scaleY: 1 }}
                 transition={{ duration: 0.2, delay: i * 0.02 }}
-                style={{ transformOrigin: `${bar.x + bar.width / 2}px ${PADDING.top + CHART_HEIGHT}px` }}
+                // framer pone transform-box: fill-box en SVG: el origen es relativo a la propia barra.
+                style={{ transformOrigin: '50% 100%' }}
               />
 
               {/* Etiqueta de año */}

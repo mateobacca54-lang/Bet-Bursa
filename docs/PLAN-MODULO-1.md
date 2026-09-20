@@ -448,9 +448,10 @@ validar; hay que reemplazarlo por backend antes de tener usuarios reales.
 
 ## 9. Fases de ejecución
 
-> **Estado (2026-09-20):** Fases 0 y 1 hechas y verificadas; de la Fase 2 solo `useProgress` y `SpacedReview`.
-> Faltan `LessonPlayer`, `NamePrompt`, y las Fases 3 y 4. Pruébalo en `/dev/camino?done=2&name=1`
-> (estados: `done=0..10`, `late=1`, `name=1`) y en `/modulo/1` con el progreso real.
+> **Estado (2026-09-20):** Fases 0, 1, 2 y 3 hechas y verificadas en navegador real: las lecciones 1, 2 y 3 se recorren
+> de principio a fin (`/modulo/1` → `/modulo/1/leccion/N`) y el camino llega al nodo 4. Falta la Fase 4 (landing `/`
+> con la gramática del camino, revisión de movimiento en móvil real) y las lecciones 4–10.
+> Pruebas: `/dev/camino?done=2&name=1` (estados: `done=0..10`, `late=1`, `name=1`) y `/modulo/1` con el progreso real.
 >
 > **Dónde me aparté de este plan, y por qué:**
 > - **Sidebar:** el ancho cambia al instante (260↔72), no animado. Animar `width` rompe la regla de solo transform/opacity y
@@ -465,6 +466,19 @@ validar; hay que reemplazarlo por backend antes de tener usuarios reales.
 >   (Hecha / Sigue / Por abrir), el rótulo tipo cotización "M1 · Fundamentos del dinero ▲ 20 %" y el título "Tu camino".
 > - **Papeles flotantes:** deciden por *container query* (ancho del héroe), no por ancho de ventana: con la barra lateral
 >   abierta el héroe mide 260 px menos que la pantalla.
+> - **Práctica de L1 (decisión #1, tomada por delegación):** se implementó el reemplazo propuesto (clasificar 6 intercambios
+>   en "trueque" vs. "necesita dinero"), no el texto libre del docx. El texto del docx sigue intacto en `temario.ts`.
+> - **`DragClassifier` muestra una situación a la vez** (no una bandeja con las 6): con la bandeja, las zonas quedaban fuera
+>   de pantalla mientras se arrastraba, sobre todo en móvil. Tres vías equivalentes: arrastrar, tocar ítem y luego zona,
+>   o teclado. Tras 2 fallos con el mismo ítem se coloca solo y se explica (nadie se atasca).
+> - **`AnimatedComparator`:** rango de 5 años al 20 % anual (simple $200.000 vs. compuesto $248.832); el punto es un
+>   `role="slider"` con teclado; el veredicto dice cuánto se acercó, sin "ganar/perder".
+> - **Lección 3 con datos cada cuarto de año** para que el compuesto se vea curvo y no quebrado.
+> - **`ConsequenceSlider`/`FeedbackOverlay`** migrados a `usePrefersReducedMotion` (decisión #7 cerrada); barras del
+>   `LiveVisualization` ancladas a su base (flotaban mientras animaban) y `height="auto"` inválido en el SVG corregido.
+> - **`FeedbackOverlay`** se trae a la vista solo (`scrollIntoView`) porque la barra fija de la lección lo tapaba.
+> - **Base móvil** (skill `mobile-native`): sin resaltado al tocar, `touch-action: manipulation`, `:hover` solo con puntero
+>   fino, `dvh` en el shell, `viewport-fit=cover`.
 
 Cada fase termina en algo que se puede ver en el navegador. No avanzar sin cerrar la anterior.
 
@@ -487,17 +501,17 @@ Cada fase termina en algo que se puede ver en el navegador. No avanzar sin cerra
   Los 4 estados del saludo se pueden ver en Storybook.
 
 ### Fase 2 — Motor de lección + L2
-- [ ] `LessonPlayer` con los 5 pasos y transiciones
-- [ ] Integrar el `ConsequenceSlider` existente en el paso 4
-- [ ] `NamePrompt` en el resumen de L1 + `SpacedReview` en el saludo (SpacedReview ya está hecho)
-- [x] `useProgress` (hook y persistencia) — falta conectarlo a completar una lección real, que necesita el `LessonPlayer`
+- [x] `LessonPlayer` con los 5 pasos y transiciones
+- [x] Integrar el `ConsequenceSlider` existente en el paso 4
+- [x] `NamePrompt` en el resumen de L1 + `SpacedReview` en el saludo
+- [x] `useProgress` (hook y persistencia), conectado a completar lecciones reales
 - **Listo cuando:** se puede recorrer la lección 2 de principio a fin, volver al camino,
   y ver el tramo nuevo dibujarse mientras la cifra de progreso rueda.
 
 ### Fase 3 — L1 y L3
-- [ ] `DragClassifier` + story + navegación por teclado
-- [ ] `AnimatedComparator` con modo predicción + story
-- [ ] Contenido de L1 y L3
+- [x] `DragClassifier` + story + navegación por teclado
+- [x] `AnimatedComparator` con modo predicción + story
+- [x] Contenido de L1 y L3
 - **Listo cuando:** las 3 lecciones se completan end-to-end y el camino llega al nodo 4.
 
 ### Fase 4 — Pulido
@@ -511,13 +525,13 @@ Cada fase termina en algo que se puede ver en el navegador. No avanzar sin cerra
 
 | # | Decisión | Estado | Bloquea |
 |---|---|---|---|
-| 1 | Aplicación práctica de L1 (ver §6) | ⏳ Necesita tu visto bueno | Fase 3 |
+| 1 | Aplicación práctica de L1 (ver §6) | ✅ Implementado el reemplazo propuesto (por delegación); reversible: el texto libre sigue en `temario.ts` | — |
 | 2 | El saludo y el nombre de usuario | ✅ Resuelto en §5.5 | — |
 | 3 | Leer el sistema de diseño en Claude Design | ⏳ Requiere `/design-login` en sesión interactiva | Reconciliación de `tokens.css`. No bloquea Fase 0–1 |
 | 4 | Confirmar las reglas de tono contra Claude Design | ⏳ Depende de #3 | Textos de Fase 2–3 |
 | 5 | Backend de progreso | Aplazado a propósito | Después de validar |
 | 6 | Camino vertical en móvil: ¿lección 1 abajo (el usuario "escala", metáfora de la gráfica) o arriba (orden de lectura, la actual queda a la vista)? Hoy: abajo. El botón del saludo ya lleva a la siguiente lección desde arriba | ⏳ Necesita tu criterio | Nada; es solo de gusto |
-| 7 | `ConsequenceSlider` y `FeedbackOverlay` siguen con el `useReducedMotion` de framer (riesgo de hidratación para usuarios con reduced-motion) | Migrar cuando se toquen | Lección 2 en producción |
+| 7 | `ConsequenceSlider` y `FeedbackOverlay` con el `useReducedMotion` de framer | ✅ Migrados a `usePrefersReducedMotion` | — |
 
 ---
 

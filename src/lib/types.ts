@@ -93,8 +93,12 @@ export interface ConsequenceSliderConfig {
 export interface DragItem {
   id: string;
   label: string;
+  /** Nombre corto para la ficha que queda dentro de la zona (por defecto, `label`) */
+  shortLabel?: string;
   /** Descripción corta o contexto adicional */
   description?: string;
+  /** Por qué va en su zona. Se muestra al colocarlo (o al revelarlo tras fallar) */
+  explanation?: string;
 }
 
 export interface DropZone {
@@ -190,6 +194,17 @@ export interface AnimatedComparatorConfig {
   animationDuration?: number;
   /** Unidad para formatear valores (COP, %, etc.) */
   valueUnit: string;
+  /** Activa el modo predicción antes de revelar la serie */
+  predictionMode?: {
+    /** Qué serie se oculta hasta la predicción */
+    seriesId: string;
+    /** En qué punto del eje X se predice */
+    atX: number;
+    /** Diferencia (en %) respecto al valor real hasta la que se considera "cerca" */
+    tolerancePercent: number;
+    feedbackClose: string;
+    feedbackFar: string;
+  };
 }
 
 // ─── Tipos de lección ───

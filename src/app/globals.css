@@ -67,3 +67,15 @@ body {
   background: var(--brand-200);
   color: var(--ink);
 }
+
+/* ─── Base móvil: sin resaltado gris al tocar, sin retardo de doble toque,
+       sin inflado de texto en horizontal ─── */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+}

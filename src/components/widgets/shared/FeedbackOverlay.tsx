@@ -1,6 +1,8 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import type { WidgetState } from '@/lib/types';
 
 interface FeedbackOverlayProps {
@@ -26,7 +28,15 @@ export default function FeedbackOverlay({
   hintMessage,
   onRetry,
 }: FeedbackOverlayProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = usePrefersReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // El resultado puede quedar bajo la barra fija de la lección: se trae a la vista.
+  useEffect(() => {
+    if (state === 'correct' || state === 'wrong' || state === 'revealed') {
+      ref.current?.scrollIntoView({ block: 'nearest', behavior: shouldReduceMotion ? 'auto' : 'smooth' });
+    }
+  }, [state, shouldReduceMotion]);
 
   if (state !== 'correct' && state !== 'wrong' && state !== 'revealed') {
     return null;
@@ -53,10 +63,12 @@ export default function FeedbackOverlay({
 
   return (
     <div
+      ref={ref}
       aria-live="assertive"
       role="status"
       className="feedback-overlay"
       style={{
+        scrollMarginBottom: 'calc(var(--space-16) * 2)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

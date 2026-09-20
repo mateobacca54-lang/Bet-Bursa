@@ -17,18 +17,6 @@ export const formatCOP = (value: number): string =>
   }).format(value);
 
 /**
- * Formatea un número como porcentaje.
- *
- * @example formatPercent(0.065) → "6,5%"
- * @example formatPercent(0.10)  → "10%"
- */
-export const formatPercent = (value: number): string =>
-  new Intl.NumberFormat('es-CO', {
-    style: 'percent',
-    maximumFractionDigits: 1,
-  }).format(value);
-
-/**
  * Calcula el precio con inflación acumulada.
  *
  * @param basePrice    — precio original
