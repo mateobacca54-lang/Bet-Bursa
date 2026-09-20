@@ -87,6 +87,19 @@
 
   /* ─── Touch target mínimo ─── */
   --touch-min: 44px;
+  /* ─── Curvas ─── */
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);    /* entradas, reveals */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);    /* hover, micro */
+  --ease-in-out:    cubic-bezier(0.76, 0, 0.24, 1);   /* transición de escena */
+
+  /* ─── Duraciones narrativas ─── */
+  --duration-micro:  150ms;  /* hover, press */
+  --duration-element: 250ms; /* card entra, feedback aparece */
+  --duration-scene:   400ms; /* cambio de paso, dibujo de tramo */
+  --duration-story:  1000ms; /* revelación del interés compuesto */
+
+  /* ─── Escalonado ─── */
+  --stagger: 60ms;
 }
 
 /* ─── Reduced motion ─── */

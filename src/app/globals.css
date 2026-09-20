@@ -1,26 +1,69 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "../styles/tokens.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* ─── Map tokens to Tailwind ─── */
+  --color-brand-50:  var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-surface:        var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink:            var(--ink);
+  --color-ink-secondary:  var(--ink-secondary);
+  --color-on-brand:       var(--on-brand);
+  --color-border:         var(--border);
+
+  --color-feedback-correct: var(--feedback-correct);
+  --color-feedback-wrong:   var(--feedback-wrong);
+
+  --font-sans: var(--font-family);
+
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-family);
+  line-height: var(--line-height-normal);
+}
+
+/* ─── Global utilities ─── */
+
+/* Uppercase tracking for buttons, chips, wordmark */
+.uppercase-tracking {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Touch target minimum */
+.touch-target {
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+}
+
+/* Focus visible ring */
+:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--brand-200);
+  color: var(--ink);
 }
