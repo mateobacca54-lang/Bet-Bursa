@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# nested placeholder repository
+/Bursa-bet/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
