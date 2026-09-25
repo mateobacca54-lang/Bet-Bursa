@@ -13,7 +13,7 @@ interface MoneditaInteractivaProps {
 }
 
 const MONEDITA_ASSETS = {
-  idle: { src: '/monedita/monedita-vectorial.svg', width: 600, height: 640 },
+  idle: { src: '/monedita/monedita.webp', width: 600, height: 640 },
   correct: { src: '/monedita/monedita-celebra.webp', width: 256, height: 256 },
   wrong: { src: '/monedita/monedita-pensando.webp', width: 256, height: 256 },
 } as const;
