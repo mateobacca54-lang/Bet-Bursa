@@ -74,7 +74,9 @@ Reglas de ejecución:
 
 ## Decisiones pendientes del equipo
 
-1. Proveedor de cuentas y base de datos para la Fase 2 (recomendación: Supabase, que incluye Auth y Postgres y tiene plan gratis).
-2. Temario del Módulo 2.
+1. ~~Proveedor de cuentas~~: **Supabase**, aprobado el 25 de septiembre. Falta conectar el conector y crear el proyecto.
+2. Temario de «Tu plata en el día a día» (ver `RUTA-DE-APRENDIZAJE.md`).
 3. Pasarela de pagos (Wompi, PayU, Mercado Pago o ePayco).
-4. Acceso a Vercel para verificar el despliegue.
+4. Acceso a Vercel: el conector entra como usuario, pero falta autorizar el equipo (scope `mateobacca54-3793`).
+
+Los módulos se nombran por lo que enseñan, no por número (`RUTA-DE-APRENDIZAJE.md`). Todo lo generado sigue `PERSONALIDAD-VISUAL.md`.
