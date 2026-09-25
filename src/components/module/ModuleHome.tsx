@@ -121,7 +121,7 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
                   color: 'var(--ink)',
                 }}
               >
-                {MODULO_1.title}
+                {nombreModulo(1)}
               </h2>
             </div>
 
@@ -160,7 +160,7 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
             completedLessons={progress.completedLessons}
             nextLesson={nextLesson}
             hrefFor={hrefFor}
-            ticker={`M1 · ${MODULO_1.title}`}
+            ticker={nombreModulo(1)}
           />
         ) : (
           <div
