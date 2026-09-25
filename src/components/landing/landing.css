@@ -211,7 +211,7 @@
   }
 }
 
-/* ─── Imagotipo provisional ─── */
+/* ─── Imagotipo (components/brand) ─── */
 .lp-logo {
   display: inline-flex;
   align-items: center;
@@ -220,21 +220,12 @@
   text-decoration: none;
   flex: 0 0 auto;
 }
+/* 28 px de alto: el ancho (≈145 px) sale de la proporción del logo. */
 .lp-logo-art {
-  position: relative;
-  display: block;
-  width: calc(var(--space-16) * 2 + var(--space-4));
-  height: var(--space-8);
-  overflow: hidden;
-  flex: 0 0 auto;
-  background: var(--surface-raised);
-}
-.lp-logo-img {
-  object-fit: cover;
-  object-position: center;
+  height: calc(var(--space-6) + var(--space-1));
 }
 @media (max-width: 360px) {
-  .lp-logo-art { width: calc(var(--space-16) * 2); }
+  .lp-logo-art { height: var(--space-6); }
 }
 
 /* ─── Héroe ─── */

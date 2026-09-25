@@ -1,0 +1,26 @@
+/* El alto lo pone quien usa el logo; por defecto sigue al texto que lo rodea. */
+:where(.bursa-imagotipo) {
+  display: block;
+  height: 1em;
+  width: auto;
+  max-width: 100%;
+  flex: 0 0 auto;
+}
+
+.bursa-imagotipo--positivo .bursa-imagotipo-simbolo { fill: var(--brand-600); }
+.bursa-imagotipo--positivo .bursa-imagotipo-letras { fill: var(--ink); }
+
+.bursa-imagotipo--negativo .bursa-imagotipo-simbolo { fill: var(--brand-600); }
+.bursa-imagotipo--negativo .bursa-imagotipo-letras { fill: var(--paper); }
+
+.bursa-imagotipo--mono .bursa-imagotipo-simbolo,
+.bursa-imagotipo--mono .bursa-imagotipo-letras { fill: currentColor; }
+
+.bursa-imagotipo--sobre-naranja .bursa-imagotipo-simbolo { fill: var(--paper); }
+.bursa-imagotipo--sobre-naranja .bursa-imagotipo-letras { fill: var(--ink); }
+
+/* En alto contraste forzado (Windows) el logo toma el color del sistema en vez de perderse. */
+@media (forced-colors: active) {
+  .bursa-imagotipo .bursa-imagotipo-simbolo,
+  .bursa-imagotipo .bursa-imagotipo-letras { fill: CanvasText; }
+}

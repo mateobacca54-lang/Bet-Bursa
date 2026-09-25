@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Imagotipo } from '@/components/brand';
 import './shell.css';
 
 export type SidebarItemId = 'inicio' | 'modulos' | 'progreso';
@@ -79,9 +79,10 @@ export default function Sidebar({ collapsed, onToggle, active = 'modulos' }: Sid
         className={`bursa-sidebar-brand${collapsed ? ' bursa-sidebar-brand--compact' : ''}`}
         aria-label="Bursa, inicio"
       >
-        <span className={`bursa-brand-art${collapsed ? ' bursa-brand-art--compact' : ''}`}>
-          <Image src="/brand/bursa-imagotipo-h-principal.jpg" alt="" fill sizes={collapsed ? '32px' : '160px'} draggable={false} />
-        </span>
+        <Imagotipo
+          variante={collapsed ? 'simbolo' : 'horizontal'}
+          className={`bursa-brand-art${collapsed ? ' bursa-brand-art--compact' : ''}`}
+        />
       </Link>
 
       {ITEMS.map((item) => {

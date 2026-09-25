@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Imagotipo } from '@/components/brand';
 import Sidebar, { type SidebarItemId } from './Sidebar';
 import StreakBadge from './StreakBadge';
 import ProgressBar from './ProgressBar';
@@ -45,9 +45,7 @@ export default function AppShell({
             className="bursa-header-brand"
             aria-label="Bursa, inicio"
           >
-            <span className="bursa-brand-art">
-              <Image src="/brand/bursa-imagotipo-h-principal.jpg" alt="" fill sizes="160px" draggable={false} />
-            </span>
+            <Imagotipo variante="horizontal" className="bursa-brand-art" />
           </Link>
 
           <div className="bursa-header-progress">

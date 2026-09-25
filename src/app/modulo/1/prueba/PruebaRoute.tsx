@@ -62,10 +62,11 @@ export default function PruebaRoute() {
 
   const todasHechas = getNextLesson(progress, MODULO_1.lessonCount) === null;
   if (!todasHechas) {
+    const hechas = new Set(progress.completedLessons.filter((l) => l >= 1 && l <= MODULO_1.lessonCount)).size;
     return (
       <Aside
-        title="Todavía te faltan lecciones"
-        body="La prueba de paso comprueba el módulo completo. Vuelve al camino y termina las que faltan."
+        title={`Llevas ${hechas} de ${MODULO_1.lessonCount} lecciones`}
+        body="La prueba de paso repasa el módulo completo, así que se abre cuando terminas todas. Vuelve al camino y sigue donde ibas."
       />
     );
   }
