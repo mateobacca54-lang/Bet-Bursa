@@ -181,7 +181,7 @@ export default function LessonPlayer({
           >
             {step === 0 && <StepHook lessonNumber={entry.number} title={entry.title} hook={entry.hook} scene={escenaDeLeccion(entry.number)} />}
             {step === 1 && <StepConcept keyConcept={entry.keyConcept} explanation={content.explanation} />}
-            {step === 2 && <StepExample example={content.example} lesson={entry.number} />}
+            {step === 2 && <StepExample example={content.example} lesson={entry.number} datoReal={content.datoReal} />}
             {step === 3 && (
               <StepPractice>
                 <PracticeWidget spec={content.practice} onStateChange={onPracticeState} />

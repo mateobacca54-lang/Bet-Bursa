@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import Reveal from '@/components/motion/Reveal';
 import { Estampa, type EstampaScene } from '@/components/illus';
 import EjemploVisual from './EjemploVisual';
+import { DatoReal } from '@/components/widgets/DatoReal';
+import type { IndicadorId } from '@/lib/indicadores/types';
 import { DURATION, EASE_OUT_EXPO, DRAW_PATH_DURATION, motionSafe, variants } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 
@@ -128,7 +130,7 @@ export function StepConcept({ keyConcept, explanation }: { keyConcept: string; e
 
 // ─── 3 · Ejemplo ────────────────────────────────────────────
 
-export function StepExample({ example, lesson }: { example: string; lesson?: number }) {
+export function StepExample({ example, lesson, datoReal }: { example: string; lesson?: number; datoReal?: IndicadorId[] }) {
   return (
     <div>
       <Reveal as="p" style={eyebrowStyle}>
@@ -144,6 +146,7 @@ export function StepExample({ example, lesson }: { example: string; lesson?: num
           <EjemploVisual lesson={lesson} />
         </Reveal>
       )}
+      {datoReal && datoReal.length > 0 && <DatoReal indicadores={datoReal} />}
     </div>
   );
 }

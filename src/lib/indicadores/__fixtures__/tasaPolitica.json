@@ -1,0 +1,35 @@
+{
+ "SERIES": [
+  {
+   "nombre": "Tasa de política monetaria",
+   "unidad": "Tasa efectiva anual base 365.",
+   "descripcionPeriodicidad": "Diaria",
+   "data": [
+    [
+     1790053200000,
+     12.0
+    ],
+    [
+     1790139600000,
+     12.0
+    ],
+    [
+     1790226000000,
+     12.0
+    ],
+    [
+     1790312400000,
+     12.0
+    ],
+    [
+     1790398800000,
+     12.0
+    ],
+    [
+     1790485200000,
+     12.0
+    ]
+   ]
+  }
+ ]
+}

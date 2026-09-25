@@ -10,6 +10,7 @@
 // ============================================================
 
 import type { AnimatedComparatorConfig, ConsequenceSliderConfig, DocumentHotspotConfig, DragClassifierConfig, ElegirConfig, ProportionBuilderConfig } from '@/lib/types';
+import type { IndicadorId } from '@/lib/indicadores/types';
 import { leccion01, leccion01Config } from './leccion-01-dinero';
 import { leccion02, leccion02Config } from './leccion-02-inflacion';
 import { leccion03, leccion03Config } from './leccion-03-interes';
@@ -38,6 +39,8 @@ export interface LessonContent {
   /** Una línea: lo que se lleva la persona */
   summary: string;
   practice: PracticeSpec;
+  /** Datos reales de hoy (Banco de la República, Superfinanciera) que se muestran bajo el ejemplo */
+  datoReal?: IndicadorId[];
 }
 
 const LECCIONES: readonly LessonContent[] = [
@@ -54,6 +57,7 @@ const LECCIONES: readonly LessonContent[] = [
     example: leccion02.example,
     summary: leccion02.summary,
     practice: { kind: 'ConsequenceSlider', config: leccion02Config },
+    datoReal: ['inflacion'],
   },
   {
     number: 3,
@@ -61,6 +65,7 @@ const LECCIONES: readonly LessonContent[] = [
     example: leccion03.example,
     summary: leccion03.summary,
     practice: { kind: 'AnimatedComparator', config: leccion03Config },
+    datoReal: ['cdt'],
   },
   {
     number: 4,
@@ -89,6 +94,7 @@ const LECCIONES: readonly LessonContent[] = [
     example: leccion07.example,
     summary: leccion07.summary,
     practice: { kind: 'DocumentHotspot', config: leccion07Config },
+    datoReal: ['tasaPolitica'],
   },
   {
     number: 8,
@@ -103,6 +109,7 @@ const LECCIONES: readonly LessonContent[] = [
     example: leccion09.example,
     summary: leccion09.summary,
     practice: { kind: 'DocumentHotspot', config: leccion09Config },
+    datoReal: ['usura'],
   },
   {
     number: 10,

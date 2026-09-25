@@ -1,0 +1,97 @@
+{
+ "SERIES": [
+  {
+   "nombre": "Tasa de Depósitos a Término Fijo (DTF) a 90 días, semanal",
+   "unidad": "Tasa efectiva anual, base 365.",
+   "descripcionPeriodicidad": "Semanal",
+   "data": [
+    [
+     1787893200000,
+     10.21
+    ],
+    [
+     1788498000000,
+     10.19
+    ],
+    [
+     1789102800000,
+     10.05
+    ],
+    [
+     1789707600000,
+     10.22
+    ],
+    [
+     1790312400000,
+     10.26
+    ],
+    [
+     1790917200000,
+     10.38
+    ]
+   ]
+  },
+  {
+   "nombre": "Tasa de Certificado de Depósito a Término (CDT) a 180 días, semanal",
+   "unidad": "Tasa efectiva anual, base 365.",
+   "descripcionPeriodicidad": "Semanal",
+   "data": [
+    [
+     1787893200000,
+     10.93
+    ],
+    [
+     1788498000000,
+     10.71
+    ],
+    [
+     1789102800000,
+     10.65
+    ],
+    [
+     1789707600000,
+     10.78
+    ],
+    [
+     1790312400000,
+     11.18
+    ],
+    [
+     1790917200000,
+     11.14
+    ]
+   ]
+  },
+  {
+   "nombre": "Tasa de Certificado de Depósito a Término (CDT) a 360 días, semanal",
+   "unidad": "Tasa efectiva anual, base 365.",
+   "descripcionPeriodicidad": "Semanal",
+   "data": [
+    [
+     1787893200000,
+     12.03
+    ],
+    [
+     1788498000000,
+     12.08
+    ],
+    [
+     1789102800000,
+     11.83
+    ],
+    [
+     1789707600000,
+     12.05
+    ],
+    [
+     1790312400000,
+     12.31
+    ],
+    [
+     1790917200000,
+     12.07
+    ]
+   ]
+  }
+ ]
+}
