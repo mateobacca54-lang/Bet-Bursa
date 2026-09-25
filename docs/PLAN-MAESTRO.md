@@ -31,52 +31,76 @@ Reglas de ejecución:
 | Apple / Linear / Stripe | Profundidad por capas: planos, sombras, un solo foco por pantalla | Tarjetas elevadas sobre fondos hundidos; una idea por sección |
 | Lemonade | Honestidad y precio claro | Planes y precio sin letra pequeña en la página de membresía |
 
-## Fases
+## Prioridades
 
-### Fase 0 · Hecho
+Revisión del 25 de septiembre de 2026. El orden importa: cada bloque se apoya en el anterior.
+Los módulos van de últimos por decisión del dueño.
 
-- Logo aprobado en Figma en toda la app, favicon, ícono de app, og.png
-- Datos públicos en lecciones 2, 3, 7 y 9 (Banco de la República) con respaldo fechado
-- Monedita sin ₿; saludo en video al entrar a /inicio
-- Héroe con profundidad (Monedita detrás, dato de hoy delante)
+### Hecho
 
-### Fase 1 · Pulido y cumplimiento (sin dependencias externas)
+- Logo de Figma en toda la app, favicon, ícono de app y og.png.
+- Datos públicos del Banco de la República en las lecciones 2, 3, 7 y 9, con un respaldo fechado.
+- Monedita sin ₿; saludo en video en /inicio; el héroe con profundidad.
+- Consentimiento de datos (Ley 1581) y /privacidad en borrador.
+- Profundidad en Método y Lee la letra.
+- Los módulos se nombran por lo que enseñan, no por número.
+- Widget GraficaConectada con la empanada en 3D (todavía no está en ninguna lección).
 
-| Id | Tarea | Ejecuta | Archivos | Listo cuando |
-|---|---|---|---|---|
-| 1.1 | Profundidad en el resto de la landing: capas, menos vacío, una idea por sección | Sonnet | `src/components/landing/*` salvo el héroe | Capturas antes/después aprobadas |
-| 1.2 | Consentimiento de datos (Ley 1581): casilla en el correo, página /privacidad en borrador, la API exige el consentimiento | Sonnet | `EmailPrompt`, `api/suscribir`, `app/privacidad` | Pruebas y captura; texto marcado para revisión legal |
-| 1.3 | Clips: Monedita celebra (fin de lección) y el corrientazo que sube (lección 2) | Opus + Higgsfield | `public/monedita`, `LessonSteps` | ~15 créditos; reproducción única; reduced motion estático |
-| 1.4 | Accesibilidad y rendimiento: Lighthouse, contraste, foco, peso de imágenes | Sonnet | Según hallazgos | Informe + correcciones |
+### P0 · Cimientos (sin esto nada más se sostiene)
 
-### Fase 2 · Cuentas y medición (necesita decisión: proveedor)
+| Id | Tarea | Por qué | Bloqueo |
+|---|---|---|---|
+| 0.1 | **Limpieza**: 10 componentes muertos de la landing, 7 imágenes v1 (unos 8 MB), la demo /dev/ahorro con `three` y `animejs`, scripts `_tmp`, 3 planes viejos | Peso, confusión para quien lea el código, dependencias que no se usan | Aprobación del dueño para borrar |
+| 0.2 | **CI en GitHub**: pruebas, tsc, lint y build en cada push | Hoy nada impide subir algo roto | — |
+| 0.3 | **Vercel**: acceso, variables de entorno y dominio propio | Sin esto no se verifica lo publicado | Reconectar Vercel con el scope correcto |
+| 0.4 | **Supabase en São Paulo**: tablas `perfiles`, `progreso` y `eventos` con RLS | Base para cuentas, medición y pagos | Pausar o borrar el proyecto vacío de Oregón (límite de 2 proyectos gratis) |
+| 0.5 | **Correo de Bursa**: dominio con correo (Google Workspace o Zoho), envío transaccional con Resend y conector de Gmail | Contacto real en /privacidad, correos de bienvenida, cuentas | Crear el correo y conectar Gmail |
 
-| Id | Tarea | Ejecuta |
+### P1 · La interfaz de inicio y la consistencia
+
+| Id | Tarea | Hallazgo |
 |---|---|---|
-| 2.1 | Cuentas con Google y enlace al correo; desde la lección 2 | Sonnet |
-| 2.2 | Progreso en servidor y migración desde localStorage | Sonnet |
-| 2.3 | Eventos: lección terminada, regreso a 7 días; /api/medir con base de datos | Sonnet |
-| 2.4 | Flujo de menores: año de nacimiento y autorización del acudiente | Sonnet |
+| 1.1 | **Una sola Monedita** | En la app es plana y naranja; en la landing, 3D y dorada. Duolingo tiene un solo búho. Hay que escoger una y regenerar la otra |
+| 1.2 | **/inicio al volver** | Tras responder la apuesta e ir al camino, al volver a /inicio sale la misma apuesta. Verificar y mostrar un estado de regreso ("sigue donde ibas") |
+| 1.3 | **Sin ceros para quien empieza** | "0 racha" y "0 de 10" con barra vacía el primer día. Mostrarlos desde la primera lección; antes, "10 lecciones de menos de 5 minutos" |
+| 1.4 | **Ayuda tapa contenido en el celular** | El botón flotante "?" queda encima de la primera opción de la apuesta |
+| 1.5 | **Sombra de Monedita** | Parece una barra de carga gris; debe ser una elipse suave o ninguna |
+| 1.6 | **Mitad vacía en escritorio** | Debajo de la tarjeta no hay nada. Mostrar el camino o la siguiente lección |
+| 1.7 | **Accesibilidad y rendimiento** | Lighthouse, contraste, foco y peso de imágenes |
 
-### Fase 3 · Contenido (necesita el temario del equipo)
+### P2 · Cuentas, medición y comunidad
 
-| Id | Tarea | Ejecuta |
-|---|---|---|
-| 3.1 | Módulo 2 «Tu primera tarjeta y tu primer sueldo»: temario lo entrega el equipo | Equipo |
-| 3.2 | Lecciones jugables del Módulo 2 con los widgets existentes | Sonnet |
+| Id | Tarea |
+|---|---|
+| 2.1 | Cuentas con Google y enlace al correo, desde la lección 2 |
+| 2.2 | Progreso en el servidor y migración desde localStorage |
+| 2.3 | Eventos en Supabase (lección terminada, regreso a 7 días); /api/medir escribe en la base de datos |
+| 2.4 | Flujo de menores: año de nacimiento y autorización del acudiente |
+| 2.5 | Redes: cuentas de Instagram, TikTok y Facebook a nombre de Bursa; programar y medir con Metricool (conector); TikTok también desde Higgsfield |
+| 2.6 | Línea de contenido: 3 piezas por semana con la plantilla de `PERSONALIDAD-VISUAL.md` y la encuesta mensual que decide el siguiente módulo |
 
-### Fase 4 · Monetización
+### P3 · Monetización
 
-| Id | Tarea | Ejecuta |
-|---|---|---|
-| 4.1 | Pasarela (tarjeta, PSE, Nequi), página de cuenta, cancelar en dos toques | Sonnet |
-| 4.2 | Convenios: códigos por institución, panel docente, prueba inicial y final | Sonnet |
+| Id | Tarea |
+|---|---|
+| 3.1 | Pasarela (tarjeta, PSE y Nequi), página de cuenta, cancelar en dos toques |
+| 3.2 | Convenios: códigos por institución, panel docente, prueba inicial y final |
 
-## Decisiones pendientes del equipo
+### P4 · Módulos (al final)
 
-1. ~~Proveedor de cuentas~~: **Supabase**, aprobado el 25 de septiembre. Falta conectar el conector y crear el proyecto.
-2. Temario de «Tu plata en el día a día» (ver `RUTA-DE-APRENDIZAJE.md`).
-3. Pasarela de pagos (Wompi, PayU, Mercado Pago o ePayco).
-4. Acceso a Vercel: el conector entra como usuario, pero falta autorizar el equipo (scope `mateobacca54-3793`).
+| Id | Tarea |
+|---|---|
+| 4.1 | GraficaConectada dentro de la lección 2 |
+| 4.2 | Temario de «Tu plata en el día a día» (lo entrega el equipo) y sus lecciones |
+| 4.3 | Widget Fichas (completar la regla) y el resto de la ruta de `RUTA-DE-APRENDIZAJE.md` |
 
-Los módulos se nombran por lo que enseñan, no por número (`RUTA-DE-APRENDIZAJE.md`). Todo lo generado sigue `PERSONALIDAD-VISUAL.md`.
+## Decisiones pendientes del dueño
+
+1. Aprobar la limpieza 0.1.
+2. Qué Monedita queda (1.1).
+3. Correo y dominio de Bursa (0.5).
+4. Pausar el proyecto vacío de Supabase en Oregón (0.4).
+5. Reconectar Vercel (0.3).
+6. Pasarela de pagos: Wompi, PayU, Mercado Pago o ePayco.
+
+Todo lo generado sigue `PERSONALIDAD-VISUAL.md`. Las gráficas y los diagramas se hacen en código, nunca con IA.
