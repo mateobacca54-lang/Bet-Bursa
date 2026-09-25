@@ -1,20 +1,11 @@
-import Image from 'next/image';
 import Link from 'next/link';
+import { Imagotipo } from '@/components/brand';
 
-/** Imagotipo provisional entregado por el equipo de Bursa. */
+/** Imagotipo aprobado en Figma, en la barra de la landing. */
 export default function BursaLogo() {
   return (
     <Link href="/" aria-label="Bursa, inicio" className="lp-logo">
-      <span className="lp-logo-art">
-        <Image
-          src="/brand/bursa-imagotipo-h-principal.jpg"
-          alt=""
-          fill
-          sizes="144px"
-          className="lp-logo-img"
-          draggable={false}
-        />
-      </span>
+      <Imagotipo variante="horizontal" className="lp-logo-art" />
     </Link>
   );
 }

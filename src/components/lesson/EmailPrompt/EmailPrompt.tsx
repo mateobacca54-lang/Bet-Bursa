@@ -1,6 +1,8 @@
 'use client';
 
 import { useId, useState, type CSSProperties, type FormEvent } from 'react';
+import Link from 'next/link';
+import { VERSION_POLITICA_ACTUAL } from '@/lib/suscripcion';
 
 interface EmailPromptProps {
   /** Se respondió, con o sin correo. El correo no se guarda en el progreso. */
@@ -21,8 +23,12 @@ const buttonBase: CSSProperties = {
 export default function EmailPrompt({ onAnswer }: EmailPromptProps) {
   const inputId = useId();
   const errorId = useId();
+  const consentId = useId();
+  const consentErrorId = useId();
   const [error, setError] = useState(false);
+  const [consentError, setConsentError] = useState(false);
   const [value, setValue] = useState('');
+  const [aceptaConsentimiento, setAceptaConsentimiento] = useState(false);
   const [answered, setAnswered] = useState<string | null>(null);
 
   const submit = (correo: string) => {
@@ -34,7 +40,7 @@ export default function EmailPrompt({ onAnswer }: EmailPromptProps) {
       void fetch('/api/suscribir', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ correo }),
+        body: JSON.stringify({ correo, consentimiento: true, versionPolitica: VERSION_POLITICA_ACTUAL }),
         keepalive: true,
       }).catch(() => {});
     } catch {
@@ -49,6 +55,12 @@ export default function EmailPrompt({ onAnswer }: EmailPromptProps) {
       setError(true);
       return;
     }
+    setError(false);
+    if (!aceptaConsentimiento) {
+      setConsentError(true);
+      return;
+    }
+    setConsentError(false);
     submit(correo);
   };
 
@@ -107,6 +119,37 @@ export default function EmailPrompt({ onAnswer }: EmailPromptProps) {
       {error && (
         <p id={errorId} role="alert" style={{ color: 'var(--ink-secondary)', fontSize: 'var(--font-size-sm)' }}>
           No parece un correo. Revísalo e intenta otra vez.
+        </p>
+      )}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', marginTop: 'var(--space-4)' }}>
+        <input
+          id={consentId}
+          type="checkbox"
+          checked={aceptaConsentimiento}
+          onChange={(e) => {
+            setAceptaConsentimiento(e.target.checked);
+            if (e.target.checked) setConsentError(false);
+          }}
+          aria-describedby={consentError ? consentErrorId : undefined}
+          style={{
+            width: 'var(--space-4)',
+            height: 'var(--space-4)',
+            minWidth: 'var(--space-4)',
+            marginTop: '2px',
+            cursor: 'pointer',
+          }}
+        />
+        <label htmlFor={consentId} style={{ fontSize: 'var(--font-size-sm)', color: 'var(--ink-secondary)' }}>
+          Acepto que Bursa guarde mi correo para escribirme sobre mis lecciones, según la{' '}
+          <Link href="/privacidad" style={{ color: 'var(--brand-700)', fontWeight: 'var(--font-weight-semibold)' }}>
+            política de datos
+          </Link>
+          .
+        </label>
+      </div>
+      {consentError && (
+        <p id={consentErrorId} role="alert" style={{ margin: '0', marginTop: 'var(--space-2)', color: 'var(--ink-secondary)', fontSize: 'var(--font-size-sm)' }}>
+          Necesitamos que marques la casilla para poder avisarte.
         </p>
       )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>

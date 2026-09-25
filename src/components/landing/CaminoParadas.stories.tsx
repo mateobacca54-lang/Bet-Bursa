@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Sección "Un camino de seis paradas": una línea SVG que se dibuja con el scroll une los seis módulos. El Módulo 1 es la única parada disponible y despliega sus 10 temas literales del temario.',
+          'Sección "Una ruta que empieza por lo que ya vives": una línea SVG que se dibuja con el scroll une los cuatro módulos del tronco común. El Módulo 1 es la única parada disponible y despliega sus 10 temas literales del temario. Debajo, las dos ramas (trabajo e inversión) se nombran por sus módulos reales.',
       },
     },
   },

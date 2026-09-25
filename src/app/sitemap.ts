@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const fijas: MetadataRoute.Sitemap = [
     { url: base, lastModified: ahora, changeFrequency: 'weekly', priority: 1 },
     { url: `${base}/sobre`, lastModified: ahora, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/privacidad`, lastModified: ahora, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${base}/inicio`, lastModified: ahora, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/modulo/1`, lastModified: ahora, changeFrequency: 'weekly', priority: 0.9 },
   ];

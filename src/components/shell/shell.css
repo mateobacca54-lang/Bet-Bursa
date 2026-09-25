@@ -57,27 +57,14 @@
   padding-inline: 0;
 }
 
+/* Imagotipo (components/brand): 28 px de alto; el ancho sale de la proporción del logo. */
 .bursa-brand-art {
-  position: relative;
-  display: block;
-  width: calc(var(--space-16) * 2 + var(--space-8));
-  height: var(--space-8);
-  flex: 0 0 auto;
-  overflow: hidden;
-  background: var(--surface-raised);
+  height: calc(var(--space-6) + var(--space-1));
 }
 
-.bursa-brand-art img {
-  object-fit: cover;
-  object-position: center;
-}
-
+/* Barra cerrada: solo el símbolo. */
 .bursa-brand-art--compact {
-  width: var(--space-8);
-}
-
-.bursa-brand-art--compact img {
-  object-position: left center;
+  height: var(--space-6);
 }
 
 .bursa-header-progress {

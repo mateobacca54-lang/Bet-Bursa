@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Imagotipo } from '@/components/brand';
 import Sidebar, { type SidebarItemId } from './Sidebar';
 import StreakBadge from './StreakBadge';
 import ProgressBar from './ProgressBar';
@@ -14,7 +14,7 @@ interface AppShellProps {
   /** Lecciones completadas del módulo actual */
   completed: number;
   total: number;
-  /** Etiqueta del módulo, ej. "Módulo 1" */
+  /** Nombre del módulo, ej. "Fundamentos del dinero" (los módulos se muestran por nombre, no por número) */
   moduleLabel: string;
   streakDays: number;
   active?: SidebarItemId;
@@ -45,9 +45,7 @@ export default function AppShell({
             className="bursa-header-brand"
             aria-label="Bursa, inicio"
           >
-            <span className="bursa-brand-art">
-              <Image src="/brand/bursa-imagotipo-h-principal.jpg" alt="" fill sizes="160px" draggable={false} />
-            </span>
+            <Imagotipo variante="horizontal" className="bursa-brand-art" />
           </Link>
 
           <div className="bursa-header-progress">
@@ -65,7 +63,7 @@ export default function AppShell({
                 <RollingNumber value={completed} /> de {total}
               </span>
             </span>
-            <ProgressBar value={completed} max={total} label={`Progreso del ${moduleLabel.toLowerCase()}`} />
+            <ProgressBar value={completed} max={total} label={`Progreso de ${moduleLabel}`} />
           </div>
 
           <StreakBadge days={streakDays} />

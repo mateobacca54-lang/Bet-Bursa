@@ -124,7 +124,7 @@ export default function PruebaDePaso({ situaciones, moduleNumber, moduleTitle, e
               transition={transition}
               className="pp-intro"
             >
-              <span className="pp-etiqueta">Prueba del Módulo {moduleNumber}</span>
+              <span className="pp-etiqueta">Prueba de {moduleTitle}</span>
               <h1 className="pp-titulo">¿Qué tanto quedó de «{moduleTitle}»?</h1>
               <p className="pp-lead">
                 Son {total} situaciones reales, no preguntas de examen. Sin reloj. Si alguna falla, te digo
@@ -177,7 +177,7 @@ export default function PruebaDePaso({ situaciones, moduleNumber, moduleTitle, e
             >
               {resultado.aprobado ? (
                 <Aprobado
-                  moduleNumber={moduleNumber}
+                  moduleTitle={moduleTitle}
                   aciertos={resultado.aciertos}
                   total={resultado.total}
                   onContinuar={onAprobada}
@@ -206,13 +206,13 @@ function prepararIntento(situaciones: readonly SituacionPrueba[]): SituacionPrue
 }
 
 function Aprobado({
-  moduleNumber,
+  moduleTitle,
   aciertos,
   total,
   onContinuar,
   reduced,
 }: {
-  moduleNumber: number;
+  moduleTitle: string;
   aciertos: number;
   total: number;
   onContinuar: () => void;
@@ -223,7 +223,7 @@ function Aprobado({
       <motion.div aria-hidden="true" animate={reduced ? undefined : variants.hop}>
         <Image src="/monedita/monedita.webp" alt="" width={96} height={102} style={{ height: 'auto' }} />
       </motion.div>
-      <h1 className="pp-titulo">Aprobaste la prueba del Módulo {moduleNumber}.</h1>
+      <h1 className="pp-titulo">Aprobaste la prueba de {moduleTitle}.</h1>
       <p className="pp-lead">
         Respondiste bien {aciertos} de {total}. Ya entiendes cómo funciona esto — no de memoria: lo pensaste en
         situaciones reales.

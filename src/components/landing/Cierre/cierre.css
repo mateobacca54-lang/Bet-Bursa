@@ -1,0 +1,24 @@
+/* ============================================================
+   cierre.css — capítulo de cierre ("Tu primera lección dura tres minutos.").
+   Solo valores de tokens.css. `.lp-closing` / `.lp-closing-inner` /
+   `.lp-closing-avatar` vienen de landing.css: aquí solo se añade lo propio.
+   ============================================================ */
+
+.cie-section {
+  position: relative;
+  isolation: isolate; /* contiene el z-index negativo de FondoVelas */
+  overflow: hidden;
+}
+
+.cie-avatar {
+  position: relative;
+}
+
+.cie-avatar-media {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* El video y su póster tienen fondo blanco: multiply lo funde con el papel del
+     cierre, igual que en /inicio (inicio.css). */
+  mix-blend-mode: multiply;
+}

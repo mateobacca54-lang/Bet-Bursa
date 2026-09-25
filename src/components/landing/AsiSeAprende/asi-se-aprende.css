@@ -1,0 +1,149 @@
+/* ============================================================
+   asi-se-aprende.css — capítulo "Así se aprende en Bursa."
+   Solo valores de tokens.css. Prefijo `asi-`, propio de este componente:
+   no toca ni redefine `lp-`, `met-` ni `cam-`.
+   ============================================================ */
+
+.asi-section {
+  background: var(--paper);
+}
+
+.asi-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+}
+
+.asi-heading {
+  max-width: 60ch;
+  margin-bottom: var(--space-8);
+}
+
+.asi-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-12);
+}
+
+.asi-step {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 52ch;
+}
+
+.asi-step-num {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--brand-600);
+  letter-spacing: var(--tracking-wide);
+}
+
+.asi-step-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(var(--font-size-2xl), 3vw, var(--font-size-3xl));
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+}
+
+.asi-step-body {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
+}
+
+/* Captura estática: móvil, o cualquier ancho con prefers-reduced-motion (AGENTS.md: bajo
+   movimiento reducido se quita el cruce, nunca la información). */
+.asi-step-shot {
+  width: min(100%, 260px);
+  margin-top: var(--space-2);
+}
+.asi-step-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ─── Celular fijo (solo modo inmersivo: ≥900px y sin reduced-motion) ─── */
+.asi-phone-wrap {
+  position: sticky;
+  top: calc(var(--lp-nav-h) + var(--space-8));
+  align-self: start;
+}
+
+.asi-phone {
+  position: relative;
+  width: min(100%, 340px, 38svh);
+  aspect-ratio: 390 / 844;
+  margin-inline: auto;
+  padding: var(--space-2);
+  background: var(--ink);
+  border-radius: calc(var(--radius-lg) * 1.7);
+  box-shadow: var(--shadow-md);
+}
+
+.asi-phone-notch {
+  position: absolute;
+  top: var(--space-2);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34%;
+  height: var(--space-3);
+  background: var(--ink);
+  border-radius: var(--radius-pill);
+  z-index: 2;
+}
+
+.asi-phone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--radius-lg) * 1.15);
+  background: var(--surface);
+  isolation: isolate;
+}
+
+.asi-screen {
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transition: opacity var(--duration-scene) var(--ease-out-expo);
+}
+.asi-screen[data-active='true'] {
+  opacity: 1;
+}
+
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  .asi-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
+    gap: var(--space-16);
+    align-items: start;
+  }
+  /* Suficiente alto por paso para que el IntersectionObserver distinga uno de
+     otro con margen, sin convertir esto en un track fijo calculado a mano. */
+  .asi-step {
+    min-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 899px) {
+  .asi-heading {
+    margin-bottom: var(--space-6);
+  }
+  .asi-steps {
+    gap: var(--space-8);
+  }
+}

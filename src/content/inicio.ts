@@ -50,7 +50,7 @@ export const WARM_UP: WarmUpConfig = {
     later:
       'Apostaste que en 10 años vale más. Puede pasar si esa plata crece, pero guardada tal cual, con el tiempo compra menos porque los precios suben.',
   },
-  outro: 'De eso trata el Módulo 1: por qué los precios suben y cómo hacer que el tiempo juegue a tu favor.',
+  outro: 'De eso trata Fundamentos del dinero: por qué los precios suben y cómo hacer que el tiempo juegue a tu favor.',
   cta: 'Ver el camino',
 };
 
@@ -66,11 +66,10 @@ export const MONEDITA_INTRO = {
 export const MODULO_1_BLURB =
   'Diez lecciones de menos de cinco minutos para entender cómo funciona el dinero en la vida real.';
 
-/** Módulo 2: solo se sabe que trata de "hacer trabajar la plata" (greeting-copy.ts, estado completo). */
+/** Vista previa del Módulo 2: nombre y pregunta salen de `content/modulos.ts` (RUTA-DE-APRENDIZAJE.md §3). */
 export const MODULO_2_PREVIEW = {
   number: 2,
-  /** Título provisional: sale de "El Módulo 2 es sobre hacerla trabajar". Cambiarlo cuando exista el temario. */
-  title: 'Hacer trabajar la plata',
+  title: 'Tu plata en el día a día',
   blurb: 'Lo que sigue cuando ya entiendes cómo funciona el dinero.',
 } as const;
 

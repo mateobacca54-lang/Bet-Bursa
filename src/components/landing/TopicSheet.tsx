@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { DURATION, EASE_OUT_EXPO, REDUCED_DURATION } from '@/lib/motion';
 import { Estampa } from '@/components/illus';
+import { nombreModulo } from '@/content/modulos';
 import type { LandingCard } from './landing-data';
 import './landing.css';
 
@@ -127,7 +128,7 @@ export default function TopicSheet({ card, origin, onClose }: TopicSheetProps) {
 
           <div className="lp-sheet-actions">
             <Link href="/inicio" className="lp-btn lp-btn--primary">
-              {card.available ? 'Empieza el Módulo 1' : 'Ver el Módulo 1'}
+              {card.available ? `Empieza ${nombreModulo(1)}` : `Ver ${nombreModulo(1)}`}
             </Link>
             <button ref={closeRef} type="button" className="lp-btn lp-btn--ghost" onClick={onClose}>
               Cerrar

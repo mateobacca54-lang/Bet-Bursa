@@ -1,0 +1,184 @@
+/* ============================================================
+   graficaConectada.css — GraficaConectada
+   Dos vistas conectadas: la gráfica (izquierda) y el bolsillo (derecha), lado a lado y
+   unidas por una guía punteada en pantallas anchas; apiladas sin scroll horizontal en
+   angostas (AGENTS.md).
+   ============================================================ */
+
+.gc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 560px;
+  font-family: var(--font-family);
+}
+
+.gc__year-label {
+  align-self: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--brand-700);
+}
+
+/* ─── Layout de las dos vistas ───
+   Grid de tres columnas: gráfica | conector | bolsillo. El conector es una columna
+   REAL (no un gap) para poder anclar ahí la línea punteada que sigue al bolsillo, a la
+   altura exacta del punto activo (ver `.gc__conector-linea`, posicionada por JS). */
+.gc__vistas {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) var(--space-8) minmax(0, 2fr);
+  align-items: stretch;
+}
+
+.gc-grafica-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.gc-grafica {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+}
+
+.gc__conector {
+  position: relative;
+}
+
+.gc__conector-linea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1.5px dashed var(--brand-600);
+  transform: translateY(-50%);
+}
+
+.gc-bolsillo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  height: 100%;
+  padding: var(--space-3) var(--space-2);
+  background: var(--paper-sunk);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.gc-bolsillo__titulo {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+}
+
+.gc-bolsillo__grid {
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+}
+
+.gc-bolsillo__sobrante {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--ink-secondary);
+}
+
+/* ─── La manija: <input type="range"> nativo, overlaid sobre el eje X de la gráfica ───
+   Su left/width/top los calcula GraficaConectada.tsx a partir de la misma geometría que
+   dibuja el punto (src/lib/graficaConectada.ts), así el thumb queda en el mismo x que
+   el punto resaltado para cualquier año. El track es transparente: lo único visible es
+   el thumb, que se lee como "el punto, proyectado al eje". Funciona con teclado
+   (flechas) de forma nativa. */
+.gc__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  transform: translateY(-50%);
+  height: var(--touch-min);
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+
+.gc__slider::-webkit-slider-runnable-track {
+  height: 1px;
+  background: transparent;
+}
+
+.gc__slider::-moz-range-track {
+  height: 1px;
+  background: transparent;
+}
+
+.gc__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -7.5px;
+  border-radius: 50%;
+  background: var(--brand-600);
+  border: 2px solid var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.gc__slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand-600);
+  border: 2px solid var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Foco: el mismo token que usa el resto de Bursa para elementos interactivos
+   (ej. DatoReal) — un contorno de 2 px en --brand-700, no un halo grueso a mano.
+   El input en sí no lleva su propio outline (es invisible, del ancho de toda el área
+   de datos): el anillo va solo en el thumb, que es la única parte visible. */
+.gc__slider:focus-visible {
+  outline: none;
+}
+
+.gc__slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--brand-700);
+  outline-offset: 2px;
+}
+
+.gc__slider:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--brand-700);
+  outline-offset: 2px;
+}
+
+.gc__frase {
+  margin: 0;
+  text-align: center;
+  font-size: var(--font-size-base);
+  color: var(--ink);
+  line-height: var(--line-height-normal);
+}
+
+/* Apilado en angosto: la gráfica arriba (a todo lo ancho), el bolsillo debajo. El
+   conector desaparece: no hay a dónde "seguir" en vertical, y la guía horizontal de la
+   propia gráfica ya termina en su borde derecho. */
+@media (max-width: 480px) {
+  .gc__vistas {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+  }
+
+  .gc__conector {
+    display: none;
+  }
+
+  .gc-bolsillo {
+    height: auto;
+  }
+}

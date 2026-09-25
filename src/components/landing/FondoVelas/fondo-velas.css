@@ -1,0 +1,30 @@
+/* ============================================================
+   fondo-velas.css — campo de velas del cierre.
+   Vive absoluto y a pantalla completa dentro de un ancestro con posición
+   (la sección debe llevar `position: relative` — normalmente también
+   `isolation: isolate`, para que el z-index negativo quede contenido).
+   ============================================================ */
+
+.fv-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fv-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fv-vela {
+  transition: opacity var(--duration-scene) var(--ease-out-expo), transform var(--duration-scene) var(--ease-out-expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fv-vela {
+    transition: none;
+  }
+}

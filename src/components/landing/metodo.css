@@ -9,6 +9,11 @@
   gap: var(--space-4);
   align-items: center;
   width: 100%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-6);
 }
 .met-copy { min-width: 0; }
 .met-steps {
@@ -24,7 +29,7 @@
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border-warm);
   border-radius: var(--radius-pill);
-  background: var(--surface-raised);
+  background: var(--paper);
   color: var(--ink);
   font: inherit;
   font-size: var(--font-size-sm);
@@ -143,8 +148,12 @@
   display: grid;
   grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
   gap: var(--space-4) var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border-warm);
+  margin-top: var(--space-8);
+  padding: var(--space-6) var(--space-8);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 .met-context-label {
   grid-column: 1 / -1;
@@ -166,11 +175,15 @@
   line-height: var(--line-height-normal);
 }
 @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-  .met-track { height: calc(2 * 80vh); }
+  /* 65vh por paso (no 80vh): la escena ya cabe cómoda en la tarjeta, así que no hace
+     falta casi una pantalla completa de scroll por paso — eso es lo que dejaba la
+     banda vacía al soltar el sticky. */
+  .met-track { height: calc(2 * 65vh); }
   .met-sticky {
     position: sticky;
     top: var(--lp-nav-h);
-    height: calc(100vh - var(--lp-nav-h));
+    min-height: calc(80vh - var(--lp-nav-h));
+    height: auto;
   }
 }
 @media (min-width: 900px) and (max-width: 1099px) {
@@ -192,5 +205,6 @@
 @media (max-width: 899px) {
   .met-money-stage { --met-stage-h: calc(var(--space-16) * 4.5); }
   .met-step-copy { min-height: calc(var(--space-16) * 3); }
-  .met-context { grid-template-columns: minmax(0, 1fr); }
+  .met-scene { padding: var(--space-4); }
+  .met-context { grid-template-columns: minmax(0, 1fr); padding: var(--space-6) var(--space-4); }
 }

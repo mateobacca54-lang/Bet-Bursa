@@ -1,0 +1,67 @@
+.dato-real {
+  margin-top: var(--space-8);
+}
+.dato-real-titulo {
+  margin: 0 0 var(--space-3) 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--brand-700);
+}
+.dato-real-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.dato-real-tarjeta {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+.dato-real-etiqueta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink-soft);
+}
+.dato-real-valor {
+  margin: var(--space-1) 0 var(--space-2) 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.dato-real-frase {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--ink);
+}
+.dato-real-fuente {
+  margin: var(--space-3) 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--ink-soft);
+}
+.dato-real-fuente a {
+  color: var(--brand-700);
+  text-underline-offset: 0.2em;
+}
+.dato-real-fuente a:focus-visible {
+  outline: 2px solid var(--brand-700);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.dato-real-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

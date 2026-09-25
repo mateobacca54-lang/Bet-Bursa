@@ -245,14 +245,18 @@
   /* Pista de 3×60vh: cada paso "cuesta" 60vh de scroll mientras el escenario, casi
      de una pantalla completa, se queda fijo. Así la sección entera cabe en una
      pantalla por paso, sin columnas vacías. */
+  /* 48vh por paso (no 60vh): menos scroll "muerto" por paso una vez el escenario
+     cabe cómodo en una pantalla. */
   .llp-escena-track {
-    height: calc(3 * 60vh);
+    height: calc(3 * 48vh);
     margin-top: 0;
   }
   .llp-escena-sticky {
     position: sticky;
     top: var(--lp-nav-h, calc(var(--space-16) + var(--space-2)));
-    min-height: calc(100vh - var(--lp-nav-h, calc(var(--space-16) + var(--space-2))));
+    /* 80vh, no 100vh: el resto es exactamente el hueco que quedaba en blanco al
+       soltar el sticky, porque esta caja sigue ocupando su alto en el flujo normal. */
+    min-height: calc(80vh - var(--lp-nav-h, calc(var(--space-16) + var(--space-2))));
     display: flex;
     align-items: center;
   }

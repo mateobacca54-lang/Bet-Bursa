@@ -1,5 +1,6 @@
 'use client';
 
+import { nombreModulo } from '@/content/modulos';
 import Link from 'next/link';
 import { MODULO_1, TEMARIO_MODULO_1 } from '@/content/modulo-1/temario';
 import { MISION_MODULO_1 } from '@/content/modulo-1/mision';
@@ -83,9 +84,6 @@ function NodoModulo({ modulo }: { modulo: ModuloResumen }) {
           color: modulo.status === 'soon' ? 'var(--ink-secondary)' : 'var(--ink)',
         }}
       >
-        Módulo {modulo.number}
-      </span>
-      <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--ink-secondary)', lineHeight: 'var(--line-height-tight)' }}>
         {modulo.status === 'soon' ? 'Próximamente' : modulo.title}
       </span>
     </div>
@@ -113,7 +111,7 @@ function FilaModulo({ modulo }: { modulo: ModuloResumen }) {
       }}
     >
       <span style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--ink)' }}>
-        M{modulo.number} · {modulo.title}
+        {modulo.title}
       </span>
       {modulo.status === 'soon' ? (
         <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--ink-secondary)' }}>Próximamente</span>
@@ -143,7 +141,7 @@ export default function Progreso({ progress, now, hydrated, onMisionHecha }: Pro
     <AppShell
       completed={view.totalHechas}
       total={view.totalLecciones}
-      moduleLabel="Módulo 1"
+      moduleLabel={nombreModulo(1)}
       streakDays={getCurrentStreak(progress, now)}
       active="progreso"
     >
