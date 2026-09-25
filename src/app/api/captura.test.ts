@@ -19,12 +19,22 @@ const evento = { moduloId: 'modulo-1', numero: 1, primerIntento: true, aprobado:
 
 describe('rutas de captura', () => {
   it('suscribir confirma aunque no se haya podido enviar el correo interno', async () => {
-    const res = await suscribir(request({ correo: ' persona@ejemplo.com ' }));
+    const res = await suscribir(request({ correo: ' persona@ejemplo.com ', consentimiento: true, versionPolitica: '2026-09-25' }));
     expect(await res.json()).toEqual({ ok: true });
-    expect(enviarCorreoInterno).toHaveBeenLastCalledWith({ asunto: 'Bursa · Nueva suscripción', cuerpo: 'persona@ejemplo.com' });
+    expect(enviarCorreoInterno).toHaveBeenLastCalledWith({
+      asunto: 'Bursa · Nueva suscripción',
+      cuerpo: expect.stringContaining('Correo: persona@ejemplo.com'),
+    });
     expect(pasaElLimite).toHaveBeenLastCalledWith('ip-prueba');
   });
-  it.each([null, {}, { correo: 'no-es-correo' }, { correo: 42 }])('rechaza suscripción inválida %j', async (datos) => {
+  it.each([
+    null,
+    {},
+    { correo: 'no-es-correo', consentimiento: true },
+    { correo: 42, consentimiento: true },
+    { correo: 'persona@ejemplo.com' },
+    { correo: 'persona@ejemplo.com', consentimiento: false },
+  ])('rechaza suscripción inválida %j', async (datos) => {
     expect((await suscribir(request(datos))).status).toBe(400);
   });
   it('medir registra una sola línea con solo los campos acordados', async () => {
@@ -41,7 +51,7 @@ describe('rutas de captura', () => {
   it.each([medir, suscribir, reporte])('rechaza JSON ilegible y aplica el límite', async (post) => {
     expect((await post(new Request('http://localhost/api', { method: 'POST', body: '{' }))).status).toBe(400);
     vi.mocked(pasaElLimite).mockReturnValue(false);
-    expect((await post(request({ ...evento, correo: 'persona@ejemplo.com', motivo: 'otra' }))).status).toBe(429);
+    expect((await post(request({ ...evento, correo: 'persona@ejemplo.com', consentimiento: true, motivo: 'otra' }))).status).toBe(429);
   });
   it.each([true, false])('reporte conserva el contrato enviado=%s y su contenido', async (enviado) => {
     vi.mocked(enviarCorreoInterno).mockResolvedValue({ enviado });

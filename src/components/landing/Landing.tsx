@@ -199,6 +199,9 @@ export default function Landing() {
             <li>
               <a href={INSTITUCIONES_MAILTO}>Escríbenos</a>
             </li>
+            <li>
+              <Link href="/privacidad">Política de datos</Link>
+            </li>
           </ul>
         </div>
       </footer>

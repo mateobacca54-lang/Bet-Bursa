@@ -28,15 +28,27 @@ export const CorreoInvalido: Story = {
     await expect(globalThis.fetch).not.toHaveBeenCalled();
   },
 };
-export const CorreoValido: Story = {
+export const SinConsentimiento: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.type(canvas.getByRole('textbox'), 'persona@ejemplo.com');
     await userEvent.click(canvas.getByRole('button', { name: 'Avísame' }));
+    await expect(canvas.getByRole('alert')).toHaveTextContent('Necesitamos que marques la casilla para poder avisarte.');
+    await expect(args.onAnswer).not.toHaveBeenCalled();
+    await expect(globalThis.fetch).not.toHaveBeenCalled();
+  },
+};
+export const CorreoValido: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.type(canvas.getByRole('textbox'), 'persona@ejemplo.com');
+    await userEvent.click(canvas.getByRole('checkbox'));
+    await userEvent.click(canvas.getByRole('button', { name: 'Avísame' }));
     await expect(canvas.getByRole('status')).toHaveTextContent('Listo. Te escribo cuando esté.');
     await expect(args.onAnswer).toHaveBeenCalledOnce();
     await expect(globalThis.fetch).toHaveBeenCalledWith('/api/suscribir', expect.objectContaining({
-      method: 'POST', body: JSON.stringify({ correo: 'persona@ejemplo.com' }),
+      method: 'POST',
+      body: JSON.stringify({ correo: 'persona@ejemplo.com', consentimiento: true, versionPolitica: '2026-09-25' }),
     }));
   },
 };
