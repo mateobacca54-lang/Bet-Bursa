@@ -8,6 +8,7 @@ import { DURATION, EASE_IN_OUT, REDUCED_DURATION, staggerDelay } from '@/lib/mot
 import Reveal from '@/components/motion/Reveal';
 import { Estampa } from '@/components/illus';
 import { HERO_LEFT, HERO_RIGHT, type LandingCard } from './landing-data';
+import { nombreModulo } from '@/content/modulos';
 import TopicSheet from './TopicSheet';
 import './landing.css';
 
@@ -148,7 +149,7 @@ export default function StickyHero() {
           <Reveal delay={0.18}>
             <div className="lp-actions">
               <Link href="/inicio" className="lp-btn lp-btn--primary">
-                Empieza el Módulo 1
+                Empieza {nombreModulo(1)}
                 <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style={{ flexShrink: 0 }}>
                   <path d="M3 9h11M10 4l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BursaLogo from './BursaLogo';
 import { Imagotipo } from '@/components/brand';
+import { nombreModulo } from '@/content/modulos';
 import HeroScrollScene from './HeroScrollScene';
 import ApareceAlBajar from './ApareceAlBajar';
 import LeeLaLetra from './LeeLaLetra';
@@ -12,7 +13,7 @@ import './landing.css';
 const INSTITUCIONES_MAILTO = 'mailto:soy.bursa.co@gmail.com?subject=Bursa%20para%20instituciones';
 
 const INSTITUCIONES_LISTA = [
-  'Las 10 lecciones del Módulo 1 están listas.',
+  `Las 10 lecciones de ${nombreModulo(1)} están listas.`,
   'Tus estudiantes entran sin crear cuenta.',
   'Es gratis para ellos.',
 ];

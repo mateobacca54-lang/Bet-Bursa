@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import PruebaCheckpoint from './PruebaCheckpoint';
+import { MODULO_1 } from '@/content/modulo-1/temario';
 
 const meta = {
   title: 'Prueba/PruebaCheckpoint',
@@ -14,7 +15,7 @@ const meta = {
     },
   },
   tags: ['autodocs'],
-  args: { moduleNumber: 1, href: '/modulo/1/prueba', delay: 0 },
+  args: { moduleName: MODULO_1.title, href: '/modulo/1/prueba', delay: 0 },
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 640, background: 'var(--ink)', padding: 24, borderRadius: 12 }}>

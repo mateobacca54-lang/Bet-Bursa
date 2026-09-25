@@ -1,5 +1,6 @@
 'use client';
 
+import { nombreModulo } from '@/content/modulos';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { MODULO_1, TEMARIO_MODULO_1 } from '@/content/modulo-1/temario';
@@ -51,7 +52,7 @@ export default function Inicio({ progress, now, hydrated }: InicioProps) {
     <AppShell
       completed={view.greeting.completedCount}
       total={total}
-      moduleLabel="Módulo 1"
+      moduleLabel={nombreModulo(1)}
       streakDays={getCurrentStreak(progress, now)}
       active="inicio"
     >

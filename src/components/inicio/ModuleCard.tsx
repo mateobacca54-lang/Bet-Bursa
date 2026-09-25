@@ -39,7 +39,6 @@ export default function ModuleCard({ card, title, blurb }: ModuleCardProps) {
       whileHover={soon || reduced ? undefined : variants.hoverLift}
     >
       <div>
-        <p className="ini-card-eyebrow uppercase-tracking">Módulo {card.number}</p>
         <h3 id={`ini-modulo-${card.number}`} className="ini-card-title">
           {title}
         </h3>
@@ -53,7 +52,7 @@ export default function ModuleCard({ card, title, blurb }: ModuleCardProps) {
         {(status === 'in-progress' || status === 'complete') && completed !== null && total !== null && (
           <div className="ini-card-progress">
             <span className="ini-chip">{status === 'complete' ? 'Módulo completo' : `Llevas ${completed} de ${total}`}</span>
-            <ProgressBar value={completed} max={total} label={`Progreso del módulo ${card.number}`} />
+            <ProgressBar value={completed} max={total} label={`Progreso de ${title}`} />
           </div>
         )}
 
@@ -62,7 +61,7 @@ export default function ModuleCard({ card, title, blurb }: ModuleCardProps) {
             <Link
               href={href}
               className={`ini-btn uppercase-tracking ${status === 'complete' ? 'ini-btn--quiet' : ''}`}
-              aria-label={`${CTA_LABEL[status]}: Módulo ${card.number}, ${title}`}
+              aria-label={`${CTA_LABEL[status]}: ${title}`}
             >
               {CTA_LABEL[status]}
             </Link>

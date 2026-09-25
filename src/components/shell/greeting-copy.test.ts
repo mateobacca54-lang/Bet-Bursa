@@ -76,7 +76,7 @@ describe('Textos del saludo', () => {
   it('estado 3 (nuevo): las 10 hechas, prueba pendiente', () => {
     const c = copyOf(STATES[3]);
     expect(c.title).toEqual({ before: 'Hola, ', name: 'Mateo', after: '.' });
-    expect(c.cta).toBe('Hacer la prueba del Módulo 1');
+    expect(c.cta).toBe('Hacer la prueba de Fundamentos del dinero');
     // no dice "terminaste": terminar las lecciones no es lo mismo que terminar el módulo
     expect(allText(c)).not.toMatch(/terminaste/i);
     expect(copyOf({ ...STATES[3], userName: null }).title).toEqual({ before: 'Hola.', name: null, after: '' });
@@ -84,9 +84,9 @@ describe('Textos del saludo', () => {
 
   it('estado 4: módulo completo, solo tras aprobar la prueba', () => {
     const c = copyOf(STATES[4]);
-    expect(c.title).toEqual({ before: 'Terminaste el Módulo 1, ', name: 'Mateo', after: '.' });
-    expect(c.cta).toBe('Ver el Módulo 2');
-    expect(copyOf({ ...STATES[4], userName: null }).title.before).toBe('Terminaste el Módulo 1.');
+    expect(c.title).toEqual({ before: 'Terminaste Fundamentos del dinero, ', name: 'Mateo', after: '.' });
+    expect(c.cta).toBe('Ver lo que sigue');
+    expect(copyOf({ ...STATES[4], userName: null }).title.before).toBe('Terminaste Fundamentos del dinero.');
   });
 
   it('solo el estado 2 propone repaso', () => {

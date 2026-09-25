@@ -6,7 +6,7 @@ import { Reveal } from '@/components/motion';
 import { useTapaAyuda } from '@/lib/useEvitarAyuda';
 
 interface PruebaCheckpointProps {
-  moduleNumber: number;
+  moduleName: string;
   href: string;
   /** Segundos de espera antes de entrar */
   delay?: number;
@@ -30,7 +30,7 @@ interface PruebaCheckpointProps {
  * useEvitarAyuda ya no tendría contra qué medir, "tapada" volvería a false, la tarjeta
  * reaparecería tapada, y así en bucle. Oculta pero presente, se puede seguir midiendo.
  */
-export default function PruebaCheckpoint({ moduleNumber, href, delay = 0 }: PruebaCheckpointProps) {
+export default function PruebaCheckpoint({ moduleName, href, delay = 0 }: PruebaCheckpointProps) {
   const ref = useRef<HTMLAnchorElement>(null);
   const tapada = useTapaAyuda(ref);
 
@@ -83,7 +83,7 @@ export default function PruebaCheckpoint({ moduleNumber, href, delay = 0 }: Prue
             className="uppercase-tracking"
             style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--brand-700)' }}
           >
-            Prueba del Módulo {moduleNumber}
+            Prueba de {moduleName}
           </span>
           <span style={{ display: 'block', fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--ink)' }}>
             Ya viste las 10 lecciones. Falta comprobar qué tanto quedó.

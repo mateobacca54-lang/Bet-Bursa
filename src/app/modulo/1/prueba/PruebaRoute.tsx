@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MODULO_1 } from '@/content/modulo-1/temario';
+import { nombreModulo } from '@/content/modulos';
 import { PRUEBA_MODULO_1 } from '@/content/modulo-1/prueba';
 import { getNextLesson } from '@/lib/progress';
 import { useProgress } from '@/lib/useProgress';
@@ -75,7 +76,7 @@ export default function PruebaRoute() {
     <PruebaDePaso
       situaciones={PRUEBA_MODULO_1}
       moduleNumber={1}
-      moduleTitle={MODULO_1.title}
+      moduleTitle={nombreModulo(1)}
       exitHref={PATH_HREF}
       onAprobada={() => {
         pass();

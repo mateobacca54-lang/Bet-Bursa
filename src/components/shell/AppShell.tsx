@@ -14,7 +14,7 @@ interface AppShellProps {
   /** Lecciones completadas del módulo actual */
   completed: number;
   total: number;
-  /** Etiqueta del módulo, ej. "Módulo 1" */
+  /** Nombre del módulo, ej. "Fundamentos del dinero" (los módulos se muestran por nombre, no por número) */
   moduleLabel: string;
   streakDays: number;
   active?: SidebarItemId;
@@ -63,7 +63,7 @@ export default function AppShell({
                 <RollingNumber value={completed} /> de {total}
               </span>
             </span>
-            <ProgressBar value={completed} max={total} label={`Progreso del ${moduleLabel.toLowerCase()}`} />
+            <ProgressBar value={completed} max={total} label={`Progreso de ${moduleLabel}`} />
           </div>
 
           <StreakBadge days={streakDays} />

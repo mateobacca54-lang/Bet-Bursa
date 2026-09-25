@@ -11,6 +11,7 @@
 
 import type { GreetingData } from '@/lib/greeting';
 import type { TemarioEntry } from '@/content/modulo-1/temario';
+import { nombreModulo, siguienteModulo } from '@/content/modulos';
 
 export type CopySegment =
   | { kind: 'text'; text: string }
@@ -27,6 +28,16 @@ export interface GreetingCopy {
 
 function totalInWords(total: number): string {
   return total === 10 ? 'Diez' : String(total);
+}
+
+/**
+ * Convierte una pregunta de catálogo ("¿A dónde se va la plata del mes?") en una cláusula
+ * que encaja a mitad de frase ("a dónde se va la plata del mes"): sin signos de interrogación
+ * y con la primera letra en minúscula.
+ */
+function comoClausula(pregunta: string): string {
+  const sinSignos = pregunta.replace(/^¿/, '').replace(/\?$/, '');
+  return sinSignos.charAt(0).toLowerCase() + sinSignos.slice(1);
 }
 
 export function getGreetingCopy(
@@ -98,23 +109,24 @@ export function getGreetingCopy(
             text: `Ya viste las ${totalInWords(data.totalLessons).toLowerCase()} lecciones. Antes de seguir, comprueba qué tanto quedó.`,
           },
         ],
-        cta: `Hacer la prueba del Módulo ${moduleNumber}`,
+        cta: `Hacer la prueba de ${nombreModulo(moduleNumber)}`,
         review: null,
       };
 
-    case 'complete':
+    case 'complete': {
+      const nombre = nombreModulo(moduleNumber);
+      const siguiente = siguienteModulo(moduleNumber);
+      const subText = siguiente
+        ? `Ya entiendes cómo funciona la plata. Lo que sigue es «${siguiente.nombre}»: ${comoClausula(siguiente.pregunta)}.`
+        : 'Ya entiendes cómo funciona la plata.';
       return {
         title: name
-          ? { before: `Terminaste el Módulo ${moduleNumber}, `, name, after: '.' }
-          : { before: `Terminaste el Módulo ${moduleNumber}.`, name: null, after: '' },
-        sub: [
-          {
-            kind: 'text',
-            text: `Ya entiendes cómo funciona la plata. El Módulo ${moduleNumber + 1} es sobre hacerla trabajar.`,
-          },
-        ],
-        cta: `Ver el Módulo ${moduleNumber + 1}`,
+          ? { before: `Terminaste ${nombre}, `, name, after: '.' }
+          : { before: `Terminaste ${nombre}.`, name: null, after: '' },
+        sub: [{ kind: 'text', text: subText }],
+        cta: siguiente ? 'Ver lo que sigue' : 'Volver al camino',
         review: null,
       };
+    }
   }
 }

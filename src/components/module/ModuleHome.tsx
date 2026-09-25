@@ -1,5 +1,6 @@
 'use client';
 
+import { nombreModulo } from '@/content/modulos';
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MODULO_1, TEMARIO_MODULO_1 } from '@/content/modulo-1/temario';
@@ -68,7 +69,7 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
     <AppShell
       completed={live.completedCount}
       total={total}
-      moduleLabel="Módulo 1"
+      moduleLabel={nombreModulo(1)}
       streakDays={getCurrentStreak(progress, now)}
     >
       <div className="bursa-hero" style={{ minHeight: 340, display: 'flex', alignItems: 'center' }}>
@@ -108,7 +109,7 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
                   color: 'var(--brand-700)',
                 }}
               >
-                Módulo 1
+                Módulo en curso
               </span>
               <h2
                 id="camino-titulo"
@@ -169,7 +170,7 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
         )}
 
         {hydrated && greeting.state === 'awaiting-test' && (
-          <PruebaCheckpoint moduleNumber={1} href="/modulo/1/prueba" delay={0.5} />
+          <PruebaCheckpoint moduleName={nombreModulo(1)} href="/modulo/1/prueba" delay={0.5} />
         )}
       </motion.section>
     </AppShell>
