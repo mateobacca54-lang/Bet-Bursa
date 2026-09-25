@@ -1,6 +1,6 @@
 import { ModuleProgress, daysBetween, toDateKey } from './progress';
 
-export type GreetingState = 'first-time' | 'in-progress' | 'returning-late' | 'complete';
+export type GreetingState = 'first-time' | 'in-progress' | 'returning-late' | 'awaiting-test' | 'complete';
 
 export interface GreetingData {
   state: GreetingState;
@@ -35,11 +35,13 @@ export function getGreetingState(progress: ModuleProgress, now: Date, totalLesso
   }
 
   let state: GreetingState = 'in-progress';
-  
+
   if (completedCount === 0) {
     state = 'first-time';
   } else if (completedCount >= totalLessons) {
-    state = 'complete';
+    // Las 10 lecciones no bastan: sin aprobar la prueba de paso no se avanza (ARQUITECTURA §2,
+    // principio "se avanza demostrando, no asistiendo"). 'complete' solo llega tras aprobarla.
+    state = progress.pruebaAprobada ? 'complete' : 'awaiting-test';
   } else if (progress.lastActiveDate) {
     const diff = daysBetween(progress.lastActiveDate, toDateKey(now));
     if (diff >= 3 && reviewLesson !== null) {

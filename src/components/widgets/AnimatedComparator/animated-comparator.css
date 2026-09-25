@@ -1,0 +1,64 @@
+.bursa-comparator {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-warm);
+  background:
+    linear-gradient(150deg, var(--surface-raised) 0%, var(--sand-50) 100%);
+}
+
+.bursa-comparator__title {
+  max-width: 27ch;
+  font-family: var(--font-serif);
+  font-size: clamp(var(--font-size-xl), 3vw, var(--font-size-2xl));
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.bursa-comparator__description {
+  max-width: 60ch;
+}
+
+.bursa-comparator__chart {
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-raised) 85%, var(--sand-100));
+}
+
+.bursa-comparator__action {
+  min-height: var(--touch-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-8);
+  color: var(--on-brand);
+  background: var(--brand-600);
+  box-shadow: 0 5px 0 var(--brand-800);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.bursa-comparator__action:hover:not(:disabled) {
+  background: var(--brand-500);
+}
+
+.bursa-comparator__action:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--brand-800);
+}
+
+.bursa-comparator__action:disabled {
+  cursor: not-allowed;
+}
+
+/* En un lienzo SVG comprimido los ejes se vuelven ruido visual. El valor del
+   punto y la leyenda siguen visibles, que son los datos accionables. */
+@media (max-width: 480px) {
+  .bursa-comparator__axis-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bursa-comparator__action { transition: none; }
+}

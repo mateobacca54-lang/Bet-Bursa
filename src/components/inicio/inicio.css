@@ -1,0 +1,364 @@
+/* ============================================================
+   inicio.css — pantalla /inicio (entre la landing y el camino).
+   Solo valores de tokens.css. Breakpoint de 720 px: a partir de ahí
+   Monedita queda a la izquierda y su globo a la derecha.
+   ============================================================ */
+
+/* ─── Héroe: Monedita + globo ─── */
+.ini-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: center;
+  padding: var(--space-8) var(--space-4);
+  background: var(--sand-100);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+@media (min-width: 720px) {
+  .ini-hero {
+    grid-template-columns: minmax(200px, 300px) minmax(0, 1fr);
+    gap: var(--space-12);
+    padding: var(--space-12);
+  }
+}
+
+/* ─── Escenario de Monedita: halo de oro y sombra en el piso (estáticos, entran con ella) ─── */
+.ini-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.ini-monedita {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 168px;
+}
+
+@media (min-width: 720px) {
+  .ini-monedita {
+    max-width: 240px;
+  }
+}
+
+.ini-monedita::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 4% -10% 2%;
+  border-radius: var(--radius-pill);
+  background: radial-gradient(circle at 50% 45%, var(--gold-100) 0%, var(--gold-100) 38%, transparent 70%);
+  pointer-events: none;
+}
+
+.ini-monedita img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.ini-monedita-shadow {
+  width: 62%;
+  height: var(--space-3);
+  margin: var(--space-1) auto 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ink) 16%, transparent);
+  filter: blur(4px);
+}
+
+/* ─── Globo de Monedita ─── */
+.ini-bubble {
+  position: relative;
+  min-height: 220px;
+  padding: var(--space-6);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Colita del globo: apunta a Monedita (arriba en móvil, a la izquierda en escritorio) */
+.ini-bubble::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--space-3) * -1);
+  left: 50%;
+  width: var(--space-6);
+  height: var(--space-6);
+  margin-left: calc(var(--space-3) * -1);
+  background: var(--surface-raised);
+  border-top: 1px solid var(--border-warm);
+  border-left: 1px solid var(--border-warm);
+  transform: rotate(45deg);
+}
+
+@media (min-width: 720px) {
+  .ini-bubble {
+    padding: var(--space-8);
+  }
+  .ini-bubble::before {
+    top: 50%;
+    left: calc(var(--space-3) * -1);
+    margin: calc(var(--space-3) * -1) 0 0;
+    border-top: none;
+    border-left: 1px solid var(--border-warm);
+    border-bottom: 1px solid var(--border-warm);
+  }
+}
+
+.ini-eyebrow {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--brand-700);
+}
+
+.ini-title {
+  margin: 0;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.ini-title em {
+  font-style: normal;
+  color: var(--brand-700);
+}
+
+.ini-lead {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-normal);
+  color: var(--ink-secondary);
+  text-wrap: balance;
+}
+
+.ini-lead strong {
+  color: var(--ink);
+  font-weight: var(--font-weight-bold);
+}
+
+/* ─── Botón principal (mismo aspecto que el del saludo del camino) ─── */
+.ini-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+  padding: var(--space-3) var(--space-8);
+  background: var(--brand-600);
+  color: var(--on-brand);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+@media (max-width: 719px) {
+  .ini-btn {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--font-size-sm);
+    text-align: left;
+  }
+}
+
+.ini-btn--quiet {
+  background: transparent;
+  color: var(--brand-700);
+  box-shadow: none;
+  border: 2px solid var(--brand-600);
+}
+
+.ini-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+/* ─── Apuesta ─── */
+.ini-question {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.ini-hint {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--ink-secondary);
+}
+
+.ini-options {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ini-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 2px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+}
+
+/* En táctil el :hover se queda pegado tras el toque: solo con puntero fino. */
+@media (hover: hover) and (pointer: fine) {
+  .ini-option[aria-disabled='false']:hover {
+    border-color: var(--brand-500);
+  }
+}
+
+.ini-option[aria-disabled='true'] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.ini-option[data-picked='true'] {
+  opacity: 1;
+  background: var(--gold-100);
+  border-color: var(--gold-500);
+}
+
+/* ─── Chip de logro (oro): "Tu apuesta", "Llevas 2 de 10" ─── */
+.ini-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--gold-100);
+  color: var(--gold-700);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+/* ─── Revelación de Monedita ─── */
+.ini-reveal {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px dashed var(--border-warm);
+}
+
+.ini-reveal p {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--ink);
+}
+
+.ini-reveal p + p {
+  margin-top: var(--space-3);
+  color: var(--ink-secondary);
+}
+
+/* ─── Módulos ─── */
+.ini-modules-title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+}
+
+.ini-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .ini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ini-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-6);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.ini-card[data-status='soon'] {
+  background: var(--sand-50);
+  border: 2px dashed var(--border-warm);
+  box-shadow: none;
+}
+
+.ini-card-eyebrow {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--brand-700);
+}
+
+.ini-card[data-status='soon'] .ini-card-eyebrow {
+  color: var(--ink-secondary);
+}
+
+.ini-card-title {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+}
+
+.ini-card-blurb {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--ink-secondary);
+}
+
+.ini-card-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+.ini-card-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}

@@ -9,9 +9,12 @@ import type { WidgetState } from '@/lib/types';
 import ProgressBar from '@/components/shell/ProgressBar';
 import { DURATION, EASE_OUT_EXPO } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { useReservarEsquina } from '@/lib/useReservarEsquina';
 import { StepHook, StepConcept, StepExample, StepPractice, StepSummary } from './LessonSteps';
+import { escenaDeLeccion } from '@/content/modulo-1/escenas';
 import PracticeWidget from './PracticeWidget';
 import NamePrompt from './NamePrompt';
+import EmailPrompt from './EmailPrompt';
 
 const STEP_NAMES = ['Gancho', 'Concepto', 'Ejemplo', 'Práctica', 'Resumen'] as const;
 const LAST = STEP_NAMES.length - 1;
@@ -29,6 +32,9 @@ interface LessonPlayerProps {
   /** Si se debe preguntar el nombre en el resumen (solo tras la lección 1, una vez) */
   askName?: boolean;
   onName?: (name: string) => void;
+  /** Si se debe ofrecer avisar por correo (solo tras la lección 1, una vez) */
+  askEmail?: boolean;
+  onEmailAnswered?: () => void;
 }
 
 /**
@@ -39,11 +45,26 @@ interface LessonPlayerProps {
  * El paso de práctica no deja avanzar hasta acertar o ver la respuesta (tras 3 fallos
  * el widget la revela): así nadie sigue sin haber intentado, pero nadie queda atascado.
  */
-export default function LessonPlayer({ entry, content, exitHref, onFinish, askName = false, onName }: LessonPlayerProps) {
+export default function LessonPlayer({
+  entry,
+  content,
+  exitHref,
+  onFinish,
+  askName = false,
+  onName,
+  askEmail = false,
+  onEmailAnswered,
+}: LessonPlayerProps) {
   const reduced = usePrefersReducedMotion();
-  // Se decide al montar: al guardar el nombre `askName` pasa a false y el formulario
-  // desaparecería antes de mostrar su confirmación.
+  // El botón de ayuda (fijo, misma esquina) sube para no montarse sobre "Continuar".
+  const pieRef = useReservarEsquina<HTMLElement>();
+  // Se deciden al montar: si cambiaran a mitad de camino, el formulario que ya se
+  // está mostrando desaparecería antes de mostrar su propia confirmación.
   const [showName] = useState(askName);
+  const [showEmail] = useState(askEmail);
+  // Una pregunta a la vez: el correo no aparece hasta que el nombre ya se contestó
+  // (o si no había nombre que preguntar, aparece de una vez).
+  const [nameDone, setNameDone] = useState(!showName);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [practiceDone, setPracticeDone] = useState(false);
@@ -158,9 +179,9 @@ export default function LessonPlayer({ entry, content, exitHref, onFinish, askNa
             exit={{ opacity: 0, x: -shift * direction }}
             transition={stepTransition}
           >
-            {step === 0 && <StepHook lessonNumber={entry.number} title={entry.title} hook={entry.hook} />}
+            {step === 0 && <StepHook lessonNumber={entry.number} title={entry.title} hook={entry.hook} scene={escenaDeLeccion(entry.number)} />}
             {step === 1 && <StepConcept keyConcept={entry.keyConcept} explanation={content.explanation} />}
-            {step === 2 && <StepExample example={content.example} />}
+            {step === 2 && <StepExample example={content.example} lesson={entry.number} />}
             {step === 3 && (
               <StepPractice>
                 <PracticeWidget spec={content.practice} onStateChange={onPracticeState} />
@@ -168,7 +189,16 @@ export default function LessonPlayer({ entry, content, exitHref, onFinish, askNa
             )}
             {step === 4 && (
               <StepSummary summary={content.summary}>
-                {showName && onName ? <NamePrompt onAnswer={onName} /> : null}
+                {showName && onName && !nameDone ? (
+                  <NamePrompt
+                    onAnswer={(name) => {
+                      onName(name);
+                      setNameDone(true);
+                    }}
+                  />
+                ) : showEmail && onEmailAnswered ? (
+                  <EmailPrompt onAnswer={onEmailAnswered} />
+                ) : null}
               </StepSummary>
             )}
           </motion.div>
@@ -176,6 +206,7 @@ export default function LessonPlayer({ entry, content, exitHref, onFinish, askNa
       </main>
 
       <footer
+        ref={pieRef}
         style={{
           position: 'sticky',
           bottom: 0,

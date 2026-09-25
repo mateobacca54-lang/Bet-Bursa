@@ -18,7 +18,7 @@ const MAX_SHIFT = 12;
 const DRIFT = 6;
 
 interface PaperProps {
-  name: 'statement' | 'bill' | 'candles' | 'receipt' | 'headline';
+  name: 'statement' | 'candles' | 'receipt' | 'headline';
   /** Cuánto se mueve con el cursor: 0 = nada, 1 = el máximo */
   depth: number;
   /** Inclinación en grados (PLAN §4.2: entre −6° y 6°) */
@@ -90,34 +90,6 @@ function Statement() {
       <div style={row}><span>Retiro</span><span>− $80.000</span></div>
       <div style={{ ...row, borderTop: '1px dashed var(--border)', marginTop: 'var(--space-2)', paddingTop: 'var(--space-2)' }}>
         <span>Tasa E.A.</span><span style={{ color: 'var(--brand-700)', fontWeight: 'var(--font-weight-semibold)' }}>8,5 %</span>
-      </div>
-    </div>
-  );
-}
-
-function Bill() {
-  return (
-    <div
-      style={{
-        width: 152,
-        height: 76,
-        background: 'var(--brand-100)',
-        border: '2px solid var(--brand-300)',
-        borderRadius: 'var(--radius-sm)',
-        boxShadow: 'var(--shadow-md)',
-        padding: 'var(--space-2) var(--space-3)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        color: 'var(--brand-800)',
-      }}
-    >
-      <div style={{ width: 34, height: 34, borderRadius: 'var(--radius-pill)', border: '2px solid var(--brand-400)' }} />
-      <div style={{ textAlign: 'right', lineHeight: 1.1 }}>
-        <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)' }}>50.000</div>
-        <div className="uppercase-tracking" style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)' }}>
-          pesos
-        </div>
       </div>
     </div>
   );
@@ -196,6 +168,11 @@ function Headline() {
  * precio). Decorativo: aria-hidden. Parallax con el cursor (tope 12 px, solo con
  * puntero fino) y deriva en reposo. Bajo prefers-reduced-motion se DESMONTA entero.
  * Debe colocarse dentro de un contenedor con position: relative.
+ *
+ * REGLA: un papel decorativo NUNCA tapa información. Viven solo en los huecos laterales del
+ * saludo (que mide máx. 600 px), dentro de los límites del héroe, y solo se muestran si el
+ * hueco los aloja con margen para inclinación, deriva y parallax (floating-papers.css).
+ * Si no caben, no se muestran.
  */
 export default function FloatingPapers() {
   const reduced = usePrefersReducedMotion();
@@ -224,10 +201,9 @@ export default function FloatingPapers() {
   return (
     <div className="bursa-papers" aria-hidden="true">
       <Paper name="statement" depth={0.9} tilt={-5} period={7.5} delay={0.5} {...shared}><Statement /></Paper>
-      <Paper name="bill" depth={0.5} tilt={6} period={9} delay={0.7} {...shared}><Bill /></Paper>
       <Paper name="candles" depth={1} tilt={4} period={6.5} delay={0.6} {...shared}><Candles /></Paper>
       <Paper name="receipt" depth={0.7} tilt={-6} period={8} delay={0.8} {...shared}><Receipt /></Paper>
-      <Paper name="headline" depth={0.4} tilt={-3} period={8.5} delay={0.9} {...shared}><Headline /></Paper>
+      <Paper name="headline" depth={0.4} tilt={-3} period={8.5} delay={0.7} {...shared}><Headline /></Paper>
     </div>
   );
 }

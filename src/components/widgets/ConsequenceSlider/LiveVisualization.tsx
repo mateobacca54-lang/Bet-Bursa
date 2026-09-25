@@ -4,7 +4,9 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { formatCOP } from '@/lib/format';
+import { DURATION, EASE_OUT_QUART, staggerDelay } from '@/lib/motion';
 import type { DataPoint } from '@/lib/types';
+import './LiveVisualization.css';
 
 interface LiveVisualizationProps {
   /** Serie de datos [{x: año, y: precio}] */
@@ -79,6 +81,7 @@ export default function LiveVisualization({
 
   return (
     <div
+      className="bursa-price-visual"
       style={{
         width: '100%',
         maxWidth: SVG_WIDTH,
@@ -96,13 +99,14 @@ export default function LiveVisualization({
           key={currentPrice}
           initial={shouldReduceMotion ? false : { y: 8, opacity: 0.5 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: shouldReduceMotion ? 0 : DURATION.micro, ease: EASE_OUT_QUART }}
           style={{
             fontFamily: 'var(--font-family)',
             fontSize: 'var(--font-size-3xl)',
             fontWeight: 'var(--font-weight-bold)',
             color: exceeds ? 'var(--brand-700)' : 'var(--ink)',
             lineHeight: 'var(--line-height-tight)',
+            fontVariantNumeric: 'tabular-nums',
           }}
         >
           {formatCOP(currentPrice)}
@@ -162,15 +166,15 @@ export default function LiveVisualization({
           opacity={0.6}
         />
         <text
-          x={SVG_WIDTH - PADDING.right + 4}
-          y={targetLineY + 4}
-          textAnchor="start"
+          x={SVG_WIDTH - PADDING.right}
+          y={Math.max(16, targetLineY - 8)}
+          textAnchor="end"
           fill="var(--brand-700)"
           fontSize={11}
           fontFamily="var(--font-family)"
           fontWeight={600}
         >
-          Meta: {formatCOP(targetPrice)}
+          Referencia: {formatCOP(targetPrice)}
         </text>
 
         {/* Eje X baseline */}
@@ -206,9 +210,9 @@ export default function LiveVisualization({
                       : 'var(--brand-300)'
                     : 'var(--border)'
                 }
-                initial={shouldReduceMotion ? false : { scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 0.2, delay: i * 0.02 }}
+                initial={shouldReduceMotion ? false : { scaleY: 0.96, opacity: 0 }}
+                animate={{ scaleY: 1, opacity: 1 }}
+                transition={{ duration: shouldReduceMotion ? 0 : DURATION.element, delay: shouldReduceMotion ? 0 : staggerDelay(i), ease: EASE_OUT_QUART }}
                 // framer pone transform-box: fill-box en SVG: el origen es relativo a la propia barra.
                 style={{ transformOrigin: '50% 100%' }}
               />
@@ -229,6 +233,10 @@ export default function LiveVisualization({
           );
         })}
       </svg>
+      <div className="bursa-price-legend">
+        <span>Precio inicial<strong>{formatCOP(basePrice)}</strong></span>
+        <span>Referencia<strong>{formatCOP(targetPrice)}</strong></span>
+      </div>
     </div>
   );
 }

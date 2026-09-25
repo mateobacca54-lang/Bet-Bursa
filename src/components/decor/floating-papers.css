@@ -1,10 +1,23 @@
 /* ============================================================
-   floating-papers.css — posición de los papeles y cuándo se ocultan.
+   floating-papers.css — dónde viven los papeles y cuándo se ocultan.
    Solo valores de tokens.css.
 
-   Los papeles deciden según el ANCHO DEL HÉROE (container query), no el de la
-   ventana: con la barra lateral abierta el héroe mide 260 px menos que la pantalla,
-   y una media query de ventana los dejaría encima del saludo.
+   REGLA: un papel decorativo nunca tapa información.
+   El saludo mide como máximo 600 px y va centrado. Los papeles viven SOLO en los huecos
+   laterales, dentro del héroe (nada cuelga por abajo), en dos columnas de dos:
+
+        izquierda            derecha
+      ┌ extracto ┐          ┌ velas ┐
+      └──────────┘          └───────┘
+      ┌ titular ─┐          ┌ recibo ┐
+      └──────────┘          └────────┘
+
+   Un papel mide hasta 200 px y necesita margen para su inclinación (±6°), su deriva (±6 px)
+   y el parallax (12 px): ~24 px. El hueco lateral es (ancho del héroe − 600) / 2, así que
+   solo caben con un héroe de 600 + 2 × (200 + 24) ≈ 1048 px. Se usa 1080 px.
+
+   Deciden según el ANCHO DEL HÉROE (container query), no el de la ventana: con la barra
+   lateral abierta el héroe mide 260 px menos que la pantalla.
    ============================================================ */
 
 .bursa-hero {
@@ -23,22 +36,13 @@
   pointer-events: auto;
 }
 
-.bursa-paper--statement { left: 0;   top: 0; }
-.bursa-paper--bill      { left: 2%;  top: 64%; }
-.bursa-paper--candles   { right: 0;  top: 0; }
-.bursa-paper--receipt   { right: 2%; top: 54%; }
-.bursa-paper--headline  { left: 24%; top: 90%; }
+.bursa-paper--statement { left: 0;  top: 0; }
+.bursa-paper--headline  { left: 0;  bottom: 0; }
+.bursa-paper--candles   { right: 0; top: 0; }
+.bursa-paper--receipt   { right: 0; bottom: 0; }
 
-/* Con menos de 1050 px de héroe solo caben los tres papeles de los lados */
-@container (max-width: 1049px) {
-  .bursa-paper--bill,
-  .bursa-paper--headline {
-    display: none;
-  }
-}
-
-/* Con menos de 780 px taparían el saludo */
-@container (max-width: 779px) {
+/* Si el héroe no aloja los papeles con margen, no se muestran */
+@container (max-width: 1079px) {
   .bursa-papers {
     display: none;
   }

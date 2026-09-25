@@ -1,0 +1,28 @@
+.bursa-price-legend {
+  display: none;
+}
+
+/* El SVG se reduce con su lienzo; las cifras HTML mantienen un tamaño legible.
+   El año actual y los extremos del período ya se muestran en el deslizador. */
+@media (max-width: 480px) {
+  .bursa-price-visual svg text {
+    display: none;
+  }
+
+  .bursa-price-legend {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    color: var(--ink-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+  }
+
+  .bursa-price-legend strong {
+    display: block;
+    color: var(--ink);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+}

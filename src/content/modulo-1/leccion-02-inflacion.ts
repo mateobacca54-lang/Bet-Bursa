@@ -44,6 +44,7 @@ export const leccion02Config: ConsequenceSliderConfig = {
   tolerance: 1, // ±1 año de tolerancia
   dataPoints,
   hookText: 'El precio de tu almuerzo en 10 años',
+  visual: 'almuerzo',
   instruction:
     'Mueve el slider hasta encontrar el año en que tu almuerzo pasa de $15.000. En 2015 costaba $8.000.',
   explanationCorrect:

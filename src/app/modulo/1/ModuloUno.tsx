@@ -10,7 +10,7 @@ import { ModuleHome } from '@/components/module';
  * En el servidor y en el primer render de hidratación `hydrated` es false.
  */
 export default function ModuloUno() {
-  const { progress, hydrated, update } = useProgress(MODULO_1.id);
+  const { progress, hydrated, update, marcarMision } = useProgress(MODULO_1.id);
   // El "ahora" se fija al montar: el saludo no debe cambiar mientras el usuario lo lee.
   const [now] = useState(() => new Date());
 
@@ -25,5 +25,13 @@ export default function ModuloUno() {
     [update]
   );
 
-  return <ModuleHome progress={progress} now={now} hydrated={hydrated} onReviewed={onReviewed} />;
+  return (
+    <ModuleHome
+      progress={progress}
+      now={now}
+      hydrated={hydrated}
+      onReviewed={onReviewed}
+      onMisionHecha={marcarMision}
+    />
+  );
 }

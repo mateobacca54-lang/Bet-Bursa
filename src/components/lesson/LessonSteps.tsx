@@ -1,9 +1,12 @@
 'use client';
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Reveal from '@/components/motion/Reveal';
-import { DURATION, EASE_OUT_EXPO, DRAW_PATH_DURATION } from '@/lib/motion';
+import { Estampa, type EstampaScene } from '@/components/illus';
+import EjemploVisual from './EjemploVisual';
+import { DURATION, EASE_OUT_EXPO, DRAW_PATH_DURATION, motionSafe, variants } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 
 // ============================================================
@@ -28,7 +31,7 @@ const bodyStyle: CSSProperties = {
   margin: 0,
 };
 
-/** Título de paso: recibe el foco al montarse (sin anillo: no es un control). */
+/** Título de paso: recibe el foco al montarse para anunciar el cambio de pantalla. */
 function StepHeading({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   const ref = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -40,7 +43,6 @@ function StepHeading({ children, style }: { children: ReactNode; style?: CSSProp
       tabIndex={-1}
       style={{
         margin: 0,
-        outline: 'none',
         color: 'var(--ink)',
         lineHeight: 'var(--line-height-tight)',
         fontWeight: 'var(--font-weight-bold)',
@@ -67,7 +69,18 @@ function highlightPesos(text: string): ReactNode[] {
 
 // ─── 1 · Gancho ─────────────────────────────────────────────
 
-export function StepHook({ lessonNumber, title, hook }: { lessonNumber: number; title: string; hook: string }) {
+export function StepHook({
+  lessonNumber,
+  title,
+  hook,
+  scene,
+}: {
+  lessonNumber: number;
+  title: string;
+  hook: string;
+  /** Ilustración del tema (components/illus). Ocupa el espacio que la pantalla de la pregunta dejaba vacío. */
+  scene?: EstampaScene | null;
+}) {
   return (
     <div>
       <Reveal as="p" style={eyebrowStyle}>
@@ -76,6 +89,11 @@ export function StepHook({ lessonNumber, title, hook }: { lessonNumber: number; 
       <Reveal delay={0.06}>
         <StepHeading style={{ fontSize: 'var(--font-size-3xl)' }}>{highlightPesos(hook)}</StepHeading>
       </Reveal>
+      {scene && (
+        <Reveal delay={0.18} style={{ marginTop: 'var(--space-8)', maxWidth: 320 }}>
+          <Estampa scene={scene} style={{ borderRadius: 'var(--radius-lg)' }} />
+        </Reveal>
+      )}
     </div>
   );
 }
@@ -110,7 +128,7 @@ export function StepConcept({ keyConcept, explanation }: { keyConcept: string; e
 
 // ─── 3 · Ejemplo ────────────────────────────────────────────
 
-export function StepExample({ example }: { example: string }) {
+export function StepExample({ example, lesson }: { example: string; lesson?: number }) {
   return (
     <div>
       <Reveal as="p" style={eyebrowStyle}>
@@ -121,6 +139,11 @@ export function StepExample({ example }: { example: string }) {
           {highlightPesos(example)}
         </StepHeading>
       </Reveal>
+      {lesson !== undefined && (
+        <Reveal delay={0.16}>
+          <EjemploVisual lesson={lesson} />
+        </Reveal>
+      )}
     </div>
   );
 }
@@ -143,16 +166,39 @@ export function StepPractice({ children }: { children: ReactNode }) {
 
 // ─── 5 · Resumen ────────────────────────────────────────────
 
+/**
+ * Monedita celebra al terminar la lección: un salto (`hop`) justo cuando el trazo del check
+ * termina de dibujarse. Tiene causa —el usuario acaba de completar algo— y bajo
+ * prefers-reduced-motion no salta: solo aparece.
+ */
+function Celebrate({ reduced }: { reduced: boolean }) {
+  const hop = motionSafe(variants, reduced).hop;
+  return (
+    <motion.div
+      style={{ flexShrink: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, ...(reduced ? {} : { y: hop.y, rotate: hop.rotate }) }}
+      transition={{
+        opacity: { duration: reduced ? 0.1 : DURATION.element, delay: reduced ? 0 : DURATION.scene },
+        y: { ...hop.transition, delay: DURATION.scene + DURATION.element },
+        rotate: { ...hop.transition, delay: DURATION.scene + DURATION.element },
+      }}
+    >
+      <Image src="/monedita/monedita-celebra.webp" alt="" width={84} height={84} style={{ display: 'block', height: 'auto' }} />
+    </motion.div>
+  );
+}
+
 export function StepSummary({ summary, children }: { summary: string; children?: ReactNode }) {
   const reduced = usePrefersReducedMotion();
   return (
     <div>
+      <div aria-hidden="true" style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
       <svg
         width="56"
         height="56"
         viewBox="0 0 56 56"
-        aria-hidden="true"
-        style={{ display: 'block', marginBottom: 'var(--space-4)' }}
+        style={{ display: 'block', flexShrink: 0 }}
       >
         <circle cx="28" cy="28" r="28" fill="var(--brand-50)" />
         <motion.path
@@ -167,6 +213,8 @@ export function StepSummary({ summary, children }: { summary: string; children?:
           transition={reduced ? { duration: 0 } : { duration: DRAW_PATH_DURATION / 2, ease: EASE_OUT_EXPO, delay: DURATION.element }}
         />
       </svg>
+      <Celebrate reduced={reduced} />
+      </div>
       <Reveal as="p" style={eyebrowStyle}>
         Lo que te llevas
       </Reveal>

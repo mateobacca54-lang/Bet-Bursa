@@ -87,6 +87,21 @@ export function getGreetingCopy(
       };
     }
 
+    case 'awaiting-test':
+      return {
+        title: name
+          ? { before: 'Hola, ', name, after: '.' }
+          : { before: 'Hola.', name: null, after: '' },
+        sub: [
+          {
+            kind: 'text',
+            text: `Ya viste las ${totalInWords(data.totalLessons).toLowerCase()} lecciones. Antes de seguir, comprueba qué tanto quedó.`,
+          },
+        ],
+        cta: `Hacer la prueba del Módulo ${moduleNumber}`,
+        review: null,
+      };
+
     case 'complete':
       return {
         title: name

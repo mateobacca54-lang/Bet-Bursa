@@ -25,6 +25,7 @@
   --color-feedback-wrong:   var(--feedback-wrong);
 
   --font-sans: var(--font-family);
+  --font-editorial: var(--font-serif);
 
   --radius-sm:   var(--radius-sm);
   --radius-md:   var(--radius-md);

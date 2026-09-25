@@ -12,7 +12,7 @@ import './landing.css';
  */
 export default function TryIt() {
   return (
-    <section id="pruebalo" className="lp-section" style={{ background: 'var(--ink)' }} aria-labelledby="pruebalo-titulo">
+    <section id="pruebalo" className="lp-section lp-light lp-light--sunk" aria-labelledby="pruebalo-titulo">
       <div className="lp-wrap lp-try">
         <Reveal>
           <p className="lp-eyebrow">Pruébalo ahora</p>
@@ -28,7 +28,7 @@ export default function TryIt() {
             <li>Descubre cuánto te acercaste.</li>
           </ol>
           <div style={{ marginTop: 'var(--space-8)' }}>
-            <Link href="/modulo/1" className="lp-btn lp-btn--primary">
+            <Link href="/inicio" className="lp-btn lp-btn--primary">
               Sigue con el Módulo 1
             </Link>
           </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { Objeto } from '@/components/illus';
 import { useState, useMemo, useCallback } from 'react';
 import type { BursaWidgetProps, ConsequenceSliderConfig, WidgetState } from '@/lib/types';
 import { calculateInflatedPrice, formatCOP } from '@/lib/format';
@@ -84,6 +85,13 @@ export default function ConsequenceSlider({
     >
       {({ state, setState }) => (
         <div>
+          {/* El objeto cuyo precio sube: se ve QUÉ se está comprando, no solo una cifra */}
+          {config.visual && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-2)' }}>
+              <Objeto id={config.visual} size={64} />
+            </div>
+          )}
+
           {/* Visualización SVG */}
           <LiveVisualization
             dataPoints={dataPoints}

@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { motion, useMotionValue, useScroll, useTransform } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { Estampa } from '@/components/illus';
 import { MARKET_SHOTS } from './landing-data';
 import './landing.css';
 
@@ -52,17 +52,17 @@ export default function MarketStrip() {
   }, [overflow]);
 
   return (
-    <section ref={sectionRef} className={`lp-market${reduced ? ' lp-market--static' : ''}`} aria-labelledby="mercado-titulo">
+    <section ref={sectionRef} className={`lp-market lp-light${reduced ? ' lp-market--static' : ''}`} aria-labelledby="mercado-titulo">
       <div className="lp-market-stage">
         <div className="lp-market-text">
           <p className="lp-eyebrow" style={{ margin: 0 }}>
-            Los mercados, de cerca
+            El mercado que ya conoces
           </p>
           <h2 id="mercado-titulo" className="lp-title">
-            Del piso de la bolsa a tu pantalla.
+            La plaza, la tienda y la bolsa son lo mismo.
           </h2>
           <p className="lp-lead">
-            Un mercado es el lugar donde compradores y vendedores se ponen de acuerdo en un precio. Antes se hacía a gritos; hoy se hace con un clic. Lo que hay que entender sigue siendo lo mismo.
+            Un mercado es cualquier sitio donde alguien vende, alguien compra y los dos aceptan un precio. Cambia el tamaño y la velocidad; el trato es el mismo.
           </p>
         </div>
 
@@ -74,10 +74,8 @@ export default function MarketStrip() {
           style={reduced ? undefined : ({ '--track-x': trackX } as Record<string, unknown>)}
         >
           {MARKET_SHOTS.map((s) => (
-            <figure key={s.src} className="lp-shot">
-              <div className="lp-shot-frame">
-                <Image src={s.src} alt={s.alt} fill sizes="(min-width: 900px) 26vw, 78vw" />
-              </div>
+            <figure key={s.scene} className="lp-shot">
+              <Estampa scene={s.scene} className="lp-shot-art" />
               <figcaption>{s.caption}</figcaption>
             </figure>
           ))}

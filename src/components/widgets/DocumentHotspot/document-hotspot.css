@@ -1,0 +1,39 @@
+/* ============================================================
+   DocumentHotspot ("Señalar") — las franjas clicables sobre el documento.
+
+   Siempre se ve un borde punteado tenue: sin eso, nadie sabe qué se puede tocar
+   en un documento que por lo demás parece de solo lectura.
+   ============================================================ */
+
+.dh-zona {
+  position: absolute;
+  border: 2px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  /* solo color/opacity: nada de layout */
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dh-zona:not(:disabled):hover {
+    border-color: var(--brand-600);
+    background: color-mix(in srgb, var(--brand-600) 8%, transparent);
+  }
+}
+
+.dh-zona:disabled {
+  cursor: default;
+}
+
+.dh-zona[data-elegida='correcta'] {
+  border-style: solid;
+  border-color: var(--feedback-correct);
+  background: color-mix(in srgb, var(--feedback-correct) 12%, transparent);
+}
+
+.dh-zona[data-elegida='incorrecta'] {
+  border-style: solid;
+  border-color: var(--feedback-wrong);
+  background: color-mix(in srgb, var(--feedback-wrong) 10%, transparent);
+}

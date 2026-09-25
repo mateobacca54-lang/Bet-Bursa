@@ -10,6 +10,7 @@ import { variants } from '@/lib/motion';
 import { Reveal } from '@/components/motion';
 import RollingNumber from './RollingNumber';
 import SpacedReview from './SpacedReview';
+import Mision from './Mision';
 import { getGreetingCopy } from './greeting-copy';
 
 interface GreetingProps {
@@ -19,6 +20,14 @@ interface GreetingProps {
   ctaHref: string;
   /** El usuario pulsó "Lo tengo" en el repaso */
   onReviewed?: (lesson: number) => void;
+  /**
+   * La misión de fin de módulo. Solo se muestra en el estado "complete" y mientras no
+   * esté reconocida (ver src/content/modulo-1/mision.ts). Sin esto, o ya hecha, no
+   * aparece nada — el módulo-agnóstico lib/greeting.ts no sabe de misiones, solo esta
+   * pantalla, que sí conoce el contenido del módulo.
+   */
+  mision?: { texto: string; hecha: boolean } | null;
+  onMisionHecha?: () => void;
 }
 
 /**
@@ -30,11 +39,13 @@ interface GreetingProps {
  *   0.20  subtítulo + botón  fadeUp
  * El camino empieza a dibujarse a los 0.40 (lo decide quien lo monta).
  */
-export default function Greeting({ data, lessons, ctaHref, onReviewed }: GreetingProps) {
+export default function Greeting({ data, lessons, ctaHref, onReviewed, mision, onMisionHecha }: GreetingProps) {
   const reduced = usePrefersReducedMotion();
   const copy = getGreetingCopy(data, lessons);
   const [reviewDone, setReviewDone] = useState(false);
+  const [misionDone, setMisionDone] = useState(false);
   const { title } = copy;
+  const mostrarMision = data.state === 'complete' && mision && !mision.hecha && !misionDone;
 
   return (
     <section
@@ -112,6 +123,20 @@ export default function Greeting({ data, lessons, ctaHref, onReviewed }: Greetin
             onDone={() => {
               setReviewDone(true);
               onReviewed?.(copy.review!.lesson);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {mostrarMision && (
+          <Mision
+            key="mision"
+            texto={mision.texto}
+            delay={0.3}
+            onDone={() => {
+              setMisionDone(true);
+              onMisionHecha?.();
             }}
           />
         )}

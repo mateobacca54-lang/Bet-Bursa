@@ -9,6 +9,9 @@ export const DURATION = {
   story: 1.0,
 };
 
+/** Bajo prefers-reduced-motion todo se reduce a un cross-fade de esta duración (segundos). */
+export const REDUCED_DURATION = 0.1;
+
 export const EASE_OUT_EXPO: Bezier = [0.16, 1, 0.3, 1];
 export const EASE_OUT_QUART: Bezier = [0.25, 1, 0.5, 1];
 export const EASE_IN_OUT: Bezier = [0.76, 0, 0.24, 1];
@@ -55,6 +58,19 @@ export const variants = {
     x: [0, -5, 5, -4, 4, 0],
     transition: {
       duration: 0.32,
+    },
+  },
+  /**
+   * CUÁNDO USARLA: Cuando un personaje (Monedita) reacciona a algo que el usuario acaba de
+   * hacer, por ejemplo al comprometer su apuesta. El salto dice "te vi": comunica causa.
+   * CUÁNDO NO: Como movimiento en reposo o decoración; si nadie causó la reacción, no se usa.
+   */
+  hop: {
+    y: [0, -16, 0],
+    rotate: [0, -4, 0],
+    transition: {
+      duration: DURATION.scene,
+      ease: EASE_OUT_QUART,
     },
   },
   /**

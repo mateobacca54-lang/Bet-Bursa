@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import './shell.css';
 
 export type SidebarItemId = 'inicio' | 'modulos' | 'progreso';
@@ -29,7 +30,7 @@ const ITEMS: { id: SidebarItemId; label: string; href: string | null; icon: Reac
   {
     id: 'inicio',
     label: 'Inicio',
-    href: '/',
+    href: '/inicio',
     icon: (
       <svg {...ICON_PROPS}>
         <path d="M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10" />
@@ -50,7 +51,7 @@ const ITEMS: { id: SidebarItemId; label: string; href: string | null; icon: Reac
   {
     id: 'progreso',
     label: 'Progreso',
-    href: null,
+    href: '/progreso',
     icon: (
       <svg {...ICON_PROPS}>
         <path d="M4 20V10m6 10V4m6 16v-7m4 7H2" />
@@ -75,18 +76,12 @@ export default function Sidebar({ collapsed, onToggle, active = 'modulos' }: Sid
     >
       <Link
         href="/"
-        className="uppercase-tracking"
+        className={`bursa-sidebar-brand${collapsed ? ' bursa-sidebar-brand--compact' : ''}`}
         aria-label="Bursa, inicio"
-        style={{
-          display: 'block',
-          padding: 'var(--space-2) var(--space-3) var(--space-6)',
-          color: 'var(--brand-600)',
-          fontSize: 'var(--font-size-xl)',
-          fontWeight: 'var(--font-weight-bold)',
-          textDecoration: 'none',
-        }}
       >
-        {collapsed ? 'B' : 'Bursa'}
+        <span className={`bursa-brand-art${collapsed ? ' bursa-brand-art--compact' : ''}`}>
+          <Image src="/brand/bursa-imagotipo-h-principal.jpg" alt="" fill sizes={collapsed ? '32px' : '160px'} draggable={false} />
+        </span>
       </Link>
 
       {ITEMS.map((item) => {

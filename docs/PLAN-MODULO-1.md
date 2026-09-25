@@ -78,7 +78,8 @@ De Brilliant se toma **una sola mecánica, aplicada en todas partes**:
 ## 3. Mapa de pantallas
 
 ```
-/                              Landing (existe, hay que rehacerla)
+/                              Landing (rehecha)
+/inicio                        INICIO adaptable: Monedita + apuesta (primera vez) / mapa de módulos (volviste)
 /modulo/1                      EL CAMINO  ← pantalla principal
 /modulo/1/leccion/1            Lección 1 — ¿Qué es el dinero?
 /modulo/1/leccion/2            Lección 2 — Inflación (widget ya existe)
@@ -484,6 +485,45 @@ validar; hay que reemplazarlo por backend antes de tener usuarios reales.
 >   rostro de personas reales (Buffett, actores). Tamaños "display" = múltiplos de `--font-size-4xl` (no hay tokens mayores: **pendiente
 >   confirmar con Claude Design**). Sin cifras de usuarios ni testimonios inventados. Las capturas del producto se regeneran con Playwright.
 >   Derechos de las fotos por verificar antes de publicar. Con reduced-motion no hay sticky ni parallax.
+
+> **Estado (2026-09-21) — `/inicio`:** entre la landing y el camino hay ahora una pantalla adaptable, guiada por **Monedita**
+> (Ola 5 del plan de ejecución). Los cuatro botones de la landing y el ítem "Inicio" del sidebar apuntan a `/inicio`; desde ahí
+> se entra al camino. Primera visita: Monedita se presenta y propone una **apuesta** (predecir antes de revelar, sobre el
+> gancho de la lección 3); no pide ningún dato. Si ya empezaste: el mismo saludo que `/modulo/1` y el mapa de módulos.
+> **Decisiones:** (1) el hombre del celular (`Personajes/Captura…png`, verde lima + marrón) queda fuera por ahora; (2) tokens
+> nuevos **aditivos** `--sand-*`, `--gold-*`, `--border-warm` en `tokens.css`, derivados de Monedita (oro = brillo de la moneda,
+> arena = papel cálido), aprobados por el dueño, pendientes de reconciliar con Claude Design (#3); (3) `motion.ts` gana la
+> variante `hop` (Monedita reacciona a lo que el usuario hizo); (4) el Módulo 2 se muestra como tarjeta "Próximamente" con título
+> **provisional** ("Hacer trabajar la plata", sale de "El Módulo 2 es sobre hacerla trabajar").
+> **Pendiente de visto bueno (copy redactado, no viene del temario):** las 3 opciones y las 3 revelaciones de la apuesta,
+> "Hola, soy Monedita / Te acompaño…", y el título del Módulo 2 (`src/content/inicio.ts`). La *pregunta* sí es literal el
+> gancho de la lección 3. **Abierto:** en móvil no hay navegación hacia `/inicio` desde el camino (solo el logo, que va a `/`);
+> el `PathPreview` de la landing enlaza directo a lecciones; la "B" de Monedita se parece al símbolo de Bitcoin (₿).
+
+> **Estado (2026-09-21) — identidad visual y tarjetas que tapaban:** dos defectos reportados por el dueño, los dos medidos
+> con Playwright antes y después (no a ojo).
+>
+> **1. Tarjetas encima de información.** En `/modulo/1` los papeles flotantes se montaban sobre el titular del saludo, el botón
+> y el rótulo "Fundamentos del Dinero": **14 choques** entre 900 y 1920 px. En la landing las tarjetas del héroe pisaban el
+> titular, la bajada y la barra superior: **33 choques**. Ahora los papeles viven solo en las cuatro esquinas del héroe, se
+> ocultan enteros si el hueco lateral no los aloja con margen para inclinación, deriva y parallax (héroe < 1080 px), y el
+> centro de la landing se estrecha para no invadir nunca las columnas. **Quedan 0 choques con contenido.** La barra superior
+> de la landing pasó a ser opaca: con un velo translúcido se adivinaba la silueta de una tarjeta detrás de la marca y del
+> botón principal. Se eliminó el papel del billete: ya no cabía sin invadir el saludo.
+>
+> **2. Las fotos no eran de Bursa.** Las ocho fotos de la landing eran de EE. UU. o España (Franklin del billete de $100, el
+> piso del NYSE, la bolsa de Madrid, una firma del *Treasurer of the United States*). Contradecían la única promesa clara del
+> titular —"ejemplos en pesos, sin jerga"—, le hablaban a un público que no es el nuestro (señores de traje en los años 60) y
+> no compartían nada con Monedita. Se sustituyeron por **estampas**: `src/components/illus/Estampa.tsx`, nueve escenas de la
+> plata cotidiana en Colombia, en el trazo de Monedita (contorno de 4 px, tres rellenos, solo tokens, sin degradados).
+> La tarjeta dejó de ser una foto con degradado encima: ahora es papel cálido con el pie en su propia banda, así el texto no
+> depende de qué haya debajo. La vista previa al compartir era la foto de la bolsa de Madrid; ahora es `public/og.png`,
+> generada con `node scripts/og.mjs`.
+>
+> **Pendiente de visto bueno:** el texto nuevo de la franja de mercados ("La plaza, la tienda y la bolsa son lo mismo" y sus
+> tres pies), que reemplaza a "Del piso de la bolsa a tu pantalla".
+> **Sin resolver:** las 8 fotos siguen en `public/landing/` **sin que nada las use** (1,5 MB, y el propio plan ya anotaba que
+> sus derechos estaban por verificar). No se borraron porque son material del dueño: decidir si se eliminan.
 
 Cada fase termina en algo que se puede ver en el navegador. No avanzar sin cerrar la anterior.
 

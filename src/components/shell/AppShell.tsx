@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Sidebar, { type SidebarItemId } from './Sidebar';
 import StreakBadge from './StreakBadge';
 import ProgressBar from './ProgressBar';
@@ -40,17 +41,13 @@ export default function AppShell({
       <div className="bursa-main">
         <header className="bursa-header">
           <Link
-            href="/"
-            className="bursa-header-brand uppercase-tracking"
+            href="/inicio"
+            className="bursa-header-brand"
             aria-label="Bursa, inicio"
-            style={{
-              color: 'var(--brand-600)',
-              fontSize: 'var(--font-size-xl)',
-              fontWeight: 'var(--font-weight-bold)',
-              textDecoration: 'none',
-            }}
           >
-            Bursa
+            <span className="bursa-brand-art">
+              <Image src="/brand/bursa-imagotipo-h-principal.jpg" alt="" fill sizes="160px" draggable={false} />
+            </span>
           </Link>
 
           <div className="bursa-header-progress">

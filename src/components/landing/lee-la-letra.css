@@ -1,0 +1,279 @@
+/* ============================================================
+   lee-la-letra.css — "El papel sobre la mesa" (SPEC-LANDING-V2.md §10).
+
+   Escritorio + movimiento: escenario sticky de una pantalla (papel + nota lado a
+   lado) sobre una pista de 3×60vh que avanza el paso con el scroll. Móvil O
+   prefers-reduced-motion: una sola tarjeta (papel arriba, nota debajo), sin sticky,
+   con Anterior/Siguiente. La condición de escritorio-con-movimiento se resuelve en
+   CSS (no en JS) para que nunca dependa de la carrera entre hidratación y
+   `usePrefersReducedMotion()`.
+   ============================================================ */
+
+.llp-escena-track {
+  margin-top: var(--space-8);
+}
+
+.llp-escena-sticky {
+  position: static;
+}
+
+.llp-escena-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.llp-heading {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* ─── El papel ─── */
+.llp-papel {
+  background: var(--surface-raised);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+  transform-origin: center;
+}
+
+.llp-papel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--border-hairline);
+}
+.llp-papel-icono {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+.llp-papel-titulo {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+  color: var(--ink);
+}
+
+.llp-papel-filas {
+  display: flex;
+  flex-direction: column;
+}
+
+.llp-fila {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--border-hairline);
+}
+.llp-fila:first-child {
+  border-top: none;
+}
+
+.llp-fila-etiqueta,
+.llp-fila-valor {
+  position: relative;
+  z-index: 1;
+}
+.llp-fila--actual {
+  background: linear-gradient(90deg, var(--gold-100), transparent);
+  border-radius: var(--radius-sm);
+}
+.llp-fila--actual::before {
+  content: '';
+  position: absolute;
+  inset: var(--space-2) auto var(--space-2) calc(-1 * var(--space-3));
+  width: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--brand-600);
+}
+.llp-fila-etiqueta {
+  font-weight: var(--font-weight-medium);
+  color: var(--ink-soft);
+}
+.llp-fila-valor {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+/* La cuota es la fila llamativa: su valor, más grande. */
+.llp-fila--destacada .llp-fila-valor {
+  font-size: var(--font-size-2xl);
+}
+@media (max-width: 420px) {
+  .llp-fila--destacada .llp-fila-valor {
+    max-width: 65%;
+    font-size: var(--font-size-xl);
+    white-space: normal;
+  }
+}
+/* La fila de gracia es letra chica de verdad, en dos líneas (prosa, no una cifra). */
+.llp-fila-valor--chica {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-xs);
+  color: var(--ink-soft);
+  white-space: normal;
+  max-width: 60%;
+}
+
+/* ─── La nota al margen ─── */
+.llp-nota {
+  position: relative;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.llp-nota-body {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: calc(var(--space-16) * 2);
+}
+.llp-nota-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.llp-nota-header img {
+  display: block;
+  border-radius: var(--radius-pill);
+}
+.llp-pasos {
+  display: flex;
+  gap: var(--space-2);
+}
+.llp-pasos span {
+  flex: 1 1 auto;
+  height: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--sand-200);
+}
+.llp-pasos span[data-estado='hecho'] { background: var(--gold-300); }
+.llp-pasos span[data-estado='actual'] { background: var(--brand-600); }
+.llp-nota-paso {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink-soft);
+}
+.llp-nota-titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  color: var(--ink);
+}
+.llp-nota-texto {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
+}
+
+.llp-nota-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.llp-nota-btn {
+  min-height: var(--touch-min);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.llp-nota-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+@media (hover: hover) and (pointer: fine) {
+  .llp-nota-btn:not(:disabled):hover {
+    border-color: var(--ink);
+  }
+}
+
+.llp-contador-box {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  display: grid;
+  gap: var(--space-2);
+}
+.llp-contador-label {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+}
+.llp-contador {
+  margin: 0;
+}
+.llp-contador-cifra {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-700);
+}
+
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  /* Pista de 3×60vh: cada paso "cuesta" 60vh de scroll mientras el escenario, casi
+     de una pantalla completa, se queda fijo. Así la sección entera cabe en una
+     pantalla por paso, sin columnas vacías. */
+  .llp-escena-track {
+    height: calc(3 * 60vh);
+    margin-top: 0;
+  }
+  .llp-escena-sticky {
+    position: sticky;
+    top: var(--lp-nav-h, calc(var(--space-16) + var(--space-2)));
+    min-height: calc(100vh - var(--lp-nav-h, calc(var(--space-16) + var(--space-2))));
+    display: flex;
+    align-items: center;
+  }
+  .llp-escena-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-areas:
+      'heading heading'
+      'paper note';
+    gap: var(--space-4) var(--space-8);
+    align-content: center;
+    width: 100%;
+  }
+  .llp-heading {
+    grid-area: heading;
+  }
+  .llp-papel-col {
+    grid-area: paper;
+    align-self: center;
+  }
+  .llp-nota-col {
+    grid-area: note;
+  }
+}

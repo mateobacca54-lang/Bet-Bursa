@@ -67,11 +67,13 @@ export default function LessonRoute({ number }: { number: number }) {
   }
 
   const askName = number === 1 && !progress.namePrompted;
+  const askEmail = number === 1 && !progress.emailPrompted;
 
   const finish = () => {
     complete(number);
-    // Si no respondió el nombre, no se le vuelve a preguntar (PLAN §5.5).
+    // Si no respondió, no se le vuelve a preguntar (PLAN §5.5; lo mismo aplica al correo).
     if (askName) update((p) => (p.namePrompted ? p : { ...p, namePrompted: true }));
+    if (askEmail) update((p) => (p.emailPrompted ? p : { ...p, emailPrompted: true }));
     router.push(PATH_HREF);
   };
 
@@ -83,6 +85,8 @@ export default function LessonRoute({ number }: { number: number }) {
       onFinish={finish}
       askName={askName}
       onName={(name) => update((p) => ({ ...p, userName: name, namePrompted: true }))}
+      askEmail={askEmail}
+      onEmailAnswered={() => update((p) => (p.emailPrompted ? p : { ...p, emailPrompted: true }))}
     />
   );
 }

@@ -20,36 +20,42 @@ export const leccion01Config: DragClassifierConfig = {
   items: [
     {
       id: 'bici-celular',
+      icon: 'bici',
       shortLabel: 'Bici por celular',
       label: 'Cambiar tu bicicleta por el celular de un amigo que justo quiere una bici',
       explanation: 'Los dos quieren lo que tiene el otro. Ese cruce de deseos casi nunca pasa, pero aquí sí.',
     },
     {
       id: 'bus',
+      icon: 'bus',
       shortLabel: 'Bus',
       label: 'Pagar el bus para ir al colegio',
       explanation: 'El conductor no necesita tu bicicleta ni tus cromos. Necesita algo que le sirva con cualquiera.',
     },
     {
       id: 'cromos',
+      icon: 'cromos',
       shortLabel: 'Cromos',
       label: 'Cambiar tus cromos repetidos por los repetidos de una compañera',
       explanation: 'Cada una tiene lo que la otra busca: hay coincidencia, así que el trueque alcanza.',
     },
     {
       id: 'profe',
+      icon: 'profesor',
       shortLabel: 'Profe de inglés',
       label: 'Pagarle a tu profesor particular de inglés',
       explanation: 'Tendrías que tener justo lo que él necesita ese día. Con dinero no hace falta adivinar.',
     },
     {
       id: 'almuerzo',
+      icon: 'empanada',
       shortLabel: 'Empanada por arepa',
       label: 'Cambiar tu empanada por la arepa de tu compañero, que hoy quería empanada',
       explanation: 'Los dos quieren lo del otro en el mismo momento: por eso el trueque funciona.',
     },
     {
       id: 'arriendo',
+      icon: 'casa',
       shortLabel: 'Arriendo',
       label: 'Pagar el arriendo',
       explanation: 'El dueño no quiere tres bicicletas: quiere poder pagar sus propias cuentas. El dinero sirve para todo.',

@@ -1,0 +1,232 @@
+/* ============================================================
+   Botón de ayuda — el aviso de que algo está mal.
+
+   Vive fijo en la esquina inferior derecha, por encima de todo. Es pequeño a propósito:
+   tiene que estar disponible sin competir con el contenido. Nunca tapa nada porque se
+   queda en el margen, fuera de la columna de lectura.
+   ============================================================ */
+
+.ay-abrir {
+  position: fixed;
+  right: max(var(--space-4), env(safe-area-inset-right));
+  /* Si la pantalla tiene su propio pie fijo (una lección, la prueba de paso),
+     ese pie publica su alto real en --pie-flotante-alto (useReservarEsquina.ts)
+     y Ayuda sube para no montarse encima. Sin pie, la variable no existe y
+     esto se comporta como max(...) con el segundo término en 0px. */
+  bottom: calc(max(var(--space-4), env(safe-area-inset-bottom)) + var(--pie-flotante-alto, 0px));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-full, 999px);
+  background: var(--surface-raised);
+  color: var(--ink-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  /* solo transform y opacity */
+  transition: transform var(--duration-micro) var(--ease-out-quart);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ay-abrir:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.ay-abrir:active {
+  transform: translateY(0);
+}
+
+.ay-abrir > [aria-hidden] {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--brand-600);
+  color: var(--on-brand);
+  font-weight: var(--font-weight-bold);
+}
+
+/* En pantallas estrechas se queda solo el signo: el texto compite con el contenido */
+@media (max-width: 559px) {
+  .ay-abrir {
+    padding: 0 var(--space-3);
+  }
+  .ay-abrir-texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.ay-root {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+
+.ay-telon {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  cursor: pointer;
+}
+
+.ay-panel {
+  position: relative;
+  width: min(420px, 100%);
+  max-height: calc(100dvh - var(--space-8));
+  overflow-y: auto;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--sand-50);
+  box-shadow: var(--shadow-lg);
+}
+
+.ay-titulo {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+}
+
+.ay-lead {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--ink-secondary);
+}
+
+.ay-motivos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.ay-motivo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ay-motivo[aria-checked='true'] {
+  border-color: var(--brand-600);
+}
+
+.ay-punto {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-warm);
+  border-radius: 999px;
+}
+
+.ay-motivo[aria-checked='true'] .ay-punto {
+  border-color: var(--brand-600);
+  background:
+    radial-gradient(circle at center, var(--brand-600) 0 4px, transparent 4px);
+}
+
+.ay-campo {
+  display: block;
+  margin-top: var(--space-4);
+}
+
+.ay-etiqueta {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink-secondary);
+}
+
+.ay-texto {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-family: inherit;
+  /* 16px o más: por debajo, iOS hace zoom al enfocar */
+  font-size: var(--font-size-base);
+  resize: vertical;
+}
+
+.ay-nota {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: var(--ink-secondary);
+}
+
+.ay-error {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--feedback-wrong, var(--brand-700));
+}
+
+.ay-acciones {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.ay-btn {
+  min-height: var(--touch-min);
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.ay-btn--principal {
+  border-color: var(--brand-600);
+  background: var(--brand-600);
+  color: var(--on-brand);
+}
+
+.ay-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ay-gracias {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}

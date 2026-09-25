@@ -7,6 +7,7 @@ import { DURATION, EASE_OUT_EXPO, SPRING_DRAG, variants } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { MAX_MISSES_PER_ITEM, correctZoneId, pickZoneAt, type ZoneRect } from '@/lib/widget-math';
 import { WidgetShell } from '../shared';
+import { Objeto } from '@/components/illus';
 
 /**
  * DragClassifier — Arquetipo B
@@ -205,8 +206,8 @@ function Board({ config, state, setState, onAttempt, disabled }: BoardProps) {
         )}
       </div>
 
-      {/* Zonas: siempre dos columnas, incluso en móvil (arrastrar a izquierda o derecha) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--space-3)' }}>
+      {/* En un teléfono angosto se apilan para conservar objetivos táctiles amplios. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(152px, 1fr))', gap: 'var(--space-3)' }}>
         {zones.map((zone, index) => {
           const placed = items.filter((i) => placements[i.id] === zone.id);
           const armed = selectedId !== null;
@@ -232,7 +233,7 @@ function Board({ config, state, setState, onAttempt, disabled }: BoardProps) {
               style={{
                 textAlign: 'left',
                 fontFamily: 'var(--font-family)',
-                minHeight: 128,
+                minHeight: 136,
                 minWidth: 0,
                 padding: 'var(--space-3)',
                 borderRadius: 'var(--radius-md)',
@@ -248,7 +249,7 @@ function Board({ config, state, setState, onAttempt, disabled }: BoardProps) {
               </span>
               <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--space-1)', minWidth: 0 }}>
                 {placed.map((i) => (
-                  <PlacedChip key={i.id} label={i.shortLabel ?? i.label} title={i.label} />
+                  <PlacedChip key={i.id} label={i.shortLabel ?? i.label} title={i.label} icon={i.icon} />
                 ))}
               </span>
             </button>
@@ -333,18 +334,22 @@ function ItemCard({ item, selected, disabled, shakeSignal, registerRef, onSelect
         padding: 'var(--space-3) var(--space-4)',
         minHeight: 'var(--touch-min)',
         maxWidth: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--space-3)',
         cursor: disabled ? 'default' : 'grab',
         touchAction: 'none' /* superficie de gesto propia: el navegador no debe hacer scroll */,
         userSelect: 'none',
         WebkitUserSelect: 'none',
       }}
     >
-      {item.label}
+      {item.icon && <Objeto id={item.icon} size={56} />}
+      <span>{item.label}</span>
     </motion.button>
   );
 }
 
-function PlacedChip({ label, title }: { label: string; title: string }) {
+function PlacedChip({ label, title, icon }: { label: string; title: string; icon?: DragItem['icon'] }) {
   const reduced = usePrefersReducedMotion();
   return (
     <motion.span
@@ -360,11 +365,15 @@ function PlacedChip({ label, title }: { label: string; title: string }) {
         borderRadius: 'var(--radius-pill)',
         padding: 'var(--space-1) var(--space-2)',
         maxWidth: '100%',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 'var(--space-1)',
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
       }}
     >
+      {icon && <Objeto id={icon} size={20} />}
       {label}
     </motion.span>
   );

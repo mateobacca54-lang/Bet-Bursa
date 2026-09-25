@@ -3,7 +3,9 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import {
   completeLesson,
+  marcarMisionHecha,
   parseProgress,
+  passPrueba,
   readRawProgress,
   saveProgress,
   type ModuleProgress,
@@ -62,5 +64,8 @@ export function useProgress(moduleId: string) {
     [update]
   );
 
-  return { progress, hydrated, update, complete };
+  const pass = useCallback(() => update(passPrueba), [update]);
+  const marcarMision = useCallback(() => update(marcarMisionHecha), [update]);
+
+  return { progress, hydrated, update, complete, pass, marcarMision };
 }

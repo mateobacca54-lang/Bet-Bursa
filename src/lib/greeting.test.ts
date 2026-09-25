@@ -40,11 +40,23 @@ describe('Greeting State (Ola 0)', () => {
     expect(s.reviewLesson).toBeNull();
   });
 
-  it('complete gana sobre returning-late', () => {
+  it('las 10 hechas sin aprobar la prueba: awaiting-test, no complete (se avanza demostrando)', () => {
     const p = emptyProgress('m1');
     p.completedLessons = [1, 2, 3];
     p.lastActiveDate = '2026-09-17';
-    
+    // pruebaAprobada sigue en false (default de emptyProgress)
+
+    const d3 = new Date(2026, 8, 20, 12, 0);
+    const s = getGreetingState(p, d3, 3);
+    expect(s.state).toBe('awaiting-test'); // gana sobre returning-late también
+  });
+
+  it('complete solo llega tras aprobar la prueba, y gana sobre returning-late', () => {
+    const p = emptyProgress('m1');
+    p.completedLessons = [1, 2, 3];
+    p.lastActiveDate = '2026-09-17';
+    p.pruebaAprobada = true;
+
     const d3 = new Date(2026, 8, 20, 12, 0);
     const s = getGreetingState(p, d3, 3);
     expect(s.state).toBe('complete');

@@ -14,16 +14,20 @@ import { ModuleHome } from '@/components/module';
  *   ?done=3      lecciones completadas (0–10)
  *   &late=1      la última actividad fue hace 5 días (estado "volvió tarde")
  *   &name=1      el usuario tiene nombre ("Mateo")
+ *   &prueba=1    con done=10: la prueba de paso está aprobada (si no, es "awaiting-test")
+ *   &mision=1    con prueba=1: la misión de fin de módulo ya se reconoció
  */
 const PRESETS: { label: string; query: string }[] = [
   { label: '0 · primera vez', query: 'done=0' },
   { label: '2 · en curso', query: 'done=2&name=1' },
   { label: '3 · volvió tarde', query: 'done=3&late=1&name=1' },
   { label: '5 · mitad, sin nombre', query: 'done=5' },
-  { label: '10 · completo', query: 'done=10&name=1' },
+  { label: '10 · prueba pendiente', query: 'done=10&name=1' },
+  { label: '10 · completo, misión pendiente', query: 'done=10&name=1&prueba=1' },
+  { label: '10 · completo, misión hecha', query: 'done=10&name=1&prueba=1&mision=1' },
 ];
 
-function build(done: number, late: boolean, named: boolean, now: Date): ModuleProgress {
+function build(done: number, late: boolean, named: boolean, prueba: boolean, mision: boolean, now: Date): ModuleProgress {
   const last = new Date(now);
   last.setDate(now.getDate() - (late ? 5 : 0));
   return {
@@ -33,6 +37,8 @@ function build(done: number, late: boolean, named: boolean, now: Date): ModulePr
     streakDays: done > 0 ? Math.min(done, 4) : 0,
     lastActiveDate: done > 0 ? toDateKey(last) : null,
     userName: named ? 'Mateo' : null,
+    pruebaAprobada: prueba,
+    misionHecha: mision,
   };
 }
 
@@ -42,7 +48,9 @@ function Playground() {
   const done = Math.min(Math.max(Number(params.get('done') ?? 2) || 0, 0), MODULO_1.lessonCount);
   const late = params.get('late') === '1';
   const named = params.get('name') === '1';
-  const progress = useMemo(() => build(done, late, named, now), [done, late, named, now]);
+  const prueba = params.get('prueba') === '1';
+  const mision = params.get('mision') === '1';
+  const progress = useMemo(() => build(done, late, named, prueba, mision, now), [done, late, named, prueba, mision, now]);
 
   return (
     <>
@@ -78,7 +86,7 @@ function Playground() {
         ))}
       </nav>
 
-      <ModuleHome key={params.toString()} progress={progress} now={now} hydrated onReviewed={() => {}} />
+      <ModuleHome key={params.toString()} progress={progress} now={now} hydrated onReviewed={() => {}} onMisionHecha={() => {}} />
     </>
   );
 }

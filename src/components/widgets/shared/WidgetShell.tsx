@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import type { WidgetState } from '@/lib/types';
 import FeedbackOverlay from './FeedbackOverlay';
+import MoneditaGuide from './MoneditaGuide';
 
 interface WidgetShellProps {
   /** Título del ejercicio */
@@ -102,6 +103,12 @@ export default function WidgetShell({
           {title}
         </h2>
       )}
+
+      <MoneditaGuide
+        compact={!title}
+        state={state}
+        message={hintMessage ?? 'Haz una predicción antes de buscar la respuesta. Equivocarse aquí también es parte de entender.'}
+      />
 
       {/* Instrucción */}
       <p

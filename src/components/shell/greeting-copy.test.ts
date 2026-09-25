@@ -30,6 +30,7 @@ const STATES: Partial<GreetingData>[] = [
   { state: 'first-time', completedCount: 0, nextLesson: 1 },
   { state: 'in-progress' },
   { state: 'returning-late', reviewLesson: 1 },
+  { state: 'awaiting-test', completedCount: 10, nextLesson: null },
   { state: 'complete', completedCount: 10, nextLesson: null },
 ];
 
@@ -72,15 +73,24 @@ describe('Textos del saludo', () => {
     expect(c.title).toEqual({ before: 'Hola de nuevo.', name: null, after: '' });
   });
 
-  it('estado 3: módulo completo', () => {
+  it('estado 3 (nuevo): las 10 hechas, prueba pendiente', () => {
     const c = copyOf(STATES[3]);
+    expect(c.title).toEqual({ before: 'Hola, ', name: 'Mateo', after: '.' });
+    expect(c.cta).toBe('Hacer la prueba del Módulo 1');
+    // no dice "terminaste": terminar las lecciones no es lo mismo que terminar el módulo
+    expect(allText(c)).not.toMatch(/terminaste/i);
+    expect(copyOf({ ...STATES[3], userName: null }).title).toEqual({ before: 'Hola.', name: null, after: '' });
+  });
+
+  it('estado 4: módulo completo, solo tras aprobar la prueba', () => {
+    const c = copyOf(STATES[4]);
     expect(c.title).toEqual({ before: 'Terminaste el Módulo 1, ', name: 'Mateo', after: '.' });
     expect(c.cta).toBe('Ver el Módulo 2');
-    expect(copyOf({ ...STATES[3], userName: null }).title.before).toBe('Terminaste el Módulo 1.');
+    expect(copyOf({ ...STATES[4], userName: null }).title.before).toBe('Terminaste el Módulo 1.');
   });
 
   it('solo el estado 2 propone repaso', () => {
-    expect(STATES.map((s) => copyOf(s).review !== null)).toEqual([false, false, true, false]);
+    expect(STATES.map((s) => copyOf(s).review !== null)).toEqual([false, false, true, false, false]);
   });
 
   it('tono: nunca deuda, urgencia ni épica, en ningún estado ni con/sin nombre', () => {

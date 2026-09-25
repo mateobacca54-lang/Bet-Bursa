@@ -3,12 +3,14 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MODULO_1, TEMARIO_MODULO_1 } from '@/content/modulo-1/temario';
+import { MISION_MODULO_1 } from '@/content/modulo-1/mision';
 import { getGreetingState, type GreetingData } from '@/lib/greeting';
 import { getCurrentStreak, getNextLesson, type ModuleProgress } from '@/lib/progress';
 import { Reveal } from '@/components/motion';
 import { AppShell, Greeting } from '@/components/shell';
 import { LearningPath } from '@/components/path';
 import { FloatingPapers } from '@/components/decor';
+import { PruebaCheckpoint } from '@/components/prueba';
 
 interface ModuleHomeProps {
   progress: ModuleProgress;
@@ -18,6 +20,8 @@ interface ModuleHomeProps {
   hydrated: boolean;
   /** El usuario pulsó "Lo tengo" en el repaso */
   onReviewed: (lesson: number) => void;
+  /** El usuario pulsó "Ya lo hice" en la misión de fin de módulo */
+  onMisionHecha: () => void;
 }
 
 const hrefFor = (lesson: number) => `/modulo/1/leccion/${lesson}`;
@@ -44,7 +48,7 @@ function LegendDot({ kind }: { kind: 'done' | 'current' | 'locked' }) {
  * Secuencia deliberada: primero se te reconoce (saludo, t=0), después se te muestra el
  * terreno (el camino se dibuja a partir de t=0.4).
  */
-export default function ModuleHome({ progress, now, hydrated, onReviewed }: ModuleHomeProps) {
+export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisionHecha }: ModuleHomeProps) {
   const total = MODULO_1.lessonCount;
   const live = useMemo(() => getGreetingState(progress, now, total), [progress, now, total]);
 
@@ -55,6 +59,10 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed }: Modu
   const greeting = frozen ?? live;
 
   const nextLesson = getNextLesson(progress, total);
+  // Las 10 hechas y sin aprobar: el botón lleva a la prueba, no al módulo siguiente
+  // (ARQUITECTURA §2: se avanza demostrando, no asistiendo).
+  const ctaHref =
+    greeting.state === 'awaiting-test' ? '/modulo/1/prueba' : nextLesson ? hrefFor(nextLesson) : '/modulo/2';
 
   return (
     <AppShell
@@ -70,8 +78,10 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed }: Modu
             <Greeting
               data={greeting}
               lessons={TEMARIO_MODULO_1}
-              ctaHref={greeting.nextLesson ? hrefFor(greeting.nextLesson) : '/modulo/2'}
+              ctaHref={ctaHref}
               onReviewed={onReviewed}
+              mision={{ texto: MISION_MODULO_1, hecha: progress.misionHecha }}
+              onMisionHecha={onMisionHecha}
             />
           </div>
         )}
@@ -156,6 +166,10 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed }: Modu
             aria-hidden="true"
             style={{ height: 420, background: 'var(--ink)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}
           />
+        )}
+
+        {hydrated && greeting.state === 'awaiting-test' && (
+          <PruebaCheckpoint moduleNumber={1} href="/modulo/1/prueba" delay={0.5} />
         )}
       </motion.section>
     </AppShell>

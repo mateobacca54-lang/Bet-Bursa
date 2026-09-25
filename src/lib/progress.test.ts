@@ -1,12 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import {
   emptyProgress,
+  parseProgress,
   toDateKey,
   daysBetween,
   completeLesson,
   getCurrentStreak,
   loadProgress,
-  saveProgress
+  saveProgress,
+  passPrueba,
+  marcarMisionHecha
 } from './progress';
 
 describe('Progress (Ola 0)', () => {
@@ -123,6 +126,47 @@ describe('Progress (Ola 0)', () => {
     expect(loadProgress('m1', memStorage)).toEqual(validP);
   });
 
+  it('pruebaAprobada: empieza en false y se sanea si el dato guardado no es booleano', () => {
+    expect(emptyProgress('m1').pruebaAprobada).toBe(false);
+
+    const badTypeStorage = {
+      getItem: () => JSON.stringify({ pruebaAprobada: 'sí' }),
+      setItem: () => {}
+    };
+    expect(loadProgress('m1', badTypeStorage).pruebaAprobada).toBe(false);
+  });
+
+  it('passPrueba: aprueba, es idempotente, y no toca nada más', () => {
+    const p = { ...emptyProgress('m1'), completedLessons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
+    const aprobado = passPrueba(p);
+    expect(aprobado.pruebaAprobada).toBe(true);
+    expect(aprobado.completedLessons).toEqual(p.completedLessons); // no muta lo demás
+    expect(aprobado).not.toBe(p); // inmutable
+
+    // aprobarla otra vez no cambia nada (idempotente): misma referencia
+    expect(passPrueba(aprobado)).toBe(aprobado);
+  });
+
+  it('misionHecha: empieza en false y se sanea si el dato guardado no es booleano', () => {
+    expect(emptyProgress('m1').misionHecha).toBe(false);
+
+    const badTypeStorage = {
+      getItem: () => JSON.stringify({ misionHecha: 1 }),
+      setItem: () => {}
+    };
+    expect(loadProgress('m1', badTypeStorage).misionHecha).toBe(false);
+  });
+
+  it('marcarMisionHecha: la reconoce, es idempotente, y no toca nada más', () => {
+    const p = { ...emptyProgress('m1'), pruebaAprobada: true };
+    const hecha = marcarMisionHecha(p);
+    expect(hecha.misionHecha).toBe(true);
+    expect(hecha.pruebaAprobada).toBe(true); // no muta lo demás
+    expect(hecha).not.toBe(p); // inmutable
+
+    expect(marcarMisionHecha(hecha)).toBe(hecha); // idempotente: misma referencia
+  });
+
   function withThrowingAccessor(fn: () => void) {
     const desc = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
     Object.defineProperty(globalThis, 'localStorage', {
@@ -149,5 +193,22 @@ describe('Progress (Ola 0)', () => {
       expect(() => saveProgress(emptyProgress('m1'))).not.toThrow();
       expect(saveProgress(emptyProgress('m1'))).toBe(false);
     });
+  });
+});
+
+
+describe('emailPrompted', () => {
+  it('empieza en false y permite leer progreso anterior', () => {
+    expect(emptyProgress('m1').emailPrompted).toBe(false);
+    expect(parseProgress('{}', 'm1').emailPrompted).toBe(false);
+  });
+  it.each([null, 'true', 1, [], {}])('sanea un valor no booleano: %j', (emailPrompted) => {
+    expect(parseProgress(JSON.stringify({ emailPrompted }), 'm1').emailPrompted).toBe(false);
+  });
+  it.each([true, false])('conserva el booleano %s al guardar y leer', (emailPrompted) => {
+    let raw = '';
+    const storage = { getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } };
+    saveProgress({ ...emptyProgress('m1'), emailPrompted }, storage);
+    expect(loadProgress('m1', storage).emailPrompted).toBe(emailPrompted);
   });
 });

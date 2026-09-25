@@ -38,6 +38,46 @@
 
 .bursa-header-brand {
   margin-right: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  text-decoration: none;
+}
+
+.bursa-sidebar-brand {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3) var(--space-6);
+  text-decoration: none;
+}
+
+.bursa-sidebar-brand--compact {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.bursa-brand-art {
+  position: relative;
+  display: block;
+  width: calc(var(--space-16) * 2 + var(--space-8));
+  height: var(--space-8);
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: var(--surface-raised);
+}
+
+.bursa-brand-art img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.bursa-brand-art--compact {
+  width: var(--space-8);
+}
+
+.bursa-brand-art--compact img {
+  object-position: left center;
 }
 
 .bursa-header-progress {

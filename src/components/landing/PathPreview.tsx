@@ -34,7 +34,10 @@ export default function PathPreview() {
               lessons={TEMARIO_MODULO_1}
               completedLessons={[]}
               nextLesson={1}
-              hrefFor={(n) => `/modulo/1/leccion/${n}`}
+              // Este es un adelanto en la landing, no el camino real: cualquier tema lleva
+              // a /inicio (el mismo punto de entrada que los demás botones de la landing),
+              // nunca directo a una lección — eso saltaría la apuesta inicial y el saludo.
+              hrefFor={() => '/inicio'}
             />
           )}
         </div>

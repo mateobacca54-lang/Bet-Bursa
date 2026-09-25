@@ -11,11 +11,12 @@ const TEXT =
   'Tu plata toma decisiones todos los días: la empanada que subió, el préstamo a un amigo, la cuota del celular. Bursa te enseña cómo funciona el dinero y los mercados donde se mueve, con ejemplos en pesos y sin jerga.';
 const WORDS = TEXT.split(' ');
 /**
- * Opacidad de una palabra que aún no "se ha leído". No baja de 0,6: las palabras en naranja, que son
- * más oscuras que el blanco, dejan de llegar a 3 : 1 sobre el fondo (mínimo WCAG AA para texto grande)
- * y quien tenga baja visión no las lee.
+ * Opacidad de una palabra que aún no "se ha leído". No baja de 0,72: desde que la sección
+ * es de papel (2026-09-26), atenuar tinta oscura sobre fondo claro pierde contraste mucho
+ * más rápido que atenuar blanco sobre negro — y las palabras en naranja son las primeras
+ * en caer por debajo de 3 : 1 (mínimo WCAG AA para texto grande).
  */
-const DIM = 0.6;
+const DIM = 0.82;
 
 function Word({ word, index, progress, reduced }: { word: string; index: number; progress: MotionValue<number>; reduced: boolean }) {
   const start = index / WORDS.length;

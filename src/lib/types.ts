@@ -1,3 +1,5 @@
+import type { ObjetoId, DocumentoId } from '@/components/illus';
+
 // ============================================================
 // types.ts — Contratos del sistema de widgets de Bursa
 // ============================================================
@@ -86,6 +88,9 @@ export interface ConsequenceSliderConfig {
 
   /** Texto del gancho / contexto inicial */
   hookText: string;
+
+  /** Dibujito del objeto cuyo precio sube (components/illus/Objetos). Decorativo. */
+  visual?: ObjetoId;
 }
 
 // ─── Configuración del DragClassifier (Arquetipo B) ───
@@ -95,6 +100,8 @@ export interface DragItem {
   label: string;
   /** Nombre corto para la ficha que queda dentro de la zona (por defecto, `label`) */
   shortLabel?: string;
+  /** Dibujito del objeto de la situación (components/illus/Objetos). Decorativo: el texto dice lo mismo. */
+  icon?: ObjetoId;
   /** Descripción corta o contexto adicional */
   description?: string;
   /** Por qué va en su zona. Se muestra al colocarlo (o al revelarlo tras fallar) */
@@ -157,10 +164,8 @@ export interface HotspotZone {
 
 export interface DocumentHotspotConfig {
   instruction: string;
-  /** Ruta a la imagen del documento */
-  imageSrc: string;
-  /** Alt text de la imagen */
-  imageAlt: string;
+  /** Qué documento dibujado mostrar (components/illus/Documento). Decorativo: las zonas son lo interactivo */
+  documento: DocumentoId;
   /** Todas las zonas interactivas */
   zones: HotspotZone[];
   /** ID de la zona correcta */
@@ -207,6 +212,25 @@ export interface AnimatedComparatorConfig {
   };
 }
 
+// ─── Configuración del Elegir (Arquetipo F) ───
+//
+// Distinto a los otros cinco: no corrige, refleja. No hay "wrong": cada opción es una
+// decisión legítima, y al elegir se muestra qué dice esa elección de quien la tomó.
+// Vive en los cierres de módulo y en la apuesta de Monedita — nunca en una prueba de paso,
+// que sí necesita corrección (ver src/content/modulo-1/prueba.ts).
+
+export interface ElegirOpcion {
+  id: string;
+  label: string;
+  /** Qué le dice esa elección a la persona sobre sí misma. Se muestra al elegir */
+  reflexion: string;
+}
+
+export interface ElegirConfig {
+  instruction: string;
+  options: ElegirOpcion[];
+}
+
 // ─── Tipos de lección ───
 
 export type WidgetType =
@@ -214,14 +238,16 @@ export type WidgetType =
   | 'DragClassifier'
   | 'ProportionBuilder'
   | 'DocumentHotspot'
-  | 'AnimatedComparator';
+  | 'AnimatedComparator'
+  | 'Elegir';
 
 export type WidgetConfig =
   | ConsequenceSliderConfig
   | DragClassifierConfig
   | ProportionBuilderConfig
   | DocumentHotspotConfig
-  | AnimatedComparatorConfig;
+  | AnimatedComparatorConfig
+  | ElegirConfig;
 
 export interface LessonConfig {
   id: string;

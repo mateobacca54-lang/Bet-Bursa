@@ -48,3 +48,4 @@ storybook-static
 
 # grabaciones y capturas de verificación (scripts/capture.mjs)
 /artifacts
+.npm-cache

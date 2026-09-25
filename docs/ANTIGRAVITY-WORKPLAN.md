@@ -81,6 +81,10 @@ OLA 3 · Lección            I ──┤
                                ↓  ← revisión tuya
 OLA 4 · Widgets            K ──┤
 (2 agentes en paralelo)    L ──┘
+                               ↓  ← revisión tuya
+OLA 5 · Inicio             M ──┤  (ver más abajo)
+(3 tareas, ejecutadas)     N ──┤
+                           O ──┘
 ```
 
 ### Ola 0 — Cimientos
@@ -164,6 +168,49 @@ de la Lección 1). No lanzarla antes: el agente escribiría contenido que habrí
 L es la única tarea que edita `types.ts` (añade `predictionMode`). Nadie más lo toca en
 esa ola.
 
+### Ola 5 — Inicio (`/inicio`, entre la landing y el camino)
+
+Ejecutada el 2026-09-21. Misma regla de siempre: un archivo, un solo dueño.
+
+| Tarea | Objetivo | Dueño exclusivo de | Depende de |
+|---|---|---|---|
+| **M** | Cimientos: tokens `sand/gold`, variante `hop`, lógica pura y contenido | `src/styles/tokens.css` (solo el bloque añadido), `src/lib/motion.ts` (solo `hop`), `src/lib/inicio.ts` + test, `src/content/inicio.ts`, `public/monedita/` | — |
+| **N** | Superficie: `Monedita`, `WarmUp`, `ModuleCard`, `Inicio` + stories | `src/components/inicio/` | M |
+| **O** | Integración: ruta y recableado de accesos | `src/app/inicio/`, `href` en `components/landing/` y `Sidebar.tsx` | N |
+
+**Verificación que se hizo** (todo en `artifacts/inicio-*` y `scripts/gestos/inicio-*.mjs`): `npm test` (78 en verde),
+`tsc` y `eslint` limpios, las 15 stories de Inicio en Chromium, `npm run capture` en los 3 perfiles para las dos versiones
+de la pantalla, **axe con 0 violaciones** en primera visita / tras apostar / volviste / 390 px, recorrido con teclado
+(el foco se queda en la opción elegida) y el flujo landing → `/inicio` → `/modulo/1`.
+**Revisión independiente con Antigravity** (`agy --mode plan`, solo lectura): 2 hallazgos, ambos corregidos (valores de
+movimiento escritos a mano en `WarmUp`; `aria-labelledby` apuntando a un `h1` que aún no existía antes de hidratar).
+
+⚠️ **`agy` en modo sin interfaz** (`-p`): no puede pedir permiso, así que **deniega los comandos de terminal** y solo lee
+archivos; y **no toma la carpeta actual como espacio de trabajo**: hay que pasarle `--add-dir "<ruta absoluta>"`. Sin eso
+devuelve "no tengo un espacio de trabajo". No usar `--dangerously-skip-permissions` salvo que el dueño lo pida.
+
+### Ola 6 — Identidad visual y tarjetas que tapaban
+
+Ejecutada el 2026-09-21, a partir de dos defectos que reportó el dueño con capturas.
+
+| Tarea | Objetivo | Dueño exclusivo de |
+|---|---|---|
+| **P** | Que ningún adorno tape contenido | `src/components/decor/` |
+| **Q** | Sistema de ilustración propio | `src/components/illus/`, `scripts/og.mjs`, `public/og.png` |
+| **R** | Montarlo en la landing | `src/components/landing/`, `src/app/page.tsx` (solo la imagen al compartir) |
+
+**Cómo se verificó** (ningún juicio a ojo): un script de Playwright mide el área de intersección entre cada adorno y cada
+elemento con contenido, en 10 anchos de 900 a 1920 px y en dos estados de progreso. Antes: 14 choques en `/modulo/1` y 33 en
+la landing. Después: **0 contra contenido**. Más `npm test` (78), las 78 pruebas de stories, `tsc` y `eslint` limpios, y axe
+con 0 violaciones en la landing a 1280 y a 390 px.
+
+⚠️ **Auditar con axe durante una animación de entrada da falsos positivos**: mientras un elemento va a media opacidad, el
+color que axe calcula es la mezcla y falla el contraste. Apareció una violación de `color-contrast` que no se reproduce al
+dejar la página en reposo. Dejar asentar la página (2,5 s) antes de auditar.
+
+⚠️ **Una captura de página completa con `position: sticky` miente**: parecía que el pie de una tarjeta estaba cortado. Medido
+en el DOM, no lo estaba. Para juzgar un héroe fijo, capturar la ventana a varias alturas de scroll, no la página entera.
+
 ---
 
 ## 5. Criterios de aceptación: artefactos, no prosa
@@ -227,6 +274,7 @@ npm run capture -- --url <url> --name tarea-e --script scripts/gestos/e.mjs
 | **J** | Grabación de: completar L2 → volver al camino → el tramo dibujándose y la cifra rodando. Y del `NamePrompt` con la ruta "Prefiero sin nombre" |
 | **K** | Grabación de arrastre con mouse **y** del recorrido completo solo con teclado (Enter, flechas, Enter) |
 | **L** | Grabación de: predecir arrastrando → revelación de la curva real por encima → feedback |
+| **N** | Grabación de la primera visita (Monedita entra → apuesta → ella salta → revelación) y de "volviste" (saludo + tarjetas), en los 3 perfiles |
 
 ### Lo que ningún agente puede certificar
 

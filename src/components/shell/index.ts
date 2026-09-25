@@ -5,4 +5,5 @@ export { default as ProgressBar } from './ProgressBar';
 export { default as RollingNumber } from './RollingNumber';
 export { default as Greeting } from './Greeting';
 export { default as SpacedReview } from './SpacedReview';
+export { default as Mision } from './Mision';
 export { getGreetingCopy } from './greeting-copy';

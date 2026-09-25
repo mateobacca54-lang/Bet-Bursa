@@ -34,8 +34,60 @@
   --ink-secondary: #5B6478;
   --on-brand:      #0A0F1C;
 
+  /* ─── Tonos de Monedita (añadidos 2026-09-21, aprobados por el dueño) ───
+     Aditivos: no reemplazan nada. Salen de la mascota: el brillo de la moneda
+     (oro) y el papel cálido donde ella vive (arena). Pendiente de reconciliar
+     con Claude Design (PLAN-MODULO-1.md §10, decisión #3).
+     Contrastes medidos: ink/sand-100 16.8, brand-700/sand-100 5.0,
+     gold-700/gold-100 6.3, ink/gold-300 13.5.                                 */
+  --sand-50:  #FBF7F1;
+  --sand-100: #F6EFE6;
+  --sand-200: #EADFCF;
+  --gold-100: #FFF1C7;
+  --gold-300: #FFD466;
+  --gold-500: #F2A81D;
+  --gold-700: #7A4F00;
+
+  /* Acentos para escenas consecutivas: señalan un cambio de idea sin competir
+     con el naranja de marca en el resto de la experiencia. */
+  --scene-blue-50:  #E9EEFF;
+  --scene-blue-500: #465FD1;
+  --scene-blue-700: #29408F;
+
+  /* ─── Papel y tinta (añadido 2026-09-26) ───
+     PENDIENTE de reconciliar con Claude Design, igual que los tonos de Monedita.
+     Casi todo sale de valores ya aprobados: --paper es --sand-50, --paper-sunk es
+     --sand-100 y --ink-soft es --ink con alfa. Lo único realmente nuevo es el par
+     --shadow-soft / --border-hairline.
+
+     La landing alternaba 13 secciones casi negras con tarjetas blanco puro: el salto
+     era tan brusco que la página se leía a gritos. Estos tokens dan el escalón que
+     faltaba entre uno y otro. No reemplazan nada: --ink y --surface-raised siguen igual.
+
+     La regla: la PÁGINA es papel, la TINTA es para el texto y para dos objetos
+     deliberados (el héroe y el cierre). El papel es --sand-50, el mismo tono cálido
+     sobre el que están dibujadas las estampas de Monedita — no es un crema decorativo,
+     es el papel donde ya vive la ilustración.
+
+     Jerarquía por OPACIDAD de una sola tinta, no por grises distintos: --ink-secondary
+     (#5B6478) es un gris FRÍO y sobre papel cálido se ve sucio.
+
+     Contrastes MEDIDOS sobre --paper (compuestos en canvas, no estimados):
+       ink        17,92  → AA en texto normal
+       ink-soft    6,05  → AA en texto normal
+       brand-700   5,35  → AA en texto normal
+       brand-600   3,27  → SOLO texto grande (≥24 px, o ≥18,7 px en negrita) o bordes
+     Sobre --paper-sunk cada uno baja ~0,2; brand-600 queda en 3,06, al filo. */
+  --paper:       var(--sand-50);
+  --paper-sunk:  var(--sand-100);  /* un escalón por debajo del papel, para hundir bloques */
+  --ink-soft:    color-mix(in srgb, var(--ink) 66%, transparent);
+
   /* ─── Bordes ─── */
   --border: #D7DCE3;
+  --border-warm: #E3D6C3;
+  /* Filo apenas visible para tarjetas blancas sobre papel: sin él flotan sin apoyarse;
+     con una sombra fuerte parecen recortadas y pegadas encima. */
+  --border-hairline: color-mix(in srgb, var(--ink) 9%, transparent);
 
   /* ─── Radios ─── */
   --radius-sm:   8px;
@@ -46,6 +98,9 @@
   /* ─── Sombras ─── */
   --shadow-sm: 0 1px 2px rgba(10, 15, 28, 0.08);
   --shadow-md: 0 8px 24px rgba(10, 15, 28, 0.12);
+  /* Difusa y SIN desplazamiento vertical: la tarjeta se posa sobre el papel en vez de
+     parecer pegada encima. Para superficies claras sobre --paper. */
+  --shadow-soft: 0 0 28px rgba(10, 15, 28, 0.06);
 
   /* ─── Espaciado ─── */
   --space-1:   4px;
@@ -58,7 +113,13 @@
   --space-16: 64px;
 
   /* ─── Tipografía ─── */
-  --font-family: 'Montserrat', sans-serif;
+  --font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+  --font-serif: Georgia, Cambria, 'Times New Roman', serif;
+  /* Titulares grandes de la landing, y NADA más (añadido 2026-09-26). Montserrat sigue
+     siendo la voz de todo el producto; esta es la voz de portada. Se deja fuera del
+     producto a propósito: dentro de una lección, dos tipografías compiten por atención
+     que le pertenece al ejercicio. */
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', var(--font-family);
   --font-size-xs:   0.75rem;   /* 12px */
   --font-size-sm:   0.875rem;  /* 14px */
   --font-size-base: 1rem;      /* 16px */
@@ -77,8 +138,10 @@
   --line-height-normal: 1.5;
   --line-height-loose:  1.75;
 
-  /* ─── Tracking (mayúscula sostenida) ─── */
-  --tracking-wide: 0.05em;
+  /* ─── Tracking ─── */
+  --tracking-wide: 0.05em;   /* mayúscula sostenida */
+  /* A 40 px o más, el espaciado normal deja huecos: los titulares grandes se cierran. */
+  --tracking-tight: -0.02em;
 
   /* ─── Transiciones ─── */
   --transition-fast:   150ms ease;

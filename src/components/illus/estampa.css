@@ -1,0 +1,12 @@
+/* ============================================================
+   estampa.css — el lienzo de las ilustraciones de Bursa.
+   El fondo blanco va aquí y no dentro del SVG, para que una estampa
+   pueda montarse sobre otra superficie si alguna vez hace falta.
+   ============================================================ */
+
+.estampa {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--surface-raised);
+}

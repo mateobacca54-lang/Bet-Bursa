@@ -6,7 +6,20 @@ export interface ModuleProgress {
   lastActiveDate: string | null;
   userName: string | null;
   namePrompted: boolean;
+  emailPrompted: boolean;
   reviewedConcepts: number[];
+  /**
+   * ¿Ya aprobó la prueba de paso de este módulo? Es lo único que se guarda de ella: no hay
+   * "reprobado" persistido (el reintento es libre y sin límite, ARQUITECTURA §2) ni número
+   * de intentos persistido. La captura de comprensión se envía aparte, sin datos personales.
+   */
+  pruebaAprobada: boolean;
+  /**
+   * ¿Ya se reconoció la misión de fin de módulo (ARQUITECTURA §2)? No se corrige — es una
+   * tarea fuera de la pantalla que solo se reconoce en la siguiente visita, nunca se
+   * verifica que de verdad se hizo.
+   */
+  misionHecha: boolean;
 }
 
 export function emptyProgress(moduleId: string): ModuleProgress {
@@ -18,8 +31,24 @@ export function emptyProgress(moduleId: string): ModuleProgress {
     lastActiveDate: null,
     userName: null,
     namePrompted: false,
+    emailPrompted: false,
     reviewedConcepts: [],
+    pruebaAprobada: false,
+    misionHecha: false,
   };
+}
+
+/**
+ * Se aprueba la prueba de paso. Nunca "se reprueba": fallar no persiste nada, solo se
+ * reintenta (ver PruebaDePaso). Idempotente: aprobarla dos veces no hace nada distinto.
+ */
+export function passPrueba(progress: ModuleProgress): ModuleProgress {
+  return progress.pruebaAprobada ? progress : { ...progress, pruebaAprobada: true };
+}
+
+/** Se reconoce la misión. Idempotente, igual que passPrueba. */
+export function marcarMisionHecha(progress: ModuleProgress): ModuleProgress {
+  return progress.misionHecha ? progress : { ...progress, misionHecha: true };
 }
 
 export function toDateKey(date: Date): string {
@@ -134,7 +163,10 @@ export function parseProgress(raw: string | null, moduleId: string): ModuleProgr
       lastActiveDate: typeof parsed.lastActiveDate === 'string' ? parsed.lastActiveDate : empty.lastActiveDate,
       userName: typeof parsed.userName === 'string' ? parsed.userName : empty.userName,
       namePrompted: typeof parsed.namePrompted === 'boolean' ? parsed.namePrompted : empty.namePrompted,
+      emailPrompted: typeof parsed.emailPrompted === 'boolean' ? parsed.emailPrompted : empty.emailPrompted,
       reviewedConcepts: Array.isArray(parsed.reviewedConcepts) ? parsed.reviewedConcepts.filter((x): x is number => typeof x === 'number') : empty.reviewedConcepts,
+      pruebaAprobada: typeof parsed.pruebaAprobada === 'boolean' ? parsed.pruebaAprobada : empty.pruebaAprobada,
+      misionHecha: typeof parsed.misionHecha === 'boolean' ? parsed.misionHecha : empty.misionHecha,
     };
   } catch {
     return empty;
