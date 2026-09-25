@@ -1,13 +1,16 @@
-import Image from 'next/image';
+'use client';
+
 import Link from 'next/link';
 import BursaLogo from './BursaLogo';
 import { Imagotipo } from '@/components/brand';
 import { nombreModulo } from '@/content/modulos';
-import HeroScrollScene from './HeroScrollScene';
 import ApareceAlBajar from './ApareceAlBajar';
 import LeeLaLetra from './LeeLaLetra';
-import MetodoDemo from './MetodoDemo';
 import CaminoParadas from './CaminoParadas';
+import AsiSeAprende from './AsiSeAprende';
+import Cierre from './Cierre';
+import { HeroMoneda, CapituloEncoge, CapituloCrece } from './capitulos';
+import { useCtaProgreso } from '@/lib/useCtaProgreso';
 import './landing.css';
 
 const INSTITUCIONES_MAILTO = 'mailto:soy.bursa.co@gmail.com?subject=Bursa%20para%20instituciones';
@@ -42,14 +45,17 @@ const PREGUNTAS = [
 ];
 
 /**
- * Landing — la página pública de Bursa (`/`), rediseño v2.
+ * Landing — la página pública de Bursa (`/`), dirección "Un objeto, un capítulo por
+ * pantalla" (docs/DIRECCION-LANDING.md).
  *
- * Estructura: barra → héroe con comparación visual → promesa →
- * ejemplo sencillo de ahorro e inversión → crédito → camino →
- * instituciones → preguntas → cierre → pie. Página blanca: el naranja se
- * reserva para el botón principal, Monedita y la elección activa.
+ * Estructura: barra → héroe (la moneda) → "tu plata se encoge" (capítulo oscuro,
+ * inflación) → "mira crecer tu plata" (ahorro vs. CDT) → crédito → así se aprende (celular) → camino →
+ * instituciones → preguntas → cierre → pie. Página blanca salvo el capítulo oscuro:
+ * el naranja se reserva para el botón principal, Monedita y la elección activa.
  */
 export default function Landing() {
+  const cta = useCtaProgreso();
+
   return (
     <div className="lp">
       <ApareceAlBajar />
@@ -60,7 +66,7 @@ export default function Landing() {
       <header className="lp-nav">
         <BursaLogo />
         <nav aria-label="Principal" className="lp-nav-links">
-          <a className="lp-nav-link" href="#como-aprendes">
+          <a className="lp-nav-link" href="#como-aprendes-app">
             Aprender
           </a>
           <a className="lp-nav-link" href="#instituciones">
@@ -70,46 +76,17 @@ export default function Landing() {
             Quiénes somos
           </Link>
         </nav>
-        <Link href="/inicio" className="lp-btn lp-btn--primary">
-          Empieza gratis
+        <Link href={cta.href} className="lp-btn lp-btn--primary">
+          {cta.label}
         </Link>
       </header>
 
       <main id="main-content">
-        <section id="inicio" className="lp-section lp-hero" aria-labelledby="hero-titulo">
-          <div className="lp-wrap lp-hero-grid">
-            <div className="lp-hero-copy">
-              <h1 id="hero-titulo" className="lp-hero-title">
-                Aprende a leer las decisiones que mueven tu plata.
-              </h1>
-              <p className="lp-hero-lead">
-                Aprende con ejemplos de la vida diaria. Tú eliges qué crees que pasará y descubres por qué.
-              </p>
-              <div className="lp-hero-actions">
-                <Link href="/inicio" className="lp-btn lp-btn--primary">
-                  Empieza gratis
-                </Link>
-                <a href="#como-aprendes" className="lp-btn lp-btn--secondary">
-                  Ver cómo aprendes
-                </a>
-              </div>
-            </div>
-
-            <HeroScrollScene />
-          </div>
-        </section>
-
-        <section className="lp-section lp-promises">
-          <div className="lp-wrap">
-            <div className="lp-promise">
-              <p className="lp-promise-body">Aprender sobre tu plata es gratis.</p>
-              <p className="lp-promise-detail">Hecho en Colombia, con ejemplos de acá.</p>
-            </div>
-          </div>
-        </section>
-
-        <MetodoDemo />
+        <HeroMoneda />
+        <CapituloEncoge />
+        <CapituloCrece />
         <LeeLaLetra />
+        <AsiSeAprende />
         <CaminoParadas />
 
         <section id="instituciones" className="lp-section lp-inst" aria-labelledby="instituciones-titulo">
@@ -162,25 +139,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="lp-section lp-closing" aria-labelledby="cierre-titulo">
-          <div className="lp-wrap lp-closing-inner">
-            <div className="lp-closing-avatar">
-              <Image
-                src="/monedita/monedita.webp"
-                alt="Monedita, la moneda que te acompaña en Bursa"
-                width={600}
-                height={640}
-                draggable={false}
-              />
-            </div>
-            <h2 id="cierre-titulo" className="lp-title">
-              Tu primera lección dura tres minutos.
-            </h2>
-            <Link href="/inicio" className="lp-btn lp-btn--primary" data-aparece="subir">
-              Empieza gratis
-            </Link>
-          </div>
-        </section>
+        <Cierre />
       </main>
 
       <footer className="lp-footer">

@@ -1,0 +1,306 @@
+/* ============================================================
+   capitulos.css — HeroMoneda, CapituloEncoge y CapituloCrece
+   (docs/DIRECCION-LANDING.md §5.1–5.3). Solo valores de tokens.css, igual que
+   landing.css: ningún color, espaciado, radio ni tipografía se escribe a mano.
+
+   Prefijos: `hm-` para HeroMoneda, `cap-encoge-` y `cap-crece-` para cada capítulo,
+   y `cap-title` como título compartido por los dos capítulos (deliberadamente NO
+   `.lp-title`: ApareceAlBajar.tsx anima automáticamente cualquier `.lp-title` al
+   entrar en pantalla, y estos títulos ya llevan SU PROPIA animación —el pin y el
+   scrub de GSAP— así que compartir la clase animaría el mismo elemento dos veces).
+   ============================================================ */
+
+/* ─── HeroMoneda ─── */
+.hm-art {
+  display: flex;
+  justify-content: center;
+}
+.hm-art img {
+  width: 100%;
+  max-width: min(720px, 92vw);
+  height: auto;
+  display: block;
+}
+.hm-confianza {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--ink-soft);
+}
+.hm-confianza span {
+  padding-inline: var(--space-1);
+}
+
+/* ─── Título compartido de capítulo: centrado, una idea por pantalla ─── */
+.cap-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--line-height-tight);
+  font-size: clamp(var(--font-size-3xl), 6vw, calc(var(--font-size-4xl) * 1.6));
+  text-wrap: balance;
+  text-align: center;
+  color: var(--ink);
+}
+
+/* Los dos capítulos anclados NO usan el padding-block de `.lp-section` (landing.css):
+   ese padding vive en el `<section>` que GSAP usa como `trigger`, y si el `<section>`
+   tuviera aire arriba, el punto donde arranca el pin (calculado sobre su borde
+   superior) quedaría desalineado del cuadro que de verdad se fija en pantalla. El
+   ritmo vertical lo dan, en su lugar, el propio pin (alto de un viewport, con
+   movimiento) y el padding de sus bloques internos — en total, más aire que el
+   `--space-16` de un `.lp-section` normal, no menos. */
+.cap-encoge,
+.cap-crece {
+  padding-block: 0;
+}
+
+/* ============================================================
+   CapituloEncoge — "Tu plata se encoge" (capítulo oscuro)
+   ============================================================ */
+.cap-encoge {
+  background: var(--ink);
+  color: var(--paper);
+  overflow: hidden; /* la moneda encogiéndose nunca debe abrir scroll lateral */
+  /* Texto secundario sobre fondo oscuro: mismo mix que --ink-soft (tokens.css), pero
+     con --paper en vez de --ink — --ink-soft está pensado para fondos claros y aquí,
+     sobre --ink, se leería casi invisible. */
+  --cap-paper-soft: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+.cap-encoge .cap-title {
+  color: var(--paper);
+}
+.cap-encoge-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* El pin solo existe con movimiento (ver CapituloEncoge.tsx); forzar 100svh también
+   solo con movimiento, o con reduced-motion el capítulo quedaría con un hueco vacío
+   forzado en vez de fluir con su contenido real. */
+@media (prefers-reduced-motion: no-preference) {
+  .cap-encoge-pin {
+    /* No 100svh a secas: el pin se fija justo debajo de la barra (`--lp-nav-h`,
+       definida en .lp de landing.css), así que su alto visible real es el viewport
+       menos esa barra. Con 100svh completo, el cuadro fijado se pasaría por debajo
+       del viewport en esa misma medida. */
+    min-height: calc(100svh - var(--lp-nav-h));
+  }
+}
+.cap-encoge-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding-block: var(--space-8);
+  width: 100%;
+}
+.cap-encoge-arte {
+  /* El objeto que cuenta la historia: grande, y acotado por el alto para que el
+     cuadro anclado quepa entero en pantalla. */
+  width: min(400px, 64vw, 40svh);
+}
+.cap-encoge-arte img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.cap-encoge-anio {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--cap-paper-soft);
+}
+.cap-encoge-cifra {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  font-size: clamp(var(--font-size-4xl), 11vw, calc(var(--font-size-4xl) * 2));
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+}
+.cap-encoge-explica {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+  line-height: var(--line-height-normal);
+  color: var(--cap-paper-soft);
+}
+.cap-encoge-nota {
+  padding-block: var(--space-6);
+  max-width: 60ch;
+  margin-inline: auto;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--cap-paper-soft);
+}
+
+/* ============================================================
+   CapituloCrece — "Mira crecer tu plata" (la firma interactiva)
+   ============================================================ */
+.cap-crece-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cap-crece-pin {
+    min-height: calc(100svh - var(--lp-nav-h));
+  }
+}
+.cap-crece-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding-block: var(--space-8);
+  width: 100%;
+}
+.cap-crece-premisa {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+  color: var(--ink-soft);
+}
+
+.cap-crece-comparacion {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 880px;
+}
+@media (min-width: 800px) {
+  .cap-crece-comparacion {
+    gap: var(--space-8);
+  }
+}
+.cap-crece-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.cap-crece-arte {
+  position: relative;
+  width: min(200px, 42vw);
+  aspect-ratio: 1600 / 1195;
+  margin-bottom: var(--space-1);
+}
+@media (min-width: 800px) {
+  .cap-crece-arte {
+    width: min(340px, 30vw, 34svh);
+  }
+}
+.cap-crece-etiqueta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink-soft);
+}
+.cap-crece-cifra {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  font-size: clamp(var(--font-size-xl), 6vw, var(--font-size-3xl));
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.cap-crece-caption {
+  margin: 0;
+  max-width: 26ch;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
+}
+@media (min-width: 800px) {
+  .cap-crece-caption {
+    max-width: 30ch;
+    font-size: var(--font-size-sm);
+  }
+}
+
+.cap-crece-grafica {
+  width: 100%;
+  max-width: 560px;
+  margin-top: var(--space-2);
+}
+.cap-crece-grafica svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cap-crece-linea {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+}
+.cap-crece-linea--ahorro {
+  stroke: var(--ink-soft);
+  stroke-width: 2;
+}
+.cap-crece-linea--cdt {
+  stroke: var(--brand-600);
+  stroke-width: 3;
+}
+.cap-crece-leyenda {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+.cap-crece-leyenda-item {
+  position: relative;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+.cap-crece-leyenda-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--space-3);
+  height: 2px;
+  transform: translateY(-50%);
+  background: currentColor;
+}
+.cap-crece-leyenda-item--ahorro {
+  color: var(--ink-soft);
+}
+.cap-crece-leyenda-item--cdt {
+  color: var(--brand-700);
+}
+
+.cap-crece-conclusion {
+  padding-block: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+.cap-crece-diferencia {
+  margin: 0;
+  max-width: 52ch;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  font-size: clamp(var(--font-size-xl), 3vw, var(--font-size-2xl));
+  color: var(--ink);
+}
+.cap-crece-nota {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
+}

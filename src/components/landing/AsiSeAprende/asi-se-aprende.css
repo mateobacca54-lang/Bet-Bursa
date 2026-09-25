@@ -82,7 +82,7 @@
 
 .asi-phone {
   position: relative;
-  width: min(100%, 280px);
+  width: min(100%, 340px, 38svh);
   aspect-ratio: 390 / 844;
   margin-inline: auto;
   padding: var(--space-2);
@@ -125,7 +125,7 @@
 
 @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
   .asi-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
     gap: var(--space-16);
     align-items: start;
   }

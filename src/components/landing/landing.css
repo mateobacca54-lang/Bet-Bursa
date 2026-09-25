@@ -14,7 +14,9 @@
   /* Alto de la barra fija: A la usa para scroll-margin-top, B para el `top`
      de sus elementos sticky (contrato SPEC §4). */
   --lp-nav-h: calc(var(--space-16) + var(--space-2)); /* 72px */
-  background: var(--surface-raised);
+  /* Papel en toda la página: las imágenes de vidrio y oro traen el fondo ajustado a
+     --paper (DIRECCION-LANDING.md §8), y las tarjetas blancas resaltan encima. */
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--font-family);
 }
@@ -230,10 +232,7 @@
 
 /* ─── Héroe ─── */
 .lp-hero {
-  background: var(--surface-raised);
-  /* Las promesas son continuación visual del héroe (mismo fondo, sin línea entre
-     medio): el héroe cede parte de su aire de abajo para no duplicar espacio. */
-  padding-bottom: var(--space-8);
+  background: var(--paper);
 }
 .lp-hero-grid {
   display: grid;
@@ -251,7 +250,7 @@
     width: 100%;
     /* 1.4fr/1fr, no 1fr/1fr: con las dos columnas iguales los botones del héroe
        (SPEC §5) no cabían en una fila justo desde 960 px y se apilaban. */
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     align-items: center;
     gap: var(--space-8);
   }
@@ -267,7 +266,7 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--tracking-tight);
   line-height: var(--line-height-tight);
-  font-size: clamp(var(--font-size-3xl), 6vw, calc(var(--font-size-4xl) * 1.6));
+  font-size: clamp(var(--font-size-4xl), 8vw, calc(var(--font-size-4xl) * 2.4));
   text-wrap: balance;
   color: var(--ink);
 }
@@ -482,44 +481,15 @@
   text-underline-offset: 3px;
 }
 
-/* ─── Una sola promesa después del héroe ─── */
-.lp-promises {
-  background: var(--sand-100);
-  padding-block: var(--space-8);
-}
-.lp-promise {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-8);
-}
-.lp-promise-body {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(var(--font-size-2xl), 3vw, var(--font-size-3xl));
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  color: var(--ink);
-}
-.lp-promise-detail {
-  margin: 0;
-  padding-left: var(--space-6);
-  border-left: var(--space-1) solid var(--brand-600);
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-normal);
-  color: var(--ink-soft);
-}
-@media (max-width: 799px) {
-  .lp-promise { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
-  .lp-promise-detail { padding-left: var(--space-4); }
-}
-
 /* ─── Instituciones ─── */
 .lp-inst {
   background: var(--surface-raised);
 }
 .lp-inst-card {
-  background: var(--scene-blue-50);
+  /* Antes era --scene-blue-50 (lavanda azulado): fuera de marca en una página cuyo
+     único acento es el naranja. --paper-sunk es el escalón de papel/tinta ya
+     aprobado (tokens.css) para hundir un bloque sobre --surface-raised. */
+  background: var(--paper-sunk);
   border-radius: var(--radius-lg);
   padding: var(--space-8);
   display: grid;
@@ -574,7 +544,8 @@
   height: var(--space-2);
   margin-top: calc(var(--space-2) * 0.55);
   border-radius: 50%;
-  background: var(--scene-blue-500);
+  /* Antes --scene-blue-500: mismo motivo que el fondo de la tarjeta, de vuelta a marca. */
+  background: var(--brand-600);
 }
 
 /* ─── Preguntas ─── */
