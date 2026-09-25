@@ -1,0 +1,14 @@
+.agents
+.claude
+.npm-cache
+.storybook
+artifacts
+Bursa-bet
+docs
+scripts
+.env*
+*.log
+*.tsbuildinfo
+_probar-prueba.mjs
+write_ahorro.js
+UsersASUSAppDataLocalTempclaudeC--Users-ASUS-OneDrive-Desktop-Bursae46463c7-8cd3-4d8e-bf3c-56c5b05ba6c8scratchpadagente-bdesktop-1440-camino-completo.png
