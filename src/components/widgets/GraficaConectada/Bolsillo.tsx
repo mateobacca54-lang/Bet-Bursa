@@ -19,14 +19,11 @@ interface BolsilloProps {
   reducedMotion: boolean;
 }
 
-/** Un token de empanada: media luna plana, mismo trazo que `illus/Objetos` (empanada). */
+/** Empanada en 3D suave, generada con la plantilla de docs/PERSONALIDAD-VISUAL.md. */
+const EMPANADA_SRC = '/objetos/empanada.webp';
+
 function Empanada() {
-  return (
-    <g>
-      <path d="M2 15a13 13 0 0 1 26 0z" fill="var(--gold-300)" stroke="var(--ink)" strokeWidth={2} strokeLinejoin="round" />
-      <path d="M6 15a9 9 0 0 1 18 0" fill="none" stroke="var(--ink)" strokeWidth={1.5} strokeDasharray="2.5 3" opacity={0.7} />
-    </g>
-  );
+  return <image href={EMPANADA_SRC} width={32} height={22} preserveAspectRatio="xMidYMid meet" />;
 }
 
 /**
@@ -59,7 +56,7 @@ export default function Bolsillo({ plata, unidades, maxUnidades, sobrante, reduc
 
       <svg
         className="gc-bolsillo__grid"
-        viewBox={`0 0 ${columnas * 34} ${Math.ceil(total / columnas) * 30}`}
+        viewBox={`0 0 ${columnas * 34} ${Math.ceil(total / columnas) * 26}`}
         aria-hidden="true"
       >
         {fichas.map((i) => {
@@ -69,7 +66,7 @@ export default function Bolsillo({ plata, unidades, maxUnidades, sobrante, reduc
           return (
             <motion.g
               key={i}
-              transform={`translate(${col * 34 + 1}, ${fila * 30 + 2})`}
+              transform={`translate(${col * 34 + 1}, ${fila * 26 + 2})`}
               initial={false}
               animate={{ opacity: alAlcance ? 1 : 0.25 }}
               transition={reducedMotion ? { duration: 0 } : { duration: DURATION.element, ease: EASE_OUT_QUART }}
