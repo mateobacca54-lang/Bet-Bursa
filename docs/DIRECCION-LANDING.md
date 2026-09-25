@@ -1,6 +1,6 @@
 # Dirección de la landing de Bursa
 
-25 de septiembre de 2026. **Propuesta pendiente del visto bueno del dueño.** Reemplaza la idea de
+25 de septiembre de 2026. **Aprobada por el dueño el 25 de septiembre.** Reemplaza la idea de
 abrir la landing con un widget jugable, que el dueño rechazó con razón.
 
 ## 1. Qué tiene que transmitir la primera pantalla
@@ -58,15 +58,18 @@ El scroll hace el trabajo; el usuario no tiene que tocar nada. Todo movimiento e
    la moneda se encoge (`scale`), mientras un contador dice cuánto compran hoy $100.000 con la
    inflación real del Banco de la República. El movimiento *es* la explicación: más scroll, más
    años, menos plata. Cita la fuente al pie.
-3. **"La misma plata, dos decisiones".** La alcancía de vidrio y la matera con la planta. Al bajar,
-   las monedas se reparten entre las dos y cada lado dice qué pasa en 12 meses. Ya existe; se pule.
+3. **"Mira crecer tu plata"** (la firma interactiva). Apartas $100.000 cada mes. Al bajar pasan
+   los meses: la alcancía suma lo guardado y el frasco crece con la tasa real de CDT, y la planta
+   crece por etapas. Al final se ve la diferencia del interés compuesto. Reemplaza a "La misma
+   plata, dos decisiones".
 4. **"Lee la letra pequeña".** El documento del crédito; al bajar, se ilumina la cláusula que
    importa. Ya existe; se pule.
 5. **"Así se aprende en Bursa".** Un celular con la app real. Al bajar, la pantalla pasa por los
    tres momentos de una lección: predices, lo ves, entiendes por qué. Aquí aparece Monedita por
    primera vez.
 6. **La ruta, instituciones, preguntas y cierre.** La ruta con los nombres reales de los módulos;
-   el cierre con Monedita saludando una vez.
+   el cierre con Monedita saludando una vez y, al fondo, velas de mercado muy tenues que se
+   iluminan cerca del cursor.
 
 ## 6. Quien vuelve
 
@@ -82,15 +85,30 @@ El scroll hace el trabajo; el usuario no tiene que tocar nada. Todo movimiento e
 - **Un capítulo oscuro** (fondo `--ink`) en medio de la página para dar ritmo, como Apple.
 - **Tipografía**: Bricolage Grotesque enorme en los títulos de capítulo, una idea por pantalla.
 
-## 8. Qué se produce y cuánto cuesta
+## 8. Sistema de imagen de la landing
 
-| Pieza | Herramienta | Costo |
-|---|---|---|
-| Moneda de vidrio y oro con la onda (héroe y capítulo 2) | Nano Banana Pro, con la alcancía actual como referencia de estilo | 2–4 créditos |
-| Celular con la app | Capturas reales de la app dentro de un marco de celular en código | 0 |
-| Monedita saludando | Clip existente | 0 |
+Todas las imágenes de la landing comparten cuatro rasgos, para que se reconozcan como de Bursa sin
+ver el logo:
 
-Sin video generado por ahora: el movimiento lo pone el scroll, no un clip.
+1. **La base.** Cada objeto se para sobre el mismo pedestal redondo, naranja de marca, con la onda
+   de Bursa grabada al frente.
+2. **El material.** Vidrio transparente y oro pulido.
+3. **La luz.** Cálida desde arriba a la izquierda, con sombra suave de contacto.
+4. **La cámara.** A la altura del objeto, en tres cuartos, con el mismo encuadre en toda la serie.
+
+Fondo papel (claro) u tinta (capítulo oscuro), ajustado en el archivo al color exacto del token,
+con los bordes difuminados para que no se note el rectángulo.
+
+| Archivo en `public/landing/` | Uso |
+|---|---|
+| `moneda.webp` | Héroe |
+| `moneda-oscura.webp` | Capítulo "Tu plata se encoge" |
+| `frasco-1.webp` a `frasco-4.webp` | Capítulo "Mira crecer tu plata": la planta y las monedas crecen con el scroll |
+| `alcancia.webp` | El mismo capítulo: la plata guardada sin intereses |
+
+Generadas con Nano Banana Pro (2 créditos cada una, 14 en total), usando como referencia de
+estilo la alcancía anterior y el símbolo del logo. Para una imagen nueva de la serie se sube una
+de estas como referencia y se pide "misma cámara, mismo pedestal, solo cambia el objeto".
 
 ## 9. Cómo sabremos que funciona
 
