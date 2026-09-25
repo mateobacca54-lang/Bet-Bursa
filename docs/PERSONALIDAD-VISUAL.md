@@ -8,54 +8,50 @@ para que sean exactos y se puedan tocar.
 
 - **Duolingo:** un personaje que siempre tiene el mismo cuerpo, la misma paleta y la misma manera de
   moverse, y que reacciona a lo que haces. La personalidad está en el personaje, no en los fondos.
-- **Brilliant:** dos registros que nunca se mezclan. Los diagramas son planos, con líneas limpias y
-  un solo color de acento. Los íconos y objetos son 3D suaves y brillantes, sobre fondo claro y sin
-  escenario.
+- **Brilliant:** los diagramas son planos, con líneas limpias y un solo color de acento, y se
+  mueven cuando los tocas.
 
-Bursa usa la misma división en dos registros.
+Bursa toma las dos cosas: un personaje único y diagramas que se tocan.
 
 ## 2. Los dos registros de Bursa
 
 | Registro | Qué es | Cómo se hace |
 |---|---|---|
-| **Diagrama** | Gráficas, líneas de tiempo, canastas, pilas de billetes que cambian | Código (SVG + `tokens.css`), plano, línea `--ink`, un acento por escena |
-| **Personaje y objeto** | Monedita, Bolsito, objetos-ícono (empanada, alcancía, tarjeta) | Generado, 3D suave, con las reglas de abajo |
+| **Diagrama** | Gráficas, líneas de tiempo, ejes, guías punteadas | Código (SVG + `tokens.css`), plano, línea `--ink`, un acento por escena |
+| **Ilustración** | Monedita, Bolsito y los objetos (empanada, alcancía, sobres, tarjeta) | Caricatura plana con borde de tinta; se genera a partir de una ilustración existente |
 
-## 3. Reglas del registro generado
+Nunca se mezclan un tercer y un cuarto estilo. Nada fotorrealista, nada de vidrio y nada de 3D:
+Monedita es plana, así que todo lo que la rodea también lo es. (El 25 de septiembre se probó una
+empanada en 3D suave y se descartó por eso.)
 
-1. **Monedita es la protagonista.** Moneda dorada con el símbolo de Bursa en relieve, ojos grandes,
-   brazos cortos. Nunca lleva ₿, $ ni el logo de otra marca.
-2. **Material:** 3D suave, tipo arcilla pulida, sin texturas realistas. Bordes redondeados.
-3. **Luz:** una luz cálida desde arriba a la izquierda y un brillo dorado suave alrededor. Sin
-   sombras duras.
-4. **Fondo:** blanco o papel liso (`--paper`), sin escenario. Así se integra con `mix-blend-mode:
-   multiply` sobre cualquier superficie de la app.
-5. **Paleta:** dorado de Monedita, naranja de marca y tinta. Otros colores solo si son del objeto
-   (la empanada es dorada, la tarjeta es tinta).
-6. **Actitud:** tranquila y curiosa. Monedita explica, señala, celebra con un salto corto o piensa
+## 3. Reglas de la ilustración
+
+1. **Monedita es la protagonista.** Es una moneda naranja de marca con borde de tinta grueso, ojos
+   grandes con brillo, sonrisa pequeña, el símbolo de Bursa (la onda) en el cuerpo, brazos y
+   piernas cortos. Nunca lleva ₿, $ ni el logo de otra marca.
+2. **Trazo:** borde oscuro (`--ink`) grueso y constante, y esquinas redondeadas.
+3. **Relleno:** plano, sin degradados, a lo sumo una sombra interior plana. La paleta es de
+   durazno, naranja de marca, crema y dorado para las monedas.
+4. **Fondo:** blanco o papel liso, sin escenario. Se integra con `mix-blend-mode: multiply` o con
+   el fondo recortado.
+5. **Actitud:** tranquila y curiosa. Monedita explica, señala, celebra con un salto corto o piensa
    con la mano en la barbilla. Nunca corre, no tiene prisa y no asusta.
-7. **Movimiento en video:** un solo gesto por clip, cámara fija, de 3 a 5 segundos. Se reproduce una
+6. **Movimiento en video:** un solo gesto por clip, cámara fija, de 3 a 5 segundos. Se reproduce una
    vez y se queda quieta en el último cuadro. Con movimiento reducido se muestra el cuadro final.
-8. **Encuadre:** el personaje ocupa el 70 % del cuadro, centrado. Nada de texto en la imagen.
+7. **Encuadre:** el sujeto ocupa del 60 al 70 % del cuadro, centrado. Nada de texto en la imagen.
+8. **Nada dibujado a mano en código.** Un objeto (empanada, billete) siempre sale de una
+   ilustración, no de un `<path>` improvisado.
 
-## 4. Plantilla de prompt
+## 4. Cómo se genera
 
-Siempre se sube la imagen de referencia (`public/monedita/monedita.webp`) y se usa este texto base.
-Solo cambia la acción.
-
-```
-Soft 3D clay-like character: a friendly golden coin mascot with large eyes and short arms,
-an embossed abstract symbol on its face (no letters, no currency signs). Warm key light from
-top left, soft golden glow, no hard shadows. Plain pure white background, no scenery, no text.
-Centered, character fills 70% of frame. Static camera.
-Action: {UNA SOLA ACCIÓN, CALMADA, 3–5 s}.
-```
-
-Objetos-ícono (sin personaje):
+Siempre se sube como referencia una ilustración existente del mismo estilo
+(`public/illustrations/*-v2.webp` o `public/monedita/monedita.webp`), con Nano Banana 2
+(1,5 créditos) y este texto:
 
 ```
-Soft 3D clay-like icon of {OBJETO}, rounded edges, warm key light from top left, soft shadow
-under the object, plain pure white background, no text, centered, fills 60% of frame.
+Redraw {OBJETO / ACCIÓN} in exactly the same flat cartoon illustration style as the reference:
+thick dark ink outline, flat warm fills, no gradients, no 3D, no photorealism.
+Plain pure white background, no text, centered, fills 65% of frame.
 ```
 
 ## 5. Presupuesto
