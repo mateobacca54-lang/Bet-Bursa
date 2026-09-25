@@ -2,6 +2,8 @@
 
 import { useRef } from 'react';
 import Image from 'next/image';
+import { useIndicadores } from '@/components/widgets/DatoReal';
+import { formatearValorIndicador } from '@/lib/indicadores/formato';
 import { useGSAP } from '@gsap/react';
 import { DURATION, gsap, registerGsap } from '@/lib/gsap';
 import './hero-scroll-scene.css';
@@ -54,6 +56,8 @@ export default function HeroScrollScene() {
 
       <div className="hs-stage" aria-hidden="true">
         <div className="hs-plinth" ref={plinthRef} />
+        {/* Detrás de la tarjeta: Monedita se asoma por el borde. Da el plano de fondo. */}
+        <Image className="hs-monedita" src="/monedita/monedita.webp" alt="" width={600} height={640} sizes="128px" draggable={false} />
         <div className="hs-card" ref={cardRef}>
           <div className="hs-face hs-face--front">
             <span className="hs-face-top">La misma plata. Dos decisiones.</span>
@@ -72,6 +76,8 @@ export default function HeroScrollScene() {
         </div>
       </div>
 
+      <HoyEnColombia />
+
       <div className="hs-static">
         <p><strong>Ahorrar:</strong> guardas la plata para usarla cuando la necesites.</p>
         <p><strong>Invertir:</strong> buscas que crezca, pero también puede perder valor.</p>
@@ -82,5 +88,23 @@ export default function HeroScrollScene() {
         Empiezas con la misma plata. Lo que cambia es el propósito y el riesgo.
       </figcaption>
     </figure>
+  );
+}
+
+/** Delante de la tarjeta: el dato real de hoy, para que el héroe hable de la plata de ahora. */
+function HoyEnColombia() {
+  const inflacion = useIndicadores().inflacion;
+  if (typeof inflacion.valor !== 'number') return null;
+  return (
+    <p className="hs-dato">
+      <span className="hs-dato-rotulo">Hoy en Colombia</span>
+      <span className="hs-dato-valor">
+        Inflación anual: <strong>{formatearValorIndicador('inflacion', inflacion.valor)}</strong>
+      </span>
+      <a className="hs-dato-fuente" href={inflacion.url} target="_blank" rel="noopener noreferrer">
+        {inflacion.periodo} · {inflacion.fuente.split(',')[0]}
+        <span className="lp-sr-only"> (se abre en otra pestaña)</span>
+      </a>
+    </p>
   );
 }

@@ -1,1 +1,1 @@
-export { default as DatoReal } from './DatoReal';
+export { default as DatoReal, useIndicadores } from './DatoReal';

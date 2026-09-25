@@ -695,3 +695,6 @@ details[open] > .lp-faq-summary .lp-faq-icon {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.lp-footer-logo {
+  height: var(--space-6);
+}

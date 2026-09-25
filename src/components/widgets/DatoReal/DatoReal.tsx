@@ -38,7 +38,8 @@ function frase(ind: Indicador, v: string): string {
  * cambia al dato en vivo si /api/indicadores trae uno más nuevo. Sin animación de entrada:
  * el número no cambia de significado al actualizarse.
  */
-export default function DatoReal({ indicadores }: { indicadores: IndicadorId[] }) {
+/** Indicadores de hoy: respaldo al primer render (igual en servidor y cliente) y luego el dato en vivo. */
+export function useIndicadores(): Mapa {
   const [datos, setDatos] = useState<Mapa>(RESPALDO);
 
   useEffect(() => {
@@ -59,6 +60,12 @@ export default function DatoReal({ indicadores }: { indicadores: IndicadorId[] }
       .catch(() => {});
     return () => ctrl.abort();
   }, []);
+
+  return datos;
+}
+
+export default function DatoReal({ indicadores }: { indicadores: IndicadorId[] }) {
+  const datos = useIndicadores();
 
   const visibles = indicadores.map((id) => datos[id]).filter((d): d is Indicador => typeof d?.valor === 'number');
   if (visibles.length === 0) return null;

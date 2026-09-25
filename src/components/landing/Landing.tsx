@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import BursaLogo from './BursaLogo';
+import { Imagotipo } from '@/components/brand';
 import HeroScrollScene from './HeroScrollScene';
 import ApareceAlBajar from './ApareceAlBajar';
 import LeeLaLetra from './LeeLaLetra';
@@ -183,7 +184,7 @@ export default function Landing() {
 
       <footer className="lp-footer">
         <div className="lp-wrap lp-footer-inner">
-          <p className="lp-footer-word">bursa</p>
+          <p className="lp-footer-word"><Imagotipo variante="horizontal" titulo="Bursa" className="lp-footer-logo" /></p>
           <p className="lp-footer-notice">
             Bursa es contenido educativo. No es asesoría financiera ni una recomendación de inversión:
             aprender cómo funciona el dinero no es lo mismo que decidir qué hacer con el tuyo.
