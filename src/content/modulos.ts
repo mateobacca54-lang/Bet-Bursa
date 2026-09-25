@@ -10,8 +10,10 @@
 // ("Fundamentos del Dinero"); `aOracion` lo pasa a cómo se muestra en pantalla, en formato
 // oración ("Fundamentos del dinero").
 //
-// Los módulos 2 a 4 salen de la tabla "Tronco común" en RUTA-DE-APRENDIZAJE.md §3. Todavía
-// no tienen temario propio, así que `disponible` es false.
+// Los módulos 2 a 4 salen de la tabla "Tronco común" de RUTA-DE-APRENDIZAJE.md §3: son el
+// tronco que ve todo el mundo. Los módulos 5 a 7 salen de la rama "ya estoy trabajando" y
+// los módulos 8 a 10, de la rama "quiero que mi plata crezca" (misma sección §3). Ninguno
+// de los módulos 2 a 10 tiene temario propio todavía, así que `disponible` es false.
 // ============================================================
 
 import { MODULO_1 } from './modulo-1/temario';
@@ -65,6 +67,48 @@ export const MODULOS: readonly ModuloCatalogo[] = [
     id: 'modulo-4',
     nombre: 'Ahorrar con metas',
     pregunta: '¿Dónde guardo la plata para que no se derrita?',
+    disponible: false,
+  },
+  {
+    numero: 5,
+    id: 'modulo-5',
+    nombre: 'Tu primer sueldo',
+    pregunta: '¿Por qué me llega menos de lo que dice el contrato?',
+    disponible: false,
+  },
+  {
+    numero: 6,
+    id: 'modulo-6',
+    nombre: 'Tu historial de crédito',
+    pregunta: '¿Qué sabe un banco de mí antes de prestarme?',
+    disponible: false,
+  },
+  {
+    numero: 7,
+    id: 'modulo-7',
+    nombre: 'Impuestos sin miedo',
+    pregunta: '¿Me toca declarar renta?',
+    disponible: false,
+  },
+  {
+    numero: 8,
+    id: 'modulo-8',
+    nombre: 'Cómo funciona invertir',
+    pregunta: '¿Por qué hay inversiones que ganan más que otras?',
+    disponible: false,
+  },
+  {
+    numero: 9,
+    id: 'modulo-9',
+    nombre: 'La bolsa por dentro',
+    pregunta: '¿Quién decide el precio de una acción?',
+    disponible: false,
+  },
+  {
+    numero: 10,
+    id: 'modulo-10',
+    nombre: 'Que no te estafen',
+    pregunta: '¿Cómo se ve una pirámide antes de caer?',
     disponible: false,
   },
 ] as const;

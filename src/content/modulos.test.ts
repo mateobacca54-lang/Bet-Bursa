@@ -27,11 +27,15 @@ describe('MODULOS', () => {
     expect(m1?.disponible).toBe(true);
   });
 
-  it('los módulos 2 a 4 todavía no están disponibles', () => {
-    for (const numero of [2, 3, 4]) {
+  it('los módulos 2 a 10 todavía no están disponibles', () => {
+    for (const numero of [2, 3, 4, 5, 6, 7, 8, 9, 10]) {
       const m = MODULOS.find((mod) => mod.numero === numero);
       expect(m?.disponible).toBe(false);
     }
+  });
+
+  it('trae los diez módulos de la ruta (tronco + dos ramas)', () => {
+    expect(MODULOS).toHaveLength(10);
   });
 
   it('ningún nombre ni pregunta menciona la palabra "Módulo" seguida de un número', () => {
@@ -54,7 +58,11 @@ describe('siguienteModulo', () => {
     expect(siguienteModulo(1)?.nombre).toBe('Tu plata en el día a día');
   });
 
+  it('el siguiente del Módulo 4 es el Módulo 5 (empieza la rama "ya trabajas")', () => {
+    expect(siguienteModulo(4)?.nombre).toBe('Tu primer sueldo');
+  });
+
   it('no hay siguiente después del último módulo del catálogo', () => {
-    expect(siguienteModulo(4)).toBeNull();
+    expect(siguienteModulo(10)).toBeNull();
   });
 });
