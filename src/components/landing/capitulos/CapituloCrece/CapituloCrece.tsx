@@ -14,21 +14,37 @@ import '../capitulos.css';
 const DEPOSITO = 100_000;
 const MESES_TOTAL = 120;
 const CHART_W = 320;
-const CHART_H = 110;
-const PASOS_GRAFICA = 40;
+const CHART_H = 170;
+const CHART_PAD = 8;
 
-/** Los puntos de las dos líneas del gráfico, para toda la década (0 a `MESES_TOTAL`). */
-function construirPuntosGrafica(tasaMensual: number): { puntosAhorro: string; puntosCdt: string } {
+interface Punto {
+  x: number;
+  y: number;
+}
+
+/** Un punto por mes (0 a `MESES_TOTAL`) de las dos líneas, en unidades del viewBox. */
+function construirPuntosGrafica(tasaMensual: number): { ahorro: Punto[]; cdt: Punto[] } {
   const max = Math.max(ahorroAcumulado(DEPOSITO, MESES_TOTAL), valorFuturoMensual(DEPOSITO, tasaMensual, MESES_TOTAL), 1);
-  const puntosAhorro: string[] = [];
-  const puntosCdt: string[] = [];
-  for (let i = 0; i <= PASOS_GRAFICA; i++) {
-    const m = (i / PASOS_GRAFICA) * MESES_TOTAL;
-    const x = (i / PASOS_GRAFICA) * CHART_W;
-    puntosAhorro.push(`${x.toFixed(1)},${(CHART_H - (ahorroAcumulado(DEPOSITO, m) / max) * CHART_H).toFixed(1)}`);
-    puntosCdt.push(`${x.toFixed(1)},${(CHART_H - (valorFuturoMensual(DEPOSITO, tasaMensual, m) / max) * CHART_H).toFixed(1)}`);
+  const ancho = CHART_W - CHART_PAD * 2;
+  const alto = CHART_H - CHART_PAD * 2;
+  const ahorro: Punto[] = [];
+  const cdt: Punto[] = [];
+  for (let m = 0; m <= MESES_TOTAL; m++) {
+    const x = CHART_PAD + (m / MESES_TOTAL) * ancho;
+    ahorro.push({ x, y: CHART_PAD + alto - (ahorroAcumulado(DEPOSITO, m) / max) * alto });
+    cdt.push({ x, y: CHART_PAD + alto - (valorFuturoMensual(DEPOSITO, tasaMensual, m) / max) * alto });
   }
-  return { puntosAhorro: puntosAhorro.join(' '), puntosCdt: puntosCdt.join(' ') };
+  return { ahorro, cdt };
+}
+
+const aTrazo = (puntos: Punto[]) =>
+  puntos.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
+
+/** El punto de la línea en el mes `m` (fraccionario), interpolado entre dos meses. */
+function puntoEn(puntos: Punto[], m: number): Punto {
+  const i = Math.min(puntos.length - 2, Math.max(0, Math.floor(m)));
+  const t = Math.min(1, Math.max(0, m - i));
+  return { x: puntos[i].x + (puntos[i + 1].x - puntos[i].x) * t, y: puntos[i].y + (puntos[i + 1].y - puntos[i].y) * t };
 }
 
 /**
@@ -58,14 +74,16 @@ export default function CapituloCrece() {
   const frasco2Ref = useRef<HTMLImageElement>(null);
   const frasco3Ref = useRef<HTMLImageElement>(null);
   const frasco4Ref = useRef<HTMLImageElement>(null);
-  const lineaAhorroRef = useRef<SVGPolylineElement>(null);
-  const lineaCdtRef = useRef<SVGPolylineElement>(null);
+  const lineaAhorroRef = useRef<SVGPathElement>(null);
+  const lineaCdtRef = useRef<SVGPathElement>(null);
+  const puntaAhorroRef = useRef<SVGCircleElement>(null);
+  const puntaCdtRef = useRef<SVGCircleElement>(null);
 
   const ahorroFinal = ahorroAcumulado(DEPOSITO, MESES_TOTAL);
   const fvFinal = valorFuturoMensual(DEPOSITO, tasaMensual, MESES_TOTAL);
   const diferenciaFinal = Math.round(fvFinal - ahorroFinal);
 
-  const { puntosAhorro, puntosCdt } = construirPuntosGrafica(tasaMensual);
+  const grafica = construirPuntosGrafica(tasaMensual);
 
   useGSAP(
     () => {
@@ -84,16 +102,18 @@ export default function CapituloCrece() {
           if (ref.current) gsap.set(ref.current, { opacity: opacidades[i] });
         });
 
-        const progreso = Math.min(1, Math.max(0, m / MESES_TOTAL));
-        const dashoffset = String(1 - progreso);
-        // Sin unidad, a propósito: con `pathLength` normalizado a 1 (SVG), el valor
-        // se interpreta como fracción del trazo. gsap.set() le añade "px" por
-        // defecto a las propiedades numéricas que no reconoce, y con esa unidad
-        // el navegador deja de escalarlo por `pathLength` (el trazo dejaba de
-        // dibujarse con el scroll). Se escribe directo al estilo, igual que los
-        // contadores se escriben directo a `textContent`.
+        const mes = Math.min(MESES_TOTAL, Math.max(0, m));
+        const dashoffset = String(1 - mes / MESES_TOTAL);
+        // Sin unidad, a propósito: con `pathLength` normalizado a 1, el valor es una
+        // fracción del trazo. gsap.set() le añadiría "px" y el navegador dejaría de
+        // escalarlo por `pathLength`, así que se escribe directo al estilo.
         if (lineaAhorroRef.current) lineaAhorroRef.current.style.strokeDashoffset = dashoffset;
         if (lineaCdtRef.current) lineaCdtRef.current.style.strokeDashoffset = dashoffset;
+        // La punta de cada línea marca dónde va el mes: solo se mueve con transform.
+        const pa = puntoEn(grafica.ahorro, mes);
+        const pc = puntoEn(grafica.cdt, mes);
+        if (puntaAhorroRef.current) puntaAhorroRef.current.style.transform = `translate(${pa.x}px, ${pa.y}px)`;
+        if (puntaCdtRef.current) puntaCdtRef.current.style.transform = `translate(${pc.x}px, ${pc.y}px)`;
       }
 
       aplicar(0);
@@ -124,7 +144,8 @@ export default function CapituloCrece() {
             end: () => `+=${Math.round(window.innerHeight * (escritorio ? 1.8 : 1.2))}`,
             pin,
             pinSpacing: true,
-            scrub: DURATION.scene,
+            // Un segundo de alcance: la rueda del mouse avanza a saltos y el scrub los alisa.
+            scrub: DURATION.story,
             invalidateOnRefresh: true,
             onUpdate: (self) => aplicar(self.progress * MESES_TOTAL),
           });
@@ -149,13 +170,14 @@ export default function CapituloCrece() {
           <p className="cap-crece-premisa">Apartas {formatCOP(DEPOSITO)} cada mes durante 10 años.</p>
 
           <div className="cap-crece-comparacion">
-            <div className="cap-crece-col">
+            <div className="cap-crece-col cap-crece-col--ahorro">
               <div className="cap-crece-arte" aria-hidden="true">
                 <Image
                   src="/landing/alcancia.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain' }}
                   draggable={false}
                 />
@@ -167,7 +189,20 @@ export default function CapituloCrece() {
               <p className="cap-crece-caption">Quieta en la alcancía, sin ganar nada extra.</p>
             </div>
 
-            <div className="cap-crece-col">
+            <div className="cap-crece-grafica">
+              <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} aria-hidden="true">
+                <path ref={lineaAhorroRef} d={aTrazo(grafica.ahorro)} pathLength={1} className="cap-crece-linea cap-crece-linea--ahorro" />
+                <path ref={lineaCdtRef} d={aTrazo(grafica.cdt)} pathLength={1} className="cap-crece-linea cap-crece-linea--cdt" />
+                <circle ref={puntaAhorroRef} r={3.5} className="cap-crece-punta cap-crece-punta--ahorro" />
+                <circle ref={puntaCdtRef} r={4.5} className="cap-crece-punta cap-crece-punta--cdt" />
+              </svg>
+              <div className="cap-crece-leyenda" aria-hidden="true">
+                <span className="cap-crece-leyenda-item cap-crece-leyenda-item--ahorro">Guardada</span>
+                <span className="cap-crece-leyenda-item cap-crece-leyenda-item--cdt">En un CDT</span>
+              </div>
+            </div>
+
+            <div className="cap-crece-col cap-crece-col--cdt">
               <div className="cap-crece-arte" aria-hidden="true">
                 <Image
                   ref={frasco1Ref}
@@ -175,7 +210,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-1.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 1 }}
                   draggable={false}
                 />
@@ -185,7 +221,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-2.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 0 }}
                   draggable={false}
                 />
@@ -195,7 +232,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-3.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 0 }}
                   draggable={false}
                 />
@@ -205,7 +243,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-4.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 0 }}
                   draggable={false}
                 />
@@ -227,16 +266,6 @@ export default function CapituloCrece() {
             al interés compuesto.
           </p>
 
-          <div className="cap-crece-grafica">
-            <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} preserveAspectRatio="none" aria-hidden="true">
-              <polyline ref={lineaAhorroRef} points={puntosAhorro} pathLength={1} className="cap-crece-linea cap-crece-linea--ahorro" />
-              <polyline ref={lineaCdtRef} points={puntosCdt} pathLength={1} className="cap-crece-linea cap-crece-linea--cdt" />
-            </svg>
-            <div className="cap-crece-leyenda" aria-hidden="true">
-              <span className="cap-crece-leyenda-item cap-crece-leyenda-item--ahorro">Guardada</span>
-              <span className="cap-crece-leyenda-item cap-crece-leyenda-item--cdt">En un CDT</span>
-            </div>
-          </div>
         </div>
       </div>
 

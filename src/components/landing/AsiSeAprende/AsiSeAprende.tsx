@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger, registerGsap } from '@/lib/gsap';
+import { pasoActivo } from '@/lib/pasoActivo';
 import '../landing.css';
 import './asi-se-aprende.css';
 
@@ -43,16 +46,21 @@ const PASOS: readonly Paso[] = [
 /**
  * AsiSeAprende — capítulo 5 de la landing: "Así se aprende en Bursa."
  *
- * En escritorio (≥900px) y sin `prefers-reduced-motion`, el celular queda fijo (sticky) y
- * su pantalla cruza en opacidad a la captura del paso activo, decidido por qué paso ocupa
- * el centro de la ventana (IntersectionObserver). En móvil o con movimiento reducido, cada
- * paso muestra su propia captura, sin scroll fijo ni cruce (AGENTS.md: bajo reduced motion
- * se quita el movimiento, nunca la información).
+ * En escritorio (≥900px) y sin `prefers-reduced-motion`, el capítulo se ancla una pantalla:
+ * a la izquierda los tres momentos, a la derecha el celular. El scroll recorre los tres
+ * (`pasoActivo`) y la pantalla del celular cruza a la captura de ese paso; el paso activo
+ * se lee entero y los otros bajan de opacidad (jerarquía, no decoración). Cada paso es un
+ * botón que lleva el scroll a su tramo, así que también se recorre con teclado.
+ *
+ * En móvil o con movimiento reducido no hay ancla: cada paso muestra su propia captura
+ * (AGENTS.md — se quita el movimiento, nunca la información).
  */
 export default function AsiSeAprende() {
   const [modoInmersivo, setModoInmersivo] = useState(false);
   const [activo, setActivo] = useState(0);
-  const stepRefs = useRef<Array<HTMLLIElement | null>>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
 
   useEffect(() => {
     const query = window.matchMedia('(min-width: 900px) and (prefers-reduced-motion: no-preference)');
@@ -62,84 +70,120 @@ export default function AsiSeAprende() {
     return () => query.removeEventListener('change', actualizar);
   }, []);
 
-  useEffect(() => {
-    if (!modoInmersivo) return;
-    const elementos = stepRefs.current.filter((el): el is HTMLLIElement => el !== null);
-    if (elementos.length === 0) return;
+  useGSAP(
+    () => {
+      if (!modoInmersivo) return;
+      registerGsap();
+      const section = sectionRef.current;
+      const pin = pinRef.current;
+      if (!section || !pin) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibles = entries.filter((entry) => entry.isIntersecting);
-        if (visibles.length === 0) return;
-        const masVisible = visibles.reduce((a, b) => (a.intersectionRatio >= b.intersectionRatio ? a : b));
-        const indice = elementos.indexOf(masVisible.target as HTMLLIElement);
-        if (indice !== -1) setActivo(indice);
-      },
-      // Banda central: un paso se vuelve activo cuando cruza el medio de la ventana.
-      { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
-    );
+      let ultimo = -1;
+      const st = ScrollTrigger.create({
+        trigger: section,
+        start: () => `top ${Math.round(document.querySelector('.lp-nav')?.getBoundingClientRect().height ?? 0)}px`,
+        end: () => `+=${Math.round(window.innerHeight * 1.6)}`,
+        pin,
+        pinSpacing: true,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const i = pasoActivo(self.progress, PASOS.length);
+          if (i !== ultimo) {
+            ultimo = i;
+            setActivo(i);
+          }
+        },
+      });
+      triggerRef.current = st;
+      return () => {
+        st.kill();
+        triggerRef.current = null;
+      };
+    },
+    { scope: sectionRef, dependencies: [modoInmersivo] }
+  );
 
-    elementos.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [modoInmersivo]);
+  function irAPaso(i: number) {
+    const st = triggerRef.current;
+    if (!st) return;
+    const destino = st.start + ((i + 0.5) / PASOS.length) * (st.end - st.start);
+    window.scrollTo({ top: destino, behavior: 'smooth' });
+  }
 
   return (
-    <section id="como-aprendes-app" className="lp-section asi-section" aria-labelledby="asi-titulo">
-      <div className="lp-wrap asi-grid">
-        <div className="asi-copy">
-          <div className="asi-heading">
-            <h2 id="asi-titulo" className="lp-title">
-              Así se aprende en Bursa.
-            </h2>
-            <p className="lp-lead">Mira los tres momentos de una lección real, tal como se ven en tu pantalla.</p>
+    <section ref={sectionRef} id="como-aprendes-app" className="lp-section asi-section" aria-labelledby="asi-titulo">
+      <div ref={pinRef} className="asi-pin">
+        <div className="lp-wrap asi-grid">
+          <div className="asi-copy">
+            <div className="asi-heading">
+              <h2 id="asi-titulo" className="lp-title">
+                Así se aprende en Bursa.
+              </h2>
+              <p className="lp-lead">Los tres momentos de una lección real, tal como se ven en tu pantalla.</p>
+            </div>
+
+            <ol className="asi-steps">
+              {PASOS.map((paso, i) => (
+                <li key={paso.id} className="asi-step" data-active={!modoInmersivo || activo === i}>
+                  {modoInmersivo ? (
+                    <button
+                      type="button"
+                      className="asi-step-boton"
+                      aria-current={activo === i ? 'step' : undefined}
+                      onClick={() => irAPaso(i)}
+                    >
+                      <span className="asi-step-num" aria-hidden="true">
+                        0{i + 1}
+                      </span>
+                      <span className="asi-step-title">{paso.titulo}</span>
+                      <span className="asi-step-body">{paso.cuerpo}</span>
+                    </button>
+                  ) : (
+                    <>
+                      <p className="asi-step-num" aria-hidden="true">
+                        0{i + 1}
+                      </p>
+                      <h3 className="asi-step-title">{paso.titulo}</h3>
+                      <p className="asi-step-body">{paso.cuerpo}</p>
+                      <div className="asi-step-shot">
+                        <Image
+                          src={paso.src}
+                          alt={paso.alt}
+                          width={1170}
+                          height={2532}
+                          sizes="(min-width: 640px) 280px, 72vw"
+                          quality={90}
+                        />
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ol>
           </div>
 
-          <ol className="asi-steps">
-            {PASOS.map((paso, i) => (
-              <li
-                key={paso.id}
-                ref={(el) => {
-                  stepRefs.current[i] = el;
-                }}
-                className="asi-step"
-                data-aparece="subir"
-              >
-                <p className="asi-step-num" aria-hidden="true">
-                  0{i + 1}
-                </p>
-                <h3 className="asi-step-title">{paso.titulo}</h3>
-                <p className="asi-step-body">{paso.cuerpo}</p>
-
-                {!modoInmersivo && (
-                  <div className="asi-step-shot">
-                    <Image src={paso.src} alt={paso.alt} width={390} height={844} sizes="(min-width: 640px) 260px, 68vw" />
-                  </div>
-                )}
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {modoInmersivo && (
-          <div className="asi-phone-wrap">
-            <div className="asi-phone" aria-hidden="true">
-              <span className="asi-phone-notch" />
-              <div className="asi-phone-screen">
-                {PASOS.map((paso, i) => (
-                  <Image
-                    key={paso.id}
-                    src={paso.src}
-                    alt=""
-                    fill
-                    sizes="300px"
-                    className="asi-screen"
-                    data-active={activo === i}
-                  />
-                ))}
+          {modoInmersivo && (
+            <div className="asi-phone-wrap">
+              <div className="asi-phone" role="img" aria-label={PASOS[activo].alt}>
+                <span className="asi-phone-notch" />
+                <div className="asi-phone-screen">
+                  {PASOS.map((paso, i) => (
+                    <Image
+                      key={paso.id}
+                      src={paso.src}
+                      alt=""
+                      fill
+                      sizes="360px"
+                      quality={90}
+                      className="asi-screen"
+                      data-active={activo === i}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capítulo de cierre: "Tu primera lección dura tres minutos." Monedita saluda una vez cuando la sección entra en pantalla, con un campo de velas casi invisible (FondoVelas) detrás que reacciona al puntero.',
+          'Capítulo de cierre: "Tu primera lección dura tres minutos." Monedita saluda una vez cuando la sección entra en pantalla; debajo, la tarjeta de la primera lección con su título y gancho del temario.',
       },
     },
   },

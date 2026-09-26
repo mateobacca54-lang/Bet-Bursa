@@ -17,7 +17,8 @@
 }
 .hm-art img {
   width: 100%;
-  max-width: min(720px, 92vw);
+  /* Casi cuadrada: se acota también por el alto para que el héroe quepa en pantalla. */
+  max-width: min(680px, 92vw, 68svh);
   height: auto;
   display: block;
 }
@@ -99,12 +100,63 @@
 .cap-encoge-arte {
   /* El objeto que cuenta la historia: grande, y acotado por el alto para que el
      cuadro anclado quepa entero en pantalla. */
-  width: min(400px, 64vw, 40svh);
+  width: min(460px, 86vw, 42svh);
+  aspect-ratio: 1;
+  /* El fondo del video es casi --ink pero no idéntico (la compresión lo mueve un par
+     de niveles): los cuatro bordes se funden con el capítulo para que nunca se vea el
+     cuadrado. Bordes rectos y no un círculo, que recortaría las esquinas del pedestal.
+     La máscara solo usa el alfa, por eso vale cualquier color opaco. */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, var(--ink) 8%, var(--ink) 92%, transparent),
+    linear-gradient(to bottom, transparent, var(--ink) 8%, var(--ink) 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, var(--ink) 8%, var(--ink) 92%, transparent),
+    linear-gradient(to bottom, transparent, var(--ink) 8%, var(--ink) 92%, transparent);
+  mask-composite: intersect;
 }
-.cap-encoge-arte img {
+.cap-encoge-arte img,
+.cap-encoge-arte video {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+.cap-encoge-datos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* Escritorio: la moneda a la izquierda, grande; el título y las cifras a la derecha. */
+@media (min-width: 900px) {
+  .cap-encoge-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'arte titulo'
+      'arte datos';
+    align-items: center;
+    column-gap: var(--space-12);
+    row-gap: var(--space-4);
+    text-align: left;
+  }
+  .cap-encoge-inner .cap-title {
+    grid-area: titulo;
+    align-self: end;
+    text-align: left;
+  }
+  .cap-encoge-arte {
+    grid-area: arte;
+    justify-self: center;
+    width: min(620px, 46vw, 72svh);
+  }
+  .cap-encoge-datos {
+    grid-area: datos;
+    align-self: start;
+    align-items: flex-start;
+  }
 }
 .cap-encoge-anio {
   margin: 0;
@@ -171,13 +223,36 @@
 .cap-crece-comparacion {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'ahorro cdt'
+    'grafica grafica';
   gap: var(--space-4);
   width: 100%;
-  max-width: 880px;
+  max-width: 1120px;
 }
-@media (min-width: 800px) {
+.cap-crece-col--ahorro {
+  grid-area: ahorro;
+}
+.cap-crece-col--cdt {
+  grid-area: cdt;
+}
+.cap-crece-comparacion .cap-crece-grafica {
+  grid-area: grafica;
+  justify-self: center;
+}
+/* Escritorio: la gráfica va EN MEDIO de la alcancía y el frasco, así el cuadro
+   anclado cabe entero en pantalla y las dos líneas quedan entre sus dos objetos. */
+@media (min-width: 900px) {
   .cap-crece-comparacion {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-areas: 'ahorro grafica cdt';
+    /* Arriba: los dos objetos miden lo mismo, así quedan a la misma altura aunque
+       los textos de abajo tengan distinto largo. */
+    align-items: start;
     gap: var(--space-8);
+  }
+  .cap-crece-comparacion .cap-crece-grafica {
+    margin-top: var(--space-12);
   }
 }
 .cap-crece-col {
@@ -190,12 +265,12 @@
 .cap-crece-arte {
   position: relative;
   width: min(200px, 42vw);
-  aspect-ratio: 1600 / 1195;
+  aspect-ratio: 1120 / 1195;
   margin-bottom: var(--space-1);
 }
-@media (min-width: 800px) {
+@media (min-width: 900px) {
   .cap-crece-arte {
-    width: min(340px, 30vw, 34svh);
+    width: min(320px, 24vw, 40svh);
   }
 }
 .cap-crece-etiqueta {
@@ -245,11 +320,25 @@
 }
 .cap-crece-linea--ahorro {
   stroke: var(--ink-soft);
-  stroke-width: 2;
+  stroke-width: 1.5;
 }
 .cap-crece-linea--cdt {
   stroke: var(--brand-600);
-  stroke-width: 3;
+  stroke-width: 2.25;
+}
+/* La punta de cada línea: arranca en el origen del viewBox y el scroll la mueve
+   con transform hasta el mes que va. */
+.cap-crece-punta {
+  will-change: transform;
+}
+.cap-crece-punta--ahorro {
+  fill: var(--ink-soft);
+}
+.cap-crece-punta--cdt {
+  fill: var(--brand-600);
+}
+.cap-crece-frasco-capa {
+  will-change: opacity;
 }
 .cap-crece-leyenda {
   display: flex;

@@ -47,10 +47,11 @@ export default function HeroMoneda() {
         <div className="hm-art">
           <Image
             src="/landing/moneda.webp"
-            alt="Una moneda de vidrio y oro con la onda de Bursa grabada, sobre un pedestal naranja"
-            width={1600}
-            height={1195}
-            sizes="(max-width: 799px) 84vw, 460px"
+            alt="Una moneda de vidrio y oro con la onda de Bursa grabada, sobre un pedestal naranja que también lleva la onda"
+            width={1800}
+            height={1831}
+            sizes="(max-width: 799px) 92vw, 680px"
+            quality={90}
             priority
             draggable={false}
           />

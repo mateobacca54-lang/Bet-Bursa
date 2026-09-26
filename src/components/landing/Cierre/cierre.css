@@ -4,21 +4,55 @@
    `.lp-closing-avatar` vienen de landing.css: aquí solo se añade lo propio.
    ============================================================ */
 
-.cie-section {
-  position: relative;
-  isolation: isolate; /* contiene el z-index negativo de FondoVelas */
-  overflow: hidden;
-}
-
 .cie-avatar {
-  position: relative;
+  /* Más grande que el avatar genérico (96px): aquí Monedita es la despedida.
+     calc() de tokens: 3 × --space-16 = 192px. */
+  width: calc(var(--space-16) * 3);
+  aspect-ratio: 480 / 464;
 }
 
 .cie-avatar-media {
   display: block;
   width: 100%;
-  height: auto;
-  /* El video y su póster tienen fondo blanco: multiply lo funde con el papel del
-     cierre, igual que en /inicio (inicio.css). */
+  height: 100%;
+  object-fit: contain;
+  /* El video y su póster tienen fondo blanco: multiply lo funde con el fondo. */
   mix-blend-mode: multiply;
+  /* No es un control: sin puntero no aparece el botón de imagen en imagen. */
+  pointer-events: none;
+}
+
+/* La primera lección, tal como aparece en el temario. */
+.cie-leccion {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-6);
+  text-align: left;
+  background: var(--paper);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+}
+.cie-leccion-meta {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--brand-700);
+}
+.cie-leccion-titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+}
+.cie-leccion-gancho {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
 }

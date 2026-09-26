@@ -4,32 +4,35 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import FondoVelas from '../FondoVelas';
+import { useCtaProgreso } from '@/lib/useCtaProgreso';
+import { TEMARIO_MODULO_1 } from '@/content/modulo-1/temario';
 import '../landing.css';
 import './cierre.css';
+
+const PRIMERA = TEMARIO_MODULO_1[0];
 
 /**
  * Cierre — última pantalla de la landing: "Tu primera lección dura tres minutos."
  *
  * Monedita saluda UNA vez, cuando la sección entra en pantalla (IntersectionObserver):
  * el mismo video de 5 s, silencioso, que ya usa /inicio, y que termina en la misma pose
- * que su póster (no hay salto al terminar). Bajo `prefers-reduced-motion` no se monta
- * observador ni video: solo el póster, quieto (AGENTS.md — se quita el movimiento, nunca
- * la información). Detrás, FondoVelas pone un campo de velas casi invisible que
- * reacciona muy sutil al puntero.
+ * que su póster. Bajo `prefers-reduced-motion` no se monta observador ni video: solo el
+ * póster, quieto. El video no es un control: sin imagen en imagen, sin puntero.
  *
- * A propósito conserva las clases `lp-closing` / `lp-closing-inner` / `lp-closing-avatar`
- * de landing.css: ApareceAlBajar (de A, fuera de esta tarea) ya trae una secuencia de
- * entrada propia para ese selector — Monedita rebota, el título se dibuja por líneas, el
- * botón sube — y así la hereda tal cual, sin duplicarla.
+ * Debajo, la tarjeta de esa primera lección (título y gancho literales del temario):
+ * lo que de verdad te llevas al hacer clic, en vez de un fondo decorativo.
+ *
+ * Conserva las clases `lp-closing` / `lp-closing-inner` / `lp-closing-avatar` de
+ * landing.css: ApareceAlBajar ya trae la secuencia de entrada para ese selector.
  */
 export default function Cierre() {
   const reduced = usePrefersReducedMotion();
+  const cta = useCtaProgreso();
   const sectionRef = useRef<HTMLElement>(null);
   const [saludar, setSaludar] = useState(false);
 
   useEffect(() => {
-    if (reduced) return; // sin observador bajo movimiento reducido: solo el póster, quieto
+    if (reduced) return;
     const el = sectionRef.current;
     if (!el) return;
 
@@ -48,7 +51,6 @@ export default function Cierre() {
 
   return (
     <section ref={sectionRef} id="cierre" className="lp-section lp-closing cie-section" aria-labelledby="cierre-titulo">
-      <FondoVelas />
       <div className="lp-wrap lp-closing-inner">
         <div className="lp-closing-avatar cie-avatar">
           {saludar && !reduced ? (
@@ -58,6 +60,9 @@ export default function Cierre() {
               muted
               playsInline
               preload="auto"
+              disablePictureInPicture
+              disableRemotePlayback
+              tabIndex={-1}
               poster="/monedita/monedita-saluda-poster.webp"
               aria-label="Monedita, la moneda que te acompaña en Bursa, te saluda"
               width={480}
@@ -73,6 +78,7 @@ export default function Cierre() {
               alt="Monedita, la moneda que te acompaña en Bursa"
               width={480}
               height={464}
+              sizes="192px"
               draggable={false}
             />
           )}
@@ -82,8 +88,14 @@ export default function Cierre() {
           Tu primera lección dura tres minutos.
         </h2>
 
-        <Link href="/inicio" className="lp-btn lp-btn--primary" data-aparece="subir">
-          Empieza gratis
+        <div className="cie-leccion">
+          <p className="cie-leccion-meta">Lección 1 · 3 minutos</p>
+          <p className="cie-leccion-titulo">{PRIMERA.title}</p>
+          <p className="cie-leccion-gancho">{PRIMERA.hook}</p>
+        </div>
+
+        <Link href={cta.href} className="lp-btn lp-btn--primary" data-aparece="subir">
+          {cta.label}
         </Link>
       </div>
     </section>

@@ -55,7 +55,8 @@ El scroll hace el trabajo; el usuario no tiene que tocar nada. Todo movimiento e
    botones. Detrás del texto, una sola moneda de vidrio y oro con la onda de Bursa grabada, quieta
    y bien iluminada. Nada más.
 2. **"Tu plata se encoge" (capítulo oscuro).** Anclado. Al bajar, pasan los años de 2026 a 2036 y
-   la moneda se encoge (`scale`), mientras un contador dice cuánto compran hoy $100.000 con la
+   la moneda se encoge sobre su pedestal quieto (un video que el scroll recorre; cada año muestra el
+   cuadro cuya área de moneda es la fracción de poder de compra que queda), mientras un contador dice cuánto compran hoy $100.000 con la
    inflación real del Banco de la República. El movimiento *es* la explicación: más scroll, más
    años, menos plata. Cita la fuente al pie.
 3. **"Mira crecer tu plata"** (la firma interactiva). Apartas $100.000 cada mes. Al bajar pasan
@@ -64,8 +65,9 @@ El scroll hace el trabajo; el usuario no tiene que tocar nada. Todo movimiento e
    plata, dos decisiones".
 4. **"Lee la letra pequeña".** El documento del crédito; al bajar, se ilumina la cláusula que
    importa. Ya existe; se pule.
-5. **"Así se aprende en Bursa".** Un celular con la app real. Al bajar, la pantalla pasa por los
-   tres momentos de una lección: predices, lo ves, entiendes por qué. Aquí aparece Monedita por
+5. **"Así se aprende en Bursa".** Un celular con la app real, anclado en una sola pantalla. Al
+   bajar, la pantalla pasa por los tres momentos de una lección: predices, lo ves, entiendes por
+   qué; cada momento es también un botón. Aquí aparece Monedita por
    primera vez.
 6. **La ruta, instituciones, preguntas y cierre.** La ruta con los nombres reales de los módulos;
    el cierre con Monedita saludando una vez y, al fondo, velas de mercado muy tenues que se
@@ -96,13 +98,14 @@ ver el logo:
 3. **La luz.** Cálida desde arriba a la izquierda, con sombra suave de contacto.
 4. **La cámara.** A la altura del objeto, en tres cuartos, con el mismo encuadre en toda la serie.
 
-Fondo papel (claro) u tinta (capítulo oscuro), ajustado en el archivo al color exacto del token,
-con los bordes difuminados para que no se note el rectángulo.
+En el capítulo claro las imágenes van con fondo transparente (el fondo papel se convirtió en alfa)
+y recortadas centradas sobre el pedestal, así nunca se ve un rectángulo. En el capítulo oscuro, el
+video se funde con una máscara radial.
 
 | Archivo en `public/landing/` | Uso |
 |---|---|
-| `moneda.webp` | Héroe |
-| `moneda-oscura.webp` | Capítulo "Tu plata se encoge" |
+| `moneda.webp` | Héroe (con la onda grabada también en el pedestal) |
+| `moneda-encoge.mp4` + `moneda-encoge-inicio.webp` / `-fin.webp` | Capítulo "Tu plata se encoge": video (Kling 3.0) que el scroll recorre; los .webp son el póster y el estado final con movimiento reducido |
 | `frasco-1.webp` a `frasco-4.webp` | Capítulo "Mira crecer tu plata": la planta y las monedas crecen con el scroll |
 | `alcancia.webp` | El mismo capítulo: la plata guardada sin intereses |
 
