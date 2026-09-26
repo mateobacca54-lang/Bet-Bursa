@@ -22,8 +22,12 @@ export interface Pose {
   x: number;
   /** Porcentaje del propio alto del elemento (para `yPercent` de GSAP). */
   y: number;
-  /** Grados de rotación. */
+  /** Grados de rotación en el plano. */
   rotacion: number;
+  /** Grados de giro 3D sobre el eje vertical (el celular se voltea de lado). */
+  rotacionY: number;
+  /** Grados de giro 3D sobre el eje horizontal (el celular se inclina hacia atrás). */
+  rotacionX: number;
 }
 
 export interface PoseCelulares {
@@ -77,6 +81,12 @@ const FLOTE_FASE_B = Math.PI / 3;
 // de su propio alto, lineal con `p` (sin curva: es fondo, no protagonista).
 const CINTA_PARALLAX = 3.5;
 
+// ─── Giro 3D (referencia: el video de Slush) ───
+// Al separarse, cada celular se voltea hacia el centro y se inclina un poco hacia atrás.
+export const PERSPECTIVA_PX = 1400;
+const GIRO_Y_FIN = 22;
+const GIRO_X_FIN = 10;
+
 // ─── Aparición de los pies de foto ───
 // Rampa lineal entre estos dos puntos de `p`; fuera de ese rango, 0 o 1.
 const PIE_INICIO = 0.55;
@@ -109,6 +119,8 @@ export function poseCelulares(pCrudo: number): PoseCelulares {
       lerp(Y_A_INICIO, Y_A_FIN, t) +
       FLOTE_AMPLITUD * Math.sin(p * FLOTE_FRECUENCIA_A * Math.PI * 2 + FLOTE_FASE_A),
     rotacion: lerp(ROTACION_A_INICIO, ROTACION_A_FIN, t),
+    rotacionY: lerp(0, GIRO_Y_FIN, t),
+    rotacionX: lerp(0, GIRO_X_FIN, t),
   };
 
   const b: Pose = {
@@ -118,12 +130,16 @@ export function poseCelulares(pCrudo: number): PoseCelulares {
       lerp(Y_B_INICIO, Y_B_FIN, t) +
       FLOTE_AMPLITUD * Math.sin(p * FLOTE_FRECUENCIA_B * Math.PI * 2 + FLOTE_FASE_B),
     rotacion: lerp(ROTACION_B_INICIO, ROTACION_B_FIN, t),
+    rotacionY: lerp(0, -GIRO_Y_FIN, t),
+    rotacionX: lerp(0, GIRO_X_FIN, t),
   };
 
   const cinta: Pose = {
     x: 0,
     y: lerp(-CINTA_PARALLAX, CINTA_PARALLAX, p),
     rotacion: 0,
+    rotacionY: 0,
+    rotacionX: 0,
   };
 
   const opacidadPie = clamp01((p - PIE_INICIO) / (PIE_FIN - PIE_INICIO));

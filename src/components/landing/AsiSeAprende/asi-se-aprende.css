@@ -19,9 +19,12 @@
      abajo de donde debía (se salía del viewport por abajo). El espaciado vertical
      de esta sección lo da `.asi-pin` a continuación, no `.lp-section`.  */
   padding-block: 0;
+  /* La cinta va a sangre (más ancha que la pantalla): se recorta aquí, sin scroll horizontal. */
+  overflow-x: clip;
 }
 
 .asi-pin {
+  overflow-x: clip;
   display: flex;
   flex-direction: column;
   padding-block: var(--space-8) var(--space-6);
@@ -65,13 +68,16 @@
      da una proporción panorámica. Se ve solo el valle central de la cinta (el resto
      lo recorta `object-fit: cover` de la imagen de abajo). */
   aspect-ratio: 3 / 4;
-  overflow: hidden;
-  border-radius: var(--radius-card-lg);
 }
 
+/* A sangre: del ancho de la pantalla y más alta que la escena, para que sus extremos
+   salgan siempre por los bordes y nunca se vea el corte de la imagen. */
 .asi-cinta {
   position: absolute;
-  inset: 0;
+  top: -20%;
+  bottom: -20%;
+  left: calc(50% - 50vw);
+  width: 100vw;
   z-index: 0;
 }
 .asi-cinta img {
@@ -85,14 +91,13 @@
   z-index: 1;
 }
 
-/* Cada celular es el <figure> completo (marco + pantalla + pie): la pose de
-   `poseCelulares()` (posición Y rotación) se aplica a todo el bloque, como una
-   tarjeta que gira un poco entera — el pie gira con su celular, no en contra. */
+/* El <figure> (marco + pie) solo se desplaza; el giro lo lleva el marco, así el pie
+   queda derecho y legible. */
 .asi-celular {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(200px, 42vw);
+  width: min(150px, 34vw);
   margin: 0;
   will-change: transform;
 }
@@ -157,8 +162,11 @@
   flex-direction: column;
   gap: var(--space-1);
   margin: 0;
-  padding-top: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   text-align: center;
+  background: var(--paper-sunk);
+  border-radius: var(--radius-md);
 }
 .asi-pie-titulo {
   font-family: var(--font-display);

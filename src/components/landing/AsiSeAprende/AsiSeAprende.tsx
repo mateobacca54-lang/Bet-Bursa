@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger, gsap, registerGsap } from '@/lib/gsap';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import { poseCelulares, type Pose } from '@/lib/celularesFlotantes';
+import { PERSPECTIVA_PX, poseCelulares, type Pose } from '@/lib/celularesFlotantes';
 import '../landing.css';
 import './asi-se-aprende.css';
 
@@ -47,10 +47,15 @@ const ACTIVIDADES: readonly [Actividad, Actividad] = [
   },
 ] as const;
 
-/** `translate() rotate()` a partir de una pose — mismo orden que compone GSAP internamente,
- * así el primer cuadro (sin JS) no salta al tomar el control `useGSAP`. */
+/** Posición del bloque (celular + pie). El pie no gira: solo el marco. */
 function transformCss(pose: Pose): string {
-  return `translate(${pose.x}%, ${pose.y}%) rotate(${pose.rotacion}deg)`;
+  return `translate(${pose.x}%, ${pose.y}%)`;
+}
+
+/** Giro del marco, en el mismo orden en que GSAP compone `transformPerspective`,
+ * `rotation`, `rotationY` y `rotationX`, así el primer cuadro (sin JS) no salta. */
+function giroCss(pose: Pose): string {
+  return `perspective(${PERSPECTIVA_PX}px) rotate(${pose.rotacion}deg) rotateY(${pose.rotacionY}deg) rotateX(${pose.rotacionX}deg)`;
 }
 
 const POSE_FINAL = poseCelulares(1);
@@ -127,6 +132,8 @@ export default function AsiSeAprende() {
       const b = celularBRef.current;
       const pieA = pieARef.current;
       const pieB = pieBRef.current;
+      const marcoA = a?.querySelector<HTMLElement>('.asi-marco-celular');
+      const marcoB = b?.querySelector<HTMLElement>('.asi-marco-celular');
 
       // `x`/`y` en 0, explícitos: antes de que GSAP toque el elemento, el HTML del
       // servidor ya trae un `transform: translate(%, %) rotate()` (para que la
@@ -136,8 +143,16 @@ export default function AsiSeAprende() {
       // sale duplicada. Fijar `x`/`y` en 0 en el primer `.set()` anula ese residuo.
       const aplicar = (p: number) => {
         const pose = poseCelulares(p);
-        if (a) gsap.set(a, { x: 0, y: 0, xPercent: pose.a.x, yPercent: pose.a.y, rotation: pose.a.rotacion });
-        if (b) gsap.set(b, { x: 0, y: 0, xPercent: pose.b.x, yPercent: pose.b.y, rotation: pose.b.rotacion });
+        if (a) gsap.set(a, { x: 0, y: 0, xPercent: pose.a.x, yPercent: pose.a.y });
+        if (b) gsap.set(b, { x: 0, y: 0, xPercent: pose.b.x, yPercent: pose.b.y });
+        const giro = (q: Pose) => ({
+          transformPerspective: PERSPECTIVA_PX,
+          rotation: q.rotacion,
+          rotationY: q.rotacionY,
+          rotationX: q.rotacionX,
+        });
+        if (marcoA) gsap.set(marcoA, giro(pose.a));
+        if (marcoB) gsap.set(marcoB, giro(pose.b));
         if (cinta) gsap.set(cinta, { x: 0, y: 0, yPercent: pose.cinta.y });
         if (pieA) gsap.set(pieA, { opacity: pose.opacidadPie });
         if (pieB) gsap.set(pieB, { opacity: pose.opacidadPie });
@@ -236,7 +251,7 @@ export default function AsiSeAprende() {
                     {/* El marco (fondo oscuro) queda en este div, aparte del pie: si el
                         fondo del figure llegara hasta el pie, el texto (tinta oscura)
                         quedaría oscuro sobre oscuro. */}
-                    <div className="asi-marco-celular">
+                    <div className="asi-marco-celular" style={{ transform: giroCss(pose) }}>
                       <span className="asi-marco-celular-notch" aria-hidden="true" />
                       <div className="asi-marco-celular-pantalla">
                         <video
