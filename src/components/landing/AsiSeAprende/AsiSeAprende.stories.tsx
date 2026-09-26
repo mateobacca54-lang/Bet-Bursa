@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capítulo "Así se aprende en Bursa.": carrusel horizontal "Highlights" con una tarjeta grande por momento de la lección —predices, lo ves, entiendes por qué—, cada una con capturas reales de escritorio y celular. Se recorre con touch, trackpad, teclado (flechas) o los controles de la píldora (puntos y pausa); avanza solo cada 6s si la sección está visible, no hay movimiento reducido y nadie interactuó.',
+          'Capítulo "Así se aprende en Bursa.": dos celulares que flotan delante de una cinta 3D de marca y, al bajar con el scroll, se apartan cada uno hacia su lado inclinándose (referencia de movimiento: la landing de Slush; colores y tipografía son los de Bursa). Cada celular reproduce en bucle un video de una actividad real de la app —mover el tiempo en el precio del almuerzo, predecir y comparar el interés compuesto—, con un botón de pausa para los dos. En escritorio la sección se ancla mientras se recorre; en celular y con movimiento reducido no hay pin ni scroll: la pose queda fija en el estado final, ya separado, con la misma información.',
       },
     },
   },

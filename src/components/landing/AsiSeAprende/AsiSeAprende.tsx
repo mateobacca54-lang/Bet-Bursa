@@ -1,300 +1,302 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger, gsap, registerGsap } from '@/lib/gsap';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import { anteriorIndice, clampIndice, debeAvanzarAuto, siguienteIndice } from '@/lib/carrusel';
+import { poseCelulares, type Pose } from '@/lib/celularesFlotantes';
 import '../landing.css';
 import './asi-se-aprende.css';
 
-interface Paso {
+interface Actividad {
   id: string;
   titulo: string;
   cuerpo: string;
-  srcEscritorio: string;
-  srcCelular: string;
-  alt: string;
+  descripcion: string;
+  poster: string;
+  posterFin: string;
+  webm: string;
+  mp4: string;
 }
 
-const AVANCE_AUTO_MS = 6000;
+// Las dos actividades reales del flujo predecir → interactuar → entender de la
+// Lección 2 (temario.ts), grabadas tal cual se ven en la app.
+const ACTIVIDADES: readonly [Actividad, Actividad] = [
+  {
+    id: 'almuerzo',
+    titulo: 'Mueves el tiempo.',
+    cuerpo: 'Arrastras los años y ves cuánto sube tu almuerzo.',
+    descripcion:
+      'Video de la actividad del almuerzo: se arrastra un control del año 2015 al año 2025, las barras del precio del almuerzo van creciendo, y al final aparece un aviso con un check que explica por qué sube: la inflación.',
+    poster: '/landing/actividad-almuerzo-inicio.webp',
+    posterFin: '/landing/actividad-almuerzo-fin.webp',
+    webm: '/landing/actividad-almuerzo.webm',
+    mp4: '/landing/actividad-almuerzo.mp4',
+  },
+  {
+    id: 'interes',
+    titulo: 'Predices y comparas.',
+    cuerpo: 'Adivinas cuánto crece tu plata y ves cuánto crece de verdad.',
+    descripcion:
+      'Video de la actividad del interés: se arrastra una predicción de cuánto va a crecer la plata, encima se dibuja la curva real del interés compuesto, y aparece el mensaje "Muy cerca…" comparando las dos.',
+    poster: '/landing/actividad-interes-inicio.webp',
+    posterFin: '/landing/actividad-interes-fin.webp',
+    webm: '/landing/actividad-interes.webm',
+    mp4: '/landing/actividad-interes.mp4',
+  },
+] as const;
 
-// Las capturas son reales, tomadas del propio flujo predecir → interactuar → entender de
-// WidgetShell en la Lección 2 (la inflación y el precio del almuerzo). No se dibujan: son
-// la app tal cual la ve quien la usa (DIRECCION-LANDING.md §5.5).
-const PASOS: readonly Paso[] = [
-  {
-    id: 'predices',
-    titulo: 'Predices.',
-    cuerpo: 'Antes de ver la respuesta, eliges qué crees que va a pasar.',
-    srcEscritorio: '/landing/app-escritorio-predices.webp',
-    srcCelular: '/landing/app-predices.webp',
-    alt: 'Una lección de Bursa en escritorio y en celular: antes de mover el slider, Monedita invita a predecir en qué año el almuerzo de $8.000 va a costar más de $15.000.',
-  },
-  {
-    id: 'lo-ves',
-    titulo: 'Lo ves.',
-    cuerpo: 'Mueves algo real —un año, un peso— y el resultado cambia frente a tus ojos.',
-    srcEscritorio: '/landing/app-escritorio-lo-ves.webp',
-    srcCelular: '/landing/app-lo-ves.webp',
-    alt: 'La misma lección en escritorio y en celular con el slider movido al año 2020: la gráfica de barras muestra cómo sube el precio del almuerzo a medida que pasan los años.',
-  },
-  {
-    id: 'entiendes',
-    titulo: 'Entiendes por qué.',
-    cuerpo: 'Monedita te explica la respuesta con la pregunta todavía fresca.',
-    srcEscritorio: '/landing/app-escritorio-entiendes.webp',
-    srcCelular: '/landing/app-entiendes.webp',
-    alt: 'La misma lección en escritorio y en celular con la respuesta correcta: un aviso con un check y Monedita celebrando explican por qué la inflación hace que el almuerzo cueste más de $15.000 en 2025.',
-  },
-];
+/** `translate() rotate()` a partir de una pose — mismo orden que compone GSAP internamente,
+ * así el primer cuadro (sin JS) no salta al tomar el control `useGSAP`. */
+function transformCss(pose: Pose): string {
+  return `translate(${pose.x}%, ${pose.y}%) rotate(${pose.rotacion}deg)`;
+}
+
+const POSE_FINAL = poseCelulares(1);
 
 /**
- * AsiSeAprende — capítulo "Así se aprende en Bursa.": un carrusel horizontal de
- * tarjetas grandes, al estilo "Highlights" de Apple (PLAN-LANDING-V3.md §3 fila 6).
+ * AsiSeAprende — capítulo "Así se aprende en Bursa.": dos celulares que flotan
+ * delante de la cinta 3D de marca y, al bajar con el scroll, se apartan cada uno
+ * hacia su lado inclinándose (referencia: la landing de Slush). Cada celular
+ * reproduce en bucle un video de una actividad real de la app.
  *
- * El scroll horizontal nativo (`scroll-snap`) es la fuente de verdad: funciona con touch
- * y trackpad sin JS. Un `IntersectionObserver` sobre las tarjetas lee cuál está más
- * visible para marcar el punto activo y mover el foco de los controles; los controles
- * (puntos, flechas) mueven el scroll con `scrollTo`. El avance automático es un cambio de
- * estado más: usa el mismo camino que un clic en "siguiente".
+ * Toda la geometría (posición, rotación, flotación, parallax de la cinta, opacidad
+ * de los pies) sale de `poseCelulares(p)` en `lib/celularesFlotantes.ts` — este
+ * componente no calcula ningún ángulo ni fracción, solo lee `p` del `ScrollTrigger`
+ * anclado y aplica la pose con `gsap.set`. En escritorio, sin movimiento reducido, la
+ * sección se ancla (patrón de `HeroGaleria`) mientras se recorre; en celular y con
+ * movimiento reducido no hay pin ni scrub: la pose queda fija en p=1 (el estado
+ * final, ya separado), que es también lo que renderiza el servidor antes de que
+ * `useGSAP` tome el control, para que la hidratación no salte.
  */
 export default function AsiSeAprende() {
   const reducirMovimiento = usePrefersReducedMotion();
-  const [activo, setActivo] = useState(0);
-  const [pausado, setPausado] = useState(false);
-  const [seccionVisible, setSeccionVisible] = useState(false);
-  const [interactuando, setInteractuando] = useState(false);
 
-  const pistaRef = useRef<HTMLDivElement>(null);
-  const tarjetasRef = useRef<Array<HTMLDivElement | null>>([]);
-  const activoRef = useRef(0);
-  const desplazandoRef = useRef(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const cintaRef = useRef<HTMLDivElement>(null);
+  const celularARef = useRef<HTMLElement>(null);
+  const celularBRef = useRef<HTMLElement>(null);
+  const pieARef = useRef<HTMLElement>(null);
+  const pieBRef = useRef<HTMLElement>(null);
+  const videoARef = useRef<HTMLVideoElement>(null);
+  const videoBRef = useRef<HTMLVideoElement>(null);
+
+  const [visible, setVisible] = useState(false);
+  // `null` = el usuario todavía no tocó el botón: el estado de pausa lo decide
+  // `reducirMovimiento` solo (los videos no arrancan solos bajo movimiento reducido).
+  // En cuanto hay un clic, ese valor manda y ya no depende de la preferencia del
+  // sistema. Derivado, no un efecto: así no hace falta sincronizar dos estados.
+  const [pausadoManual, setPausadoManual] = useState<boolean | null>(null);
+  const pausado = pausadoManual ?? reducirMovimiento;
+
+  // La escena reproduce los videos solo mientras está en pantalla.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entrada]) => setVisible(entrada.isIntersecting), {
+      threshold: 0.3,
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
-    activoRef.current = activo;
-  }, [activo]);
+    const deberianReproducirse = visible && !pausado;
+    for (const ref of [videoARef, videoBRef]) {
+      const video = ref.current;
+      if (!video) continue;
+      if (deberianReproducirse) {
+        video.play().catch(() => {
+          // Autoplay bloqueado (p. ej. ahorro de datos): el póster se queda quieto,
+          // el botón de la pastilla sigue ofreciendo reproducir a mano.
+        });
+      } else {
+        video.pause();
+      }
+    }
+  }, [visible, pausado]);
 
-  const irA = useCallback(
-    (i: number) => {
-      const pista = pistaRef.current;
-      const tarjeta = tarjetasRef.current[i];
-      if (!pista || !tarjeta) return;
-      desplazandoRef.current = true;
-      pista.scrollTo({
-        left: tarjeta.offsetLeft - pista.offsetLeft,
-        behavior: reducirMovimiento ? 'auto' : 'smooth',
-      });
-      setActivo(i);
-      // El scroll suave dispara varios eventos de IntersectionObserver mientras viaja;
-      // se ignoran hasta que termine, para no pisar el índice que el usuario eligió.
-      window.setTimeout(() => {
-        desplazandoRef.current = false;
-      }, reducirMovimiento ? 50 : 500);
+  useGSAP(
+    () => {
+      registerGsap();
+
+      const cinta = cintaRef.current;
+      const a = celularARef.current;
+      const b = celularBRef.current;
+      const pieA = pieARef.current;
+      const pieB = pieBRef.current;
+
+      // `x`/`y` en 0, explícitos: antes de que GSAP toque el elemento, el HTML del
+      // servidor ya trae un `transform: translate(%, %) rotate()` (para que la
+      // hidratación arranque en la pose final). GSAP, al leerlo por primera vez,
+      // interpreta ese `translate(%)` ya resuelto a píxeles como un `x`/`y` fijo
+      // propio y lo sigue sumando a `xPercent`/`yPercent` en cada `.set()` — la pose
+      // sale duplicada. Fijar `x`/`y` en 0 en el primer `.set()` anula ese residuo.
+      const aplicar = (p: number) => {
+        const pose = poseCelulares(p);
+        if (a) gsap.set(a, { x: 0, y: 0, xPercent: pose.a.x, yPercent: pose.a.y, rotation: pose.a.rotacion });
+        if (b) gsap.set(b, { x: 0, y: 0, xPercent: pose.b.x, yPercent: pose.b.y, rotation: pose.b.rotacion });
+        if (cinta) gsap.set(cinta, { x: 0, y: 0, yPercent: pose.cinta.y });
+        if (pieA) gsap.set(pieA, { opacity: pose.opacidadPie });
+        if (pieB) gsap.set(pieB, { opacity: pose.opacidadPie });
+      };
+
+      const mm = gsap.matchMedia();
+      mm.add(
+        {
+          // Solo aquí hay pin y scrub. Con movimiento reducido o en celular, la pose
+          // queda fija en el estado final: es la misma "(reduce), (max-width: 899px)"
+          // que ya usa CapituloCrece, solo que aquí no hay una versión "movil" con su
+          // propio pin — en celular esta escena nunca se ancla.
+          animada: '(prefers-reduced-motion: no-preference) and (min-width: 900px)',
+          quieta: '(prefers-reduced-motion: reduce), (max-width: 899px)',
+        },
+        (context) => {
+          const { animada = false } = context.conditions ?? {};
+
+          if (!animada) {
+            aplicar(1);
+            return;
+          }
+
+          const section = sectionRef.current;
+          const pin = pinRef.current;
+          if (!section || !pin) {
+            aplicar(1);
+            return;
+          }
+
+          aplicar(0);
+
+          const st = ScrollTrigger.create({
+            trigger: section,
+            start: () => `top ${Math.round(document.querySelector('.lp-nav')?.getBoundingClientRect().height ?? 0)}px`,
+            end: () => `+=${Math.round(window.innerHeight * 1.35)}`,
+            pin,
+            pinSpacing: true,
+            scrub: true,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => aplicar(self.progress),
+          });
+          aplicar(st.progress);
+
+          // Otros capítulos de arriba (p. ej. HeroGaleria) crean su propio pin un
+          // ciclo de React después del primer render, y ese pin-spacer tardío cambia
+          // cuánto mide todo lo de ARRIBA de esta sección. `refresh()` una vez que la
+          // página termina de cargar recalcula el ancla contra el alto ya definitivo;
+          // es idempotente, así que no hace daño si ya estaba bien.
+          const alCargarTodo = () => ScrollTrigger.refresh();
+          window.addEventListener('load', alCargarTodo);
+
+          return () => {
+            window.removeEventListener('load', alCargarTodo);
+            st.kill();
+          };
+        }
+      );
+
+      return () => mm.revert();
     },
-    [reducirMovimiento]
+    { scope: sectionRef }
   );
 
-  // Paso activo: la tarjeta más visible dentro de la pista, según IntersectionObserver.
-  useEffect(() => {
-    const pista = pistaRef.current;
-    if (!pista) return;
-
-    const observer = new IntersectionObserver(
-      (entradas) => {
-        if (desplazandoRef.current) return;
-        let mejor: IntersectionObserverEntry | null = null;
-        for (const entrada of entradas) {
-          if (!mejor || entrada.intersectionRatio > mejor.intersectionRatio) {
-            mejor = entrada;
-          }
-        }
-        if (mejor && mejor.intersectionRatio > 0) {
-          const i = tarjetasRef.current.indexOf(mejor.target as HTMLDivElement);
-          if (i >= 0) setActivo(i);
-        }
-      },
-      { root: pista, threshold: [0.5, 0.75, 1] }
-    );
-
-    for (const tarjeta of tarjetasRef.current) {
-      if (tarjeta) observer.observe(tarjeta);
-    }
-    return () => observer.disconnect();
-  }, []);
-
-  // La sección cuenta como "visible" (para el avance automático) al 50% o más en pantalla.
-  useEffect(() => {
-    const pista = pistaRef.current;
-    const section = pista?.closest('section');
-    if (!section) return;
-    const observer = new IntersectionObserver(([entrada]) => setSeccionVisible(entrada.isIntersecting), {
-      threshold: 0.5,
-    });
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
-
-  // Avance automático: cada AVANCE_AUTO_MS, solo si la sección está visible, sin
-  // movimiento reducido, sin pausa manual y sin puntero/foco dentro del carrusel. Se
-  // detiene solo al llegar al último paso (PLAN §3 fila 6, AGENTS.md movimiento).
-  useEffect(() => {
-    if (reducirMovimiento || pausado || interactuando || !seccionVisible) return;
-    if (!debeAvanzarAuto(activo, PASOS.length)) return;
-
-    const id = window.setTimeout(() => {
-      irA(siguienteIndice(activoRef.current, PASOS.length));
-    }, AVANCE_AUTO_MS);
-    return () => window.clearTimeout(id);
-  }, [activo, reducirMovimiento, pausado, interactuando, seccionVisible, irA]);
-
-  function alTeclado(evento: React.KeyboardEvent<HTMLDivElement>) {
-    if (evento.key === 'ArrowRight') {
-      evento.preventDefault();
-      irA(siguienteIndice(activo, PASOS.length));
-    } else if (evento.key === 'ArrowLeft') {
-      evento.preventDefault();
-      irA(anteriorIndice(activo, PASOS.length));
-    }
-  }
-
   return (
-    <section id="como-aprendes-app" className="lp-section asi-section" aria-labelledby="asi-titulo">
-      <div className="lp-wrap asi-wrap">
-        <div className="asi-heading">
-          <h2 id="asi-titulo" className="lp-title">
-            Así se aprende en Bursa.
-          </h2>
-          <p className="lp-lead">Los tres momentos de una lección real, tal como se ven en tu pantalla.</p>
-        </div>
+    <section id="como-aprendes-app" ref={sectionRef} className="lp-section asi-section" aria-labelledby="asi-titulo">
+      <div ref={pinRef} className="asi-pin">
+        <div className="lp-wrap asi-wrap">
+          <div className="asi-heading">
+            <h2 id="asi-titulo" className="lp-title">
+              Así se aprende en Bursa.
+            </h2>
+            <p className="lp-lead">Cada lección es una actividad: mueves algo y ves qué le pasa a tu plata.</p>
+          </div>
 
-        <div
-          ref={pistaRef}
-          className="asi-pista"
-          role="region"
-          aria-roledescription="carrusel"
-          aria-label="Así se aprende en Bursa"
-          tabIndex={0}
-          onKeyDown={alTeclado}
-          onPointerEnter={() => setInteractuando(true)}
-          onPointerLeave={() => setInteractuando(false)}
-          onFocus={() => setInteractuando(true)}
-          onBlur={() => setInteractuando(false)}
-          onPointerDown={() => setPausado(true)}
-        >
-          {PASOS.map((paso, i) => (
-            <div
-              key={paso.id}
-              ref={(el) => {
-                tarjetasRef.current[i] = el;
-              }}
-              className="asi-tarjeta"
-              role="group"
-              aria-roledescription="paso"
-              aria-label={`${i + 1} de ${PASOS.length}`}
-            >
-              <p className="asi-tarjeta-num" aria-hidden="true">
-                0{i + 1}
-              </p>
-              <h3 className="asi-tarjeta-titulo">{paso.titulo}</h3>
-              <p className="asi-tarjeta-cuerpo">{paso.cuerpo}</p>
-
-              <div className="asi-capturas">
-                <div className="asi-marco-escritorio" aria-hidden="true">
-                  <div className="asi-marco-barra">
-                    <span className="asi-marco-punto" />
-                    <span className="asi-marco-punto" />
-                    <span className="asi-marco-punto" />
-                  </div>
-                  <div className="asi-marco-pantalla">
-                    <Image
-                      src={paso.srcEscritorio}
-                      alt=""
-                      width={2000}
-                      height={1800}
-                      sizes="(min-width: 900px) min(760px, 62vw), 0px"
-                      quality={90}
-                    />
-                  </div>
-                </div>
-
-                <div className="asi-marco-celular" role="img" aria-label={paso.alt}>
-                  <span className="asi-marco-celular-notch" />
-                  <div className="asi-marco-celular-pantalla">
-                    <Image
-                      src={paso.srcCelular}
-                      alt=""
-                      width={1170}
-                      height={2532}
-                      sizes="(min-width: 900px) 180px, 62vw"
-                      quality={90}
-                    />
-                  </div>
-                </div>
-              </div>
+          <div className="asi-escena">
+            <div ref={cintaRef} className="asi-cinta" style={{ transform: transformCss(POSE_FINAL.cinta) }} aria-hidden="true">
+              <Image src="/landing/cinta.webp" alt="" fill sizes="100vw" quality={90} />
             </div>
-          ))}
-        </div>
 
-        <div className="asi-controles">
-          <button
-            type="button"
-            className="asi-flecha"
-            onClick={() => irA(anteriorIndice(activo, PASOS.length))}
-            disabled={activo === 0}
-            aria-label="Paso anterior"
-          >
-            <FlechaIcono direccion="izquierda" />
-          </button>
+            <div className="asi-celulares">
+              {ACTIVIDADES.map((actividad, i) => {
+                const esA = i === 0;
+                const celularRef = esA ? celularARef : celularBRef;
+                const pieRef = esA ? pieARef : pieBRef;
+                const videoRef = esA ? videoARef : videoBRef;
+                const pose = esA ? POSE_FINAL.a : POSE_FINAL.b;
+
+                return (
+                  <figure
+                    key={actividad.id}
+                    ref={celularRef}
+                    className={`asi-celular asi-celular--${esA ? 'a' : 'b'}`}
+                    style={{ transform: transformCss(pose) }}
+                  >
+                    {/* El marco (fondo oscuro) queda en este div, aparte del pie: si el
+                        fondo del figure llegara hasta el pie, el texto (tinta oscura)
+                        quedaría oscuro sobre oscuro. */}
+                    <div className="asi-marco-celular">
+                      <span className="asi-marco-celular-notch" aria-hidden="true" />
+                      <div className="asi-marco-celular-pantalla">
+                        <video
+                          ref={videoRef}
+                          className="asi-video"
+                          muted
+                          loop
+                          playsInline
+                          preload="metadata"
+                          poster={reducirMovimiento ? actividad.posterFin : actividad.poster}
+                          aria-hidden="true"
+                          width={780}
+                          height={1688}
+                        >
+                          <source src={actividad.webm} type="video/webm" />
+                          <source src={actividad.mp4} type="video/mp4" />
+                        </video>
+                      </div>
+                    </div>
+
+                    <span className="lp-sr-only">{actividad.descripcion}</span>
+
+                    <figcaption ref={pieRef} className="asi-pie" style={{ opacity: POSE_FINAL.opacidadPie }}>
+                      <span className="asi-pie-titulo">{actividad.titulo}</span>
+                      <span className="asi-pie-cuerpo">{actividad.cuerpo}</span>
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* En celular los pies van como lista, aparte de cada celular (AGENTS.md: el
+              texto nunca depende de que el JS haya calculado una pose). El de arriba
+              (dentro de cada <figure>) es el mismo contenido pero se oculta <900px con
+              CSS: nunca coexisten los dos visibles, así que un lector de pantalla no
+              los lee dos veces. */}
+          <ul className="asi-pies-lista">
+            {ACTIVIDADES.map((actividad) => (
+              <li key={actividad.id} className="asi-pies-lista-item">
+                <span className="asi-pie-titulo">{actividad.titulo}</span>
+                <span className="asi-pie-cuerpo">{actividad.cuerpo}</span>
+              </li>
+            ))}
+          </ul>
 
           <div className="asi-pildora">
-            {PASOS.map((paso, i) => (
-              <button
-                key={paso.id}
-                type="button"
-                className="asi-punto"
-                data-active={activo === i}
-                aria-current={activo === i ? 'true' : undefined}
-                aria-label={`Ir al paso ${i + 1}: ${paso.titulo}`}
-                onClick={() => irA(clampIndice(i, PASOS.length))}
-              />
-            ))}
             <button
               type="button"
               className="asi-pausa"
-              onClick={() => setPausado((p) => !p)}
-              aria-label={pausado ? 'Reanudar avance automático' : 'Pausar avance automático'}
+              onClick={() => setPausadoManual(!pausado)}
               aria-pressed={pausado}
+              aria-label={pausado ? 'Reproducir las actividades' : 'Pausar las actividades'}
             >
               {pausado ? <ReproducirIcono /> : <PausaIcono />}
             </button>
           </div>
-
-          <button
-            type="button"
-            className="asi-flecha"
-            onClick={() => irA(siguienteIndice(activo, PASOS.length))}
-            disabled={activo === PASOS.length - 1}
-            aria-label="Paso siguiente"
-          >
-            <FlechaIcono direccion="derecha" />
-          </button>
         </div>
       </div>
     </section>
-  );
-}
-
-function FlechaIcono({ direccion }: { direccion: 'izquierda' | 'derecha' }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path
-        d={direccion === 'izquierda' ? 'M11 3l-6 6 6 6' : 'M7 3l6 6-6 6'}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 
