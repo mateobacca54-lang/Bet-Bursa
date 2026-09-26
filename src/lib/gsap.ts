@@ -5,7 +5,7 @@ import { CustomEase } from 'gsap/CustomEase';
 import { DURATION, EASE_OUT_EXPO, EASE_OUT_QUART, STAGGER } from './motion';
 
 // ============================================================
-// gsap.ts — registro central de GSAP (SPEC-LANDING-V2.md §11).
+// gsap.ts — registro central de GSAP (docs/archivo/SPEC-LANDING-V2.md §11).
 //
 // GSAP es SOLO para "apariciones al hacer scroll" (ScrollTrigger + SplitText).
 // Framer Motion sigue siendo el motor de lo interactivo (los widgets de lección y

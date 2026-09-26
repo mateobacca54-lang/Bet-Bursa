@@ -1,7 +1,7 @@
 # SPEC — Landing v2 (`/`)
 
 Estratega: Opus 5.5. Construcción: dos subagentes Fable 5.1 en paralelo, cada uno con archivos propios.
-Diseño de referencia: Figma `paQQjPBZ0Y4hNqLkCcuBWH` (página "Landing"). Plan y porqués: `docs/PLAN-REDISENO-LANDING.md`.
+Diseño de referencia: Figma `paQQjPBZ0Y4hNqLkCcuBWH` (página "Landing"). Plan y porqués: `docs/archivo/PLAN-REDISENO-LANDING.md`.
 
 ## 0. La idea en una frase
 

@@ -2,6 +2,8 @@
 
 Escuela de dinero y mercados para jóvenes colombianos. Este repo es la app (Next.js + React + Storybook).
 
+La documentación empieza en [`docs/README.md`](./docs/README.md).
+
 ## Empezar
 
 ```bash

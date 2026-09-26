@@ -6,7 +6,7 @@ import { DURATION, EASE_NAME, ScrollTrigger, SplitText, STAGGER, gsap, registerG
 registerGsap();
 
 /**
- * ApareceAlBajar — "que las cosas vayan apareciendo" al bajar (SPEC-LANDING-V2.md §11).
+ * ApareceAlBajar — "que las cosas vayan apareciendo" al bajar (docs/archivo/SPEC-LANDING-V2.md §11).
  *
  * No renderiza nada: busca los elementos ya pintados por el servidor (por clase o por
  * `data-aparece`) y les monta GSAP + ScrollTrigger encima. El HTML del servidor sale
