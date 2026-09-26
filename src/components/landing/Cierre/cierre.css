@@ -34,7 +34,7 @@
   /* Más grande que el avatar genérico (96px): aquí Monedita es la despedida.
      calc() de tokens: 3 × --space-16 = 192px. */
   width: calc(var(--space-16) * 3);
-  aspect-ratio: 480 / 464;
+  aspect-ratio: 1;
 }
 
 .cie-avatar-media {

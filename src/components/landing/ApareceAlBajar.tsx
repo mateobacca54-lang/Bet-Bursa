@@ -69,12 +69,6 @@ export default function ApareceAlBajar() {
         return gsap.to(el, { y: 0, autoAlpha: 1, duration: DURATION.element, ease: EASE_NAME.outExpo, delay, paused });
       }
 
-      /** Se dibuja de izquierda a derecha (scaleX). Devuelve el tween, pausado. */
-      function buildDraw(el: Element, paused = true) {
-        gsap.set(el, { scaleX: 0, transformOrigin: 'left center' });
-        return gsap.to(el, { scaleX: 1, duration: DURATION.scene, ease: EASE_NAME.outExpo, paused });
-      }
-
       /** Reproduce `playable` (tween o timeline) una sola vez, al entrar en pantalla. */
       function onEnterOnce(trigger: Element, playable: { play: () => void }, start = 'top 85%') {
         scrollTriggers.push(
@@ -88,22 +82,6 @@ export default function ApareceAlBajar() {
       }
 
       function setup() {
-        // ─── Héroe: al cargar, no por scroll (SPEC §11 tabla) ───
-        const heroTitle = document.querySelector('#hero-titulo');
-        if (heroTitle) {
-          const tl = gsap.timeline();
-          tl.add(buildLines(heroTitle, false));
-
-          const restOfHero = ['.lp-hero-lead', '.lp-hero-actions']
-            .map((sel) => document.querySelector(sel))
-            .filter((el): el is Element => el !== null);
-          restOfHero.forEach((el, i) => {
-            tl.add(buildRise(el, 12, 0, false), i === 0 ? '-=0.1' : `-=${DURATION.element - STAGGER}`);
-          });
-
-          tl.play();
-        }
-
         // ─── Cada .lp-title / .lp-lead (propias y de B), salvo el héroe y el cierre
         // (el cierre lleva su propia secuencia, más abajo) ───
         document.querySelectorAll<HTMLElement>('.lp-title').forEach((el) => {
@@ -112,16 +90,6 @@ export default function ApareceAlBajar() {
         });
         // Los párrafos (.lp-lead) ya no aparecen al bajar: un fade por defecto no explica
         // nada (docs/PLAN-LANDING-V3.md §5). Solo los titulares llevan máscara de línea.
-
-        // ─── Promesa única: se dibuja la línea y entra el texto ───
-        document.querySelectorAll<HTMLElement>('.lp-promise').forEach((col, i) => {
-          const line = col.querySelector<HTMLElement>('[data-aparece="dibujar"]');
-          const body = col.querySelector<HTMLElement>('[data-aparece="subir"]');
-          const tl = gsap.timeline({ paused: true, delay: i * STAGGER });
-          if (line) tl.add(buildDraw(line, false));
-          if (body) tl.add(buildRise(body, 12, 0, false), '-=0.15');
-          if (line || body) onEnterOnce(col, tl);
-        });
 
         // ─── Cierre: Monedita con un pequeño rebote, luego el título por líneas,
         // luego el botón (secuencia propia, no la genérica) ───
