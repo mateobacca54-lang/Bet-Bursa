@@ -105,6 +105,12 @@ export default function AsiSeAprende() {
           rafId = null;
         }
       };
+      // Al soltarse la sección, el bucle sigue hasta alcanzar el cuadro final (o el
+      // inicial, al subir) y ahí se apaga: si se corta de golpe, un scroll rápido deja
+      // la animación congelada a medias.
+      const soltar = () => {
+        activo = false;
+      };
 
       const opcionesScroll = {
         trigger: section,
@@ -124,24 +130,31 @@ export default function AsiSeAprende() {
         let objeto: string | null = null;
 
         const tick = () => {
-          if (!activo) {
-            rafId = null;
-            return;
-          }
+          let llego = true;
           if (video.readyState >= 1 && Number.isFinite(video.duration)) {
             const objetivoTiempo = objetivoProgreso * video.duration;
             tiempoActual = acercar(tiempoActual, objetivoTiempo, FACTOR_SUAVIZADO);
             if (!video.seeking && Math.abs(video.currentTime - tiempoActual) > UMBRAL_SEEK) {
               video.currentTime = tiempoActual;
             }
+            llego =
+              tiempoActual === objetivoTiempo &&
+              !video.seeking &&
+              Math.abs(video.currentTime - objetivoTiempo) <= UMBRAL_SEEK;
+          }
+          if (!activo && llego) {
+            rafId = null;
+            return;
           }
           rafId = requestAnimationFrame(tick);
         };
         const iniciar = () => {
           if (activo) return;
           activo = true;
-          tiempoActual = video.currentTime;
-          rafId = requestAnimationFrame(tick);
+          if (rafId === null) {
+            tiempoActual = video.currentTime;
+            rafId = requestAnimationFrame(tick);
+          }
         };
 
         // Descarga entera antes de conectar el video: Safari en iPhone no deja saltar a
@@ -162,10 +175,12 @@ export default function AsiSeAprende() {
           ...opcionesScroll,
           onUpdate: (self) => {
             objetivoProgreso = self.progress;
+            // Un salto que cruza la sección entera no la activa: igual hay que ir al cuadro nuevo.
+            if (rafId === null) rafId = requestAnimationFrame(tick);
           },
           onToggle: (self) => {
             if (self.isActive) iniciar();
-            else detener();
+            else soltar();
           },
         });
         ScrollTrigger.sort();
@@ -269,10 +284,6 @@ export default function AsiSeAprende() {
       });
 
       const tick = () => {
-        if (!activo) {
-          rafId = null;
-          return;
-        }
         progresoActual = acercar(progresoActual, objetivoProgreso, FACTOR_SUAVIZADO);
         const indice = cuadroParaProgreso(progresoActual, TOTAL_CUADROS_MOVIL);
         if (indice !== cuadroDibujado) {
@@ -280,22 +291,28 @@ export default function AsiSeAprende() {
           canvas.dataset.cuadro = String(indice);
           dibujar(indice);
         }
+        if (!activo && progresoActual === objetivoProgreso) {
+          rafId = null;
+          return;
+        }
         rafId = requestAnimationFrame(tick);
       };
       const iniciar = () => {
         if (activo) return;
         activo = true;
-        rafId = requestAnimationFrame(tick);
+        if (rafId === null) rafId = requestAnimationFrame(tick);
       };
 
       const st = ScrollTrigger.create({
         ...opcionesScroll,
         onUpdate: (self) => {
           objetivoProgreso = self.progress;
+          // Un salto que cruza la sección entera no la activa: igual hay que ir al cuadro nuevo.
+          if (rafId === null) rafId = requestAnimationFrame(tick);
         },
         onToggle: (self) => {
           if (self.isActive) iniciar();
-          else detener();
+          else soltar();
         },
       });
       ScrollTrigger.sort();
