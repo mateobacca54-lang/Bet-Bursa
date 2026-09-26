@@ -15,17 +15,26 @@ const ACTIVIDADES = [
   { id: 'interes', titulo: 'Predices y comparas.', cuerpo: 'Adivinas cuánto crece tu plata y ves cuánto crece de verdad.' },
 ] as const;
 
+const VIDEOS = {
+  escritorio: { mp4: '/landing/celulares.mp4', webm: '/landing/celulares.webm', poster: '/landing/celulares-poster.webp' },
+  movil: { mp4: '/landing/celulares-movil.mp4', webm: '/landing/celulares-movil.webm', poster: '/landing/celulares-movil-poster.webp' },
+} as const;
+
 /**
  * AsiSeAprende — capítulo "Así se aprende en Bursa.": dos celulares con pantallas
  * reales de la app flotan y giran sobre la cinta de la marca (referencia: la landing
- * de Slush). El video (tres giros generados con Higgsfield) avanza con el scroll, igual
- * que la moneda de HeroGaleria: en escritorio la sección se ancla y el progreso del
- * scroll fija el cuadro. En celular, con movimiento reducido o ahorro de datos se ve el
- * último cuadro como imagen fija, con la misma información.
+ * de Slush). La sección se queda quieta al llegar y el scroll recorre el video (tres
+ * giros generados con Higgsfield) de principio a fin; al terminar, la página sigue.
+ * En celular se usa un recorte cuadrado del mismo video, entero (sin cortar celulares). Con movimiento reducido o
+ * ahorro de datos se ve el último cuadro como imagen fija, con la misma información.
+ *
+ * El video se descarga entero (blob) antes de conectarlo: Safari en iPhone no deja
+ * saltar a un cuadro que no ha bajado, y recorrerlo con el dedo lo exige.
  */
 export default function AsiSeAprende() {
   const reducirMovimiento = usePrefersReducedMotion();
   const [conVideo, setConVideo] = useState(false);
+  const [esEscritorio, setEsEscritorio] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -33,7 +42,10 @@ export default function AsiSeAprende() {
   useEffect(() => {
     const query = window.matchMedia(ESCRITORIO);
     const conexion = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const actualizar = () => setConVideo(query.matches && !reducirMovimiento && !conexion?.saveData);
+    const actualizar = () => {
+      setEsEscritorio(query.matches);
+      setConVideo(!reducirMovimiento && !conexion?.saveData);
+    };
     actualizar();
     query.addEventListener('change', actualizar);
     return () => query.removeEventListener('change', actualizar);
@@ -54,6 +66,22 @@ export default function AsiSeAprende() {
         if (Math.abs(video.currentTime - t) > 0.01) video.currentTime = t;
       };
 
+      // Descarga entera antes de conectar el video (ver arriba). Mientras tanto, el póster.
+      const fuente = esEscritorio ? VIDEOS.escritorio : VIDEOS.movil;
+      const url = video.canPlayType('video/mp4; codecs="avc1.640028"') ? fuente.mp4 : fuente.webm;
+      let objeto: string | null = null;
+      let vivo = true;
+      fetch(url)
+        .then((r) => r.blob())
+        .then((blob) => {
+          if (!vivo) return;
+          objeto = URL.createObjectURL(blob);
+          video.src = objeto;
+        })
+        .catch(() => {
+          // Sin red: queda el póster, con la misma información.
+        });
+
       const st = ScrollTrigger.create({
         trigger: section,
         start: () => `top ${Math.round(document.querySelector('.lp-nav')?.getBoundingClientRect().height ?? 0)}px`,
@@ -61,6 +89,7 @@ export default function AsiSeAprende() {
         pin,
         pinSpacing: true,
         invalidateOnRefresh: true,
+        anticipatePin: 1,
         onUpdate: (self) => aplicar(self.progress),
       });
       ScrollTrigger.sort();
@@ -68,11 +97,13 @@ export default function AsiSeAprende() {
       const alListo = () => aplicar(st.progress);
       video.addEventListener('loadedmetadata', alListo);
       return () => {
+        vivo = false;
         video.removeEventListener('loadedmetadata', alListo);
+        if (objeto) URL.revokeObjectURL(objeto);
         st.kill();
       };
     },
-    { scope: sectionRef, dependencies: [conVideo] }
+    { scope: sectionRef, dependencies: [conVideo, esEscritorio] }
   );
 
   return (
@@ -92,28 +123,28 @@ export default function AsiSeAprende() {
               className="asi-media"
               muted
               playsInline
-              preload="auto"
+              preload="none"
               disablePictureInPicture
               disableRemotePlayback
               tabIndex={-1}
-              poster="/landing/celulares-poster.webp"
-              width={1600}
-              height={900}
-              aria-hidden="true"
-            >
-              <source src="/landing/celulares.webm" type="video/webm" />
-              <source src="/landing/celulares.mp4" type="video/mp4" />
-            </video>
-          ) : (
-            <Image
-              className="asi-media"
-              src="/landing/celulares-poster.webp"
-              alt=""
-              width={1920}
+              poster={esEscritorio ? VIDEOS.escritorio.poster : VIDEOS.movil.poster}
+              width={esEscritorio ? 1920 : 1080}
               height={1080}
-              sizes="100vw"
-              quality={85}
+              aria-hidden="true"
             />
+          ) : (
+            <picture>
+              <source media="(min-width: 900px)" srcSet={VIDEOS.escritorio.poster} />
+              <Image
+                className="asi-media"
+                src={VIDEOS.movil.poster}
+                alt=""
+                width={1080}
+                height={1080}
+                sizes="100vw"
+                unoptimized
+              />
+            </picture>
           )}
           <p className="lp-sr-only">
             Dos celulares con la app de Bursa flotan y giran sobre una cinta naranja. Uno muestra cuánto sube el precio

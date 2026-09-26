@@ -32,8 +32,10 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+  aspect-ratio: 1;
+  /* En celular el cuadro se ve entero: su papel es el de la sección, así que el
+     espacio que sobra no se nota. */
+  object-fit: contain;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 95%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 95%, transparent 100%);
 }
@@ -68,26 +70,28 @@
   }
   .asi-media {
     aspect-ratio: 16 / 9;
+    object-fit: cover;
   }
   .asi-actividades {
     grid-template-columns: repeat(2, minmax(0, 32ch));
     gap: var(--space-8);
   }
 
-  /* Anclada: el cuadro mide lo que se ve bajo la barra; el video llena lo que deja
-     el titular. */
-  .asi-pin[data-video='true'] {
-    height: calc(100svh - var(--lp-nav-h));
-  }
-  .asi-pin[data-video='true'] .asi-encabezado {
-    padding-top: var(--space-8);
-  }
-  .asi-pin[data-video='true'] .asi-escena {
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .asi-pin[data-video='true'] .asi-media {
-    height: 100%;
-    aspect-ratio: auto;
-  }
+}
+
+/* Anclada (con video, en cualquier pantalla): el cuadro mide lo que se ve bajo la
+   barra y el video llena lo que deja el titular. */
+.asi-pin[data-video='true'] {
+  height: calc(100svh - var(--lp-nav-h));
+}
+.asi-pin[data-video='true'] .asi-encabezado {
+  padding-top: var(--space-6);
+}
+.asi-pin[data-video='true'] .asi-escena {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.asi-pin[data-video='true'] .asi-media {
+  height: 100%;
+  aspect-ratio: auto;
 }
