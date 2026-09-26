@@ -163,6 +163,28 @@
 
   /* ─── Escalonado ─── */
   --stagger: 60ms;
+
+  /* ─── Landing v3: "La galería de tu plata" (añadido 2026-09-26) ───
+     Aprobado por el dueño el 26 de septiembre ("desarrolla todo" sobre
+     docs/PLAN-LANDING-V3.md §4). PENDIENTE de reconciliar con Claude Design.
+     Solo la landing los usa: la app sigue con su escala. */
+  --font-size-display-1: clamp(3.5rem, 7.5vw, 7.5rem);   /* 56–120px, titular del héroe */
+  --font-size-display-2: clamp(2.75rem, 5vw, 5rem);      /* 44–80px, titulares de capítulo */
+  --font-size-display-3: clamp(2rem, 3.2vw, 3rem);       /* 32–48px, titulares de tarjeta */
+  --font-size-lead:      clamp(1.125rem, 1.5vw, 1.3125rem); /* 18–21px, cuerpo grande junto a un titular */
+  --tracking-display: -0.035em;   /* todo lo de 44px para arriba */
+  --line-height-display: 0.95;    /* titulares gigantes, compactos */
+  --font-weight-light: 300;       /* cuerpo grande: la jerarquía la da el tamaño, no la negrita */
+
+  --radius-card-lg: 28px;         /* tarjetas grandes de capítulo y marcos de imagen */
+
+  /* Material de la navegación flotante. El desenfoque es estático: nunca se anima. */
+  --surface-glass: color-mix(in srgb, var(--paper) 72%, transparent);
+  --blur-glass: 20px;
+
+  --band-gap: clamp(6rem, 10vw, 9rem); /* aire entre bandas en escritorio */
+  --page-max: 1200px;                  /* ancho máximo del contenido */
+  --press-scale: 0.97;                 /* respuesta al presionar un botón */
 }
 
 /* ─── Reduced motion ─── */
