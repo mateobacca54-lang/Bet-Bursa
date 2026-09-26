@@ -8,7 +8,7 @@ import { DURATION, EASE_OUT_EXPO, EASE_OUT_QUART, STAGGER } from './motion';
 // gsap.ts — registro central de GSAP (SPEC-LANDING-V2.md §11).
 //
 // GSAP es SOLO para "apariciones al hacer scroll" (ScrollTrigger + SplitText).
-// Framer Motion sigue siendo el motor de lo interactivo (HeroQuiz, MetodoDemo,
+// Framer Motion sigue siendo el motor de lo interactivo (los widgets de lección y
 // el contador de LeeLaLetra): nunca las dos animan el MISMO elemento.
 //
 // Los plugins tocan `window`/`document` al registrarse, así que el registro

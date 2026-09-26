@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import Image from 'next/image';
 
 // ============================================================
 // Objetos — los dibujitos chicos de Bursa: las cosas de las que hablan las prácticas.
@@ -41,7 +42,7 @@ export const OBJETOS: readonly ObjetoId[] = [
 
 export const esObjeto = (id: string | undefined): id is ObjetoId => !!id && (OBJETOS as readonly string[]).includes(id);
 
-const DIBUJOS: Record<ObjetoId, () => React.ReactElement> = {
+const DIBUJOS: Record<Exclude<ObjetoId, 'almuerzo'>, () => React.ReactElement> = {
   // Cambiar tu bici por el celular de un amigo
   bici: () => (
     <g>
@@ -119,17 +120,6 @@ const DIBUJOS: Record<ObjetoId, () => React.ReactElement> = {
     </g>
   ),
 
-  // El almuerzo del ejemplo de la inflación: un plato caliente
-  almuerzo: () => (
-    <g>
-      <path d="M36 12q-5 5 0 10t0 10M48 8q-5 5 0 10t0 10M60 12q-5 5 0 10t0 10" fill="none" {...thin} />
-      <ellipse cx={48} cy={66} rx={40} ry={16} fill="var(--surface-raised)" {...line} />
-      <ellipse cx={48} cy={62} rx={27} ry={9} fill="none" {...thin} />
-      <ellipse cx={40} cy={60} rx={13} ry={7} fill="var(--gold-500)" {...thin} />
-      <circle cx={60} cy={58} r={7} fill="var(--brand-300)" {...thin} />
-    </g>
-  ),
-
   // El billete con el que se paga
   billete: () => (
     <g>
@@ -163,8 +153,29 @@ interface ObjetoProps {
   style?: CSSProperties;
 }
 
+// Objetos que ya tienen imagen generada en public/objetos/: se muestran como imagen, no dibujados.
+const IMAGENES: Record<'almuerzo', string> = {
+  almuerzo: '/objetos/almuerzo.webp',
+};
+
 /** Un dibujito cuadrado y sin fondo, para acompañar un texto. Decorativo (aria-hidden). */
 export default function Objeto({ id, size = 56, className, style }: ObjetoProps) {
+  if (id === 'almuerzo') {
+    const imagen = IMAGENES[id];
+    return (
+      <Image
+        src={imagen}
+        alt=""
+        width={size}
+        height={size}
+        className={`objeto${className ? ` ${className}` : ''}`}
+        data-objeto={id}
+        style={{ display: 'block', flexShrink: 0, ...style }}
+        aria-hidden="true"
+        draggable={false}
+      />
+    );
+  }
   const Dibujo = DIBUJOS[id];
   return (
     <svg

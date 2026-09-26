@@ -1,0 +1,118 @@
+/* ============================================================
+   nav-pildora.css — navegación flotante de la landing v3.
+   Solo valores de tokens.css. El desenfoque del material es estático.
+   ============================================================ */
+
+.navp {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: var(--lp-nav-h);
+  padding: var(--space-2) var(--space-3) 0;
+  padding-top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
+  pointer-events: none;
+}
+@media (min-width: 720px) {
+  .navp {
+    padding-inline: var(--space-6);
+  }
+}
+
+.navp-pildora {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: var(--page-max);
+  height: calc(var(--lp-nav-h) - var(--space-4));
+  margin: 0 auto;
+  padding: 0 var(--space-2) 0 var(--space-4);
+  background: var(--surface-glass);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
+  backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+}
+
+.navp-anclas {
+  display: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+@media (min-width: 1024px) {
+  .navp-anclas {
+    display: flex;
+  }
+}
+
+.navp-ancla {
+  position: relative;
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-soft);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: var(--radius-pill);
+}
+/* La raya del capítulo activo: crece desde el centro con transform, nunca con width. */
+.navp-ancla::after {
+  content: '';
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-1);
+  height: 2px;
+  background: var(--brand-600);
+  border-radius: var(--radius-pill);
+  transform: scaleX(0);
+  transition: transform var(--duration-element) var(--ease-out-expo);
+}
+.navp-ancla[aria-current='true'] {
+  color: var(--ink);
+}
+.navp-ancla[aria-current='true']::after {
+  transform: scaleX(1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .navp-ancla:hover {
+    color: var(--ink);
+  }
+}
+
+.navp-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.navp-secundario {
+  display: none;
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-soft);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+@media (min-width: 720px) {
+  .navp-secundario {
+    display: inline-flex;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .navp-secundario:hover {
+    color: var(--ink);
+  }
+}
+.navp-cta {
+  /* --space-8 + --space-2 = 40px: cabe dentro de la píldora sin tocar sus bordes. */
+  min-height: calc(var(--space-8) + var(--space-2));
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--font-size-sm);
+}
+@media (max-width: 360px) {
+  .navp-cta {
+    padding-inline: var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+}

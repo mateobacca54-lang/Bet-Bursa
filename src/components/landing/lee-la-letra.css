@@ -1,12 +1,16 @@
 /* ============================================================
-   lee-la-letra.css — "El papel sobre la mesa" (SPEC-LANDING-V2.md §10).
+   lee-la-letra.css — "El papel sobre la mesa" (SPEC-LANDING-V2.md §10),
+   puesta en escena v3 (docs/PLAN-LANDING-V3.md §3 fila 5): "el contrato del
+   crédito como objeto de la galería, inclinado".
 
-   Escritorio + movimiento: escenario sticky de una pantalla (papel + nota lado a
-   lado) sobre una pista de 3×60vh que avanza el paso con el scroll. Móvil O
-   prefers-reduced-motion: una sola tarjeta (papel arriba, nota debajo), sin sticky,
-   con Anterior/Siguiente. La condición de escritorio-con-movimiento se resuelve en
-   CSS (no en JS) para que nunca dependa de la carrera entre hidratación y
-   `usePrefersReducedMotion()`.
+   Escritorio (≥960px) + movimiento: escenario sticky de una pantalla, con una
+   composición editorial asimétrica — titular y nota a la izquierda, el papel a
+   la derecha, más grande, inclinado -3° de forma ESTÁTICA (nunca animada) —
+   sobre una pista de 3×60vh que avanza el paso con el scroll. Móvil O
+   prefers-reduced-motion: una sola columna (papel recto arriba, nota debajo),
+   sin sticky, con Anterior/Siguiente. La condición de escritorio-con-movimiento
+   se resuelve en CSS (no en JS) para que nunca dependa de la carrera entre
+   hidratación y `usePrefersReducedMotion()`.
    ============================================================ */
 
 .llp-escena-track {
@@ -31,10 +35,14 @@
 /* ─── El papel ─── */
 .llp-papel {
   background: var(--surface-raised);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-card-lg);
+  /* Sombra de contacto suave, no una sombra nueva: es la misma --shadow-soft que
+     ya posa las tarjetas claras sobre --paper (tokens.css). */
+  box-shadow: var(--shadow-soft);
   padding: var(--space-6);
   transform-origin: center;
+  /* Recto en móvil; la inclinación de galería llega en el media query de escritorio. */
+  transform: rotate(0deg);
 }
 
 .llp-papel-header {
@@ -241,7 +249,7 @@
   color: var(--brand-700);
 }
 
-@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 960px) and (prefers-reduced-motion: no-preference) {
   /* Pista de 3×60vh: cada paso "cuesta" 60vh de scroll mientras el escenario, casi
      de una pantalla completa, se queda fijo. Así la sección entera cabe en una
      pantalla por paso, sin columnas vacías. */
@@ -260,18 +268,22 @@
     display: flex;
     align-items: center;
   }
+  /* Composición editorial asimétrica (Ramp + Apple): texto a la izquierda —
+     titular, lead y nota apiladas—, el papel a la derecha, más ancho, como
+     objeto único de la galería. */
   .llp-escena-wrap {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     grid-template-areas:
-      'heading heading'
-      'paper note';
-    gap: var(--space-4) var(--space-8);
+      'heading paper'
+      'note    paper';
+    gap: var(--space-6) var(--space-12);
     align-content: center;
     width: 100%;
   }
   .llp-heading {
     grid-area: heading;
+    text-align: left;
   }
   .llp-papel-col {
     grid-area: paper;
@@ -279,5 +291,9 @@
   }
   .llp-nota-col {
     grid-area: note;
+  }
+  .llp-papel {
+    /* La inclinación de galería (Tomorro): estática, nunca animada. */
+    transform: rotate(-3deg);
   }
 }

@@ -27,6 +27,15 @@
   scroll-margin-top: var(--lp-nav-h);
 }
 
+/* Lenis (scroll suave en escritorio, useScrollSuave): el navegador no debe alisar encima. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
 /* Foco visible: brand-400 no llega a 3:1 sobre blanco (SPEC §2). */
 .lp a:focus-visible,
 .lp button:focus-visible,
@@ -70,7 +79,7 @@
 
 /* ─── Clases compartidas del contrato (SPEC §4) ─── */
 .lp-wrap {
-  max-width: 1120px;
+  max-width: var(--page-max);
   margin: 0 auto;
   padding-inline: var(--space-4);
 }
@@ -84,7 +93,7 @@
 }
 @media (min-width: 960px) {
   .lp-section {
-    padding-block: calc(var(--space-16) * 1.25);
+    padding-block: var(--band-gap);
   }
 }
 .lp-section--paper {
@@ -94,17 +103,27 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--line-height-tight);
-  font-size: clamp(var(--font-size-3xl), 4vw, calc(var(--font-size-4xl) * 1.25));
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-display);
+  font-size: var(--font-size-display-2);
   text-wrap: balance;
+}
+/* Aire entre un titular gigante y su párrafo. */
+.lp-title + .lp-lead {
+  margin-top: var(--space-4);
+}
+/* Palabra acentuada dentro de un titular: una sola por titular, en el color de marca.
+   brand-600 solo se permite en texto grande (tokens.css), y aquí siempre lo es. */
+.lp-acento {
+  color: var(--brand-600);
 }
 .lp-lead {
   margin: 0;
-  font-size: clamp(var(--font-size-base), 1.6vw, var(--font-size-lg));
+  font-size: var(--font-size-lead);
+  font-weight: var(--font-weight-light);
   line-height: var(--line-height-normal);
   color: var(--ink-soft);
-  max-width: 60ch;
+  max-width: 56ch;
 }
 
 /* ─── Botones ───
@@ -123,12 +142,12 @@
   text-decoration: none;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: transform var(--duration-micro) var(--ease-out-quart),
-    background var(--duration-micro) var(--ease-out-quart),
-    border-color var(--duration-micro) var(--ease-out-quart);
+  /* Solo se anima la escala al presionar; el cambio de color al pasar el puntero es
+     instantáneo (AGENTS.md: solo transform y opacity). */
+  transition: transform var(--duration-micro) var(--ease-out-quart);
 }
 .lp-btn:active {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
 }
 .lp-btn--primary {
   background: var(--brand-600);
@@ -150,68 +169,7 @@
   }
 }
 
-/* ─── Barra fija ─── */
-.lp-nav {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  min-height: var(--lp-nav-h);
-  padding: var(--space-2) var(--space-4);
-  padding-top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
-  background: var(--surface-raised);
-  border-bottom: 1px solid var(--border-hairline);
-}
-@media (min-width: 720px) {
-  .lp-nav {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
-  }
-}
-.lp-nav .lp-btn {
-  /* --space-8 + --space-2 = 40px: la barra es más baja que --touch-min (44px). */
-  min-height: calc(var(--space-8) + var(--space-2));
-  padding: var(--space-2) var(--space-6);
-  font-size: var(--font-size-sm);
-  flex: 0 0 auto;
-}
-@media (max-width: 360px) {
-  .lp-nav { gap: var(--space-2); }
-  .lp-nav .lp-btn {
-    padding-inline: var(--space-3);
-    font-size: var(--font-size-xs);
-  }
-}
-.lp-nav-links {
-  display: none;
-  align-items: center;
-  gap: var(--space-1);
-  flex: 1 1 auto;
-  justify-content: center;
-}
-@media (min-width: 720px) {
-  .lp-nav-links {
-    display: flex;
-  }
-}
-.lp-nav-link {
-  color: var(--ink-soft);
-  text-decoration: none;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-}
-@media (hover: hover) and (pointer: fine) {
-  .lp-nav-link:hover {
-    color: var(--ink);
-    background: var(--paper);
-  }
-}
+/* La barra de navegación vive en NavPildora/nav-pildora.css. */
 
 /* ─── Imagotipo (components/brand) ─── */
 .lp-logo {
@@ -230,267 +188,16 @@
   .lp-logo-art { height: var(--space-6); }
 }
 
-/* ─── Héroe ─── */
-.lp-hero {
-  background: var(--paper);
-}
-.lp-hero-grid {
-  display: grid;
-  gap: var(--space-12);
-  align-items: start;
-}
-@media (min-width: 800px) {
-  .lp-hero {
-    display: flex;
-    align-items: center;
-    min-height: calc(100svh - var(--lp-nav-h));
-    padding-block: var(--space-8);
-  }
-  .lp-hero-grid {
-    width: 100%;
-    /* 1.4fr/1fr, no 1fr/1fr: con las dos columnas iguales los botones del héroe
-       (SPEC §5) no cabían en una fila justo desde 960 px y se apilaban. */
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    align-items: center;
-    gap: var(--space-8);
-  }
-}
-.lp-hero-copy {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-.lp-hero-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--line-height-tight);
-  font-size: clamp(var(--font-size-4xl), 8vw, calc(var(--font-size-4xl) * 2.4));
-  text-wrap: balance;
-  color: var(--ink);
-}
-.lp-hero-lead {
-  margin: 0;
-  font-size: clamp(var(--font-size-base), 1.8vw, var(--font-size-xl));
-  line-height: var(--line-height-normal);
-  color: var(--ink-soft);
-  max-width: 52ch;
-  text-wrap: pretty;
-}
-.lp-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-@media (min-width: 800px) {
-  /* Un poco menos de relleno lateral que el botón genérico: con el texto de
-     "Soy docente o institución" es lo que faltaba, junto con el ratio de la
-     grilla, para que los dos botones cupieran en una fila desde 1024 px. */
-  .lp-hero-actions .lp-btn {
-    padding-inline: var(--space-6);
-  }
-}
-/* ─── HeroQuiz ─── */
-.hq-card {
-  position: relative;
-  background: var(--surface-raised);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-.hq-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-.hq-avatar {
-  flex: 0 0 auto;
-  width: calc(var(--space-16) + var(--space-6));
-  line-height: 0;
-}
-.hq-eyebrow {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--ink-soft);
-}
-.hq-question {
-  margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  color: var(--ink);
-  text-wrap: balance;
-}
-.hq-time {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--ink-soft);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  white-space: nowrap;
-}
-.hq-time-track {
-  display: block;
-  flex: 1 1 auto;
-  height: var(--space-1);
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  background: var(--brand-100);
-}
-.hq-time-fill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--brand-600);
-}
-.hq-options {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.hq-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: var(--touch-min);
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-raised);
-  color: var(--ink);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-md);
-  font: inherit;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  text-align: left;
-  cursor: pointer;
-  transition: opacity var(--transition-fast), border-color var(--transition-fast),
-    background var(--transition-fast);
-}
-@media (hover: hover) and (pointer: fine) {
-  .hq-option[aria-disabled='false']:hover {
-    border-color: var(--brand-500);
-  }
-}
-.hq-option[aria-disabled='true'] {
-  cursor: default;
-}
-/* Ni la elegida ni la correcta: baja de opacidad (SPEC §5). El color nunca es
-   la única pista: cada estado también lleva texto ("Tu predicción" / "Respuesta"). */
-.hq-option[data-state='dimmed'] {
-  opacity: 0.55;
-}
-.hq-option[data-state='selected-correct'],
-.hq-option[data-state='selected-wrong'] {
-  border-color: var(--brand-600);
-  background: var(--brand-50);
-}
-.hq-option[data-state='correct'] {
-  border-color: var(--ink);
-}
-.hq-option-label {
-  flex: 1 1 auto;
-}
-.hq-option-tags {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
-  flex: 0 0 auto;
-}
-.hq-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  white-space: nowrap;
-}
-.hq-badge--pick {
-  background: var(--brand-600);
-  color: var(--on-brand);
-}
-.hq-badge--answer {
-  background: var(--paper-sunk);
-  color: var(--ink);
-}
-/* La tarjeta abraza su contenido: reservar el alto de la revelación dejaba un
-   bloque blanco enorme antes de responder (parecía rota). El crecimiento al
-   revelar lo causa el usuario (SPEC §5 permite esta alternativa: animar solo
-   el contenido con opacity + y, sin fijar la altura del contenedor). */
-.hq-reveal-hint {
-  margin: 0;
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-hairline);
-  font-size: var(--font-size-sm);
-  color: var(--ink-soft);
-}
-.hq-reveal-inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-hairline);
-}
-.hq-reveal-line {
-  margin: 0;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--ink);
-}
-.hq-reveal-always {
-  margin: 0;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--ink-soft);
-}
-.hq-reveal-concept {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-tight);
-  color: var(--ink);
-  text-wrap: balance;
-}
-.hq-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-1);
-}
-.hq-link {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 /* ─── Instituciones ─── */
 .lp-inst {
-  background: var(--surface-raised);
+  background: var(--paper);
 }
 .lp-inst-card {
   /* Antes era --scene-blue-50 (lavanda azulado): fuera de marca en una página cuyo
      único acento es el naranja. --paper-sunk es el escalón de papel/tinta ya
      aprobado (tokens.css) para hundir un bloque sobre --surface-raised. */
   background: var(--paper-sunk);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card-lg);
   padding: var(--space-8);
   display: grid;
   gap: var(--space-8);
@@ -514,7 +221,7 @@
    de esta tarjeta, a 1440 px, llegaba a 5 líneas. Una variante más chica, solo
    aquí, para que quede en 2–3. */
 .lp-inst-copy .lp-title {
-  font-size: clamp(var(--font-size-2xl), 3vw, var(--font-size-4xl));
+  font-size: var(--font-size-display-3);
 }
 .lp-inst-side-title {
   margin: 0 0 var(--space-3);
@@ -552,18 +259,28 @@
 .lp-faq {
   background: var(--paper);
 }
+/* Editorial (Ramp): el titular a la izquierda y las preguntas como filas separadas por
+   un filo, sin tarjetas. */
+.lp-faq-grid {
+  display: grid;
+  gap: var(--space-8);
+}
+@media (min-width: 960px) {
+  .lp-faq-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: var(--space-16);
+    align-items: start;
+  }
+}
 .lp-faq-list {
   display: grid;
-  gap: var(--space-3);
-  margin-top: var(--space-8);
+  margin: 0;
   padding: 0;
   list-style: none;
+  border-top: 1px solid var(--border-hairline);
 }
 .lp-faq-item {
-  background: var(--surface-raised);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-md);
-  padding-inline: var(--space-4);
+  border-bottom: 1px solid var(--border-hairline);
 }
 .lp-faq-summary {
   display: flex;
@@ -571,8 +288,8 @@
   justify-content: space-between;
   gap: var(--space-3);
   min-height: var(--touch-min);
-  padding-block: var(--space-2);
-  font-size: var(--font-size-base);
+  padding-block: var(--space-4);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--ink);
   cursor: pointer;

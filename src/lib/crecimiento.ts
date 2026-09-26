@@ -53,6 +53,71 @@ export function valorFuturoMensual(depositoMensual: number, tasaMensual: number,
   return (depositoMensual * (Math.pow(1 + tasaMensual, meses) - 1)) / tasaMensual;
 }
 
+/**
+ * Los montos mensuales entre los que se puede elegir en "Mira crecer tu plata"
+ * (las tres píldoras). Orden = orden en pantalla, de menos a más.
+ */
+export const MONTOS_MENSUALES: readonly number[] = [50_000, 100_000, 200_000];
+
+/** Monto mensual con el que arranca el capítulo, antes de que el usuario elija otro. */
+export const MONTO_MENSUAL_DEFECTO = 100_000;
+
+/** Un punto (x, y) de la gráfica de "Mira crecer tu plata", en unidades del viewBox. */
+export interface PuntoGrafica {
+  x: number;
+  y: number;
+}
+
+/**
+ * Un punto por mes (0 a `mesesTotal`) de las dos líneas de la gráfica — lo guardado sin
+ * interés y lo mismo en un CDT — dentro de un viewBox de `ancho` x `alto` con `padding`
+ * de aire en los cuatro lados. Las dos líneas comparten el mismo eje vertical (el máximo
+ * de las dos series al final del plazo), así se pueden comparar en el mismo dibujo.
+ */
+export function construirPuntosGrafica(
+  depositoMensual: number,
+  tasaMensual: number,
+  mesesTotal: number,
+  ancho: number,
+  alto: number,
+  padding: number
+): { ahorro: PuntoGrafica[]; cdt: PuntoGrafica[] } {
+  const max = Math.max(
+    ahorroAcumulado(depositoMensual, mesesTotal),
+    valorFuturoMensual(depositoMensual, tasaMensual, mesesTotal),
+    1
+  );
+  const anchoUtil = ancho - padding * 2;
+  const altoUtil = alto - padding * 2;
+  const ahorro: PuntoGrafica[] = [];
+  const cdt: PuntoGrafica[] = [];
+  for (let m = 0; m <= mesesTotal; m++) {
+    const x = padding + (m / mesesTotal) * anchoUtil;
+    ahorro.push({ x, y: padding + altoUtil - (ahorroAcumulado(depositoMensual, m) / max) * altoUtil });
+    cdt.push({ x, y: padding + altoUtil - (valorFuturoMensual(depositoMensual, tasaMensual, m) / max) * altoUtil });
+  }
+  return { ahorro, cdt };
+}
+
+/**
+ * El punto de una serie de `construirPuntosGrafica` en el mes `m` (puede ser
+ * fraccionario), interpolado entre los dos meses enteros más cercanos — así la punta de
+ * la línea se mueve suave con el scroll en vez de saltar mes a mes.
+ */
+export function puntoEnGrafica(puntos: PuntoGrafica[], m: number): PuntoGrafica {
+  const i = Math.min(puntos.length - 2, Math.max(0, Math.floor(m)));
+  const t = Math.min(1, Math.max(0, m - i));
+  return {
+    x: puntos[i].x + (puntos[i + 1].x - puntos[i].x) * t,
+    y: puntos[i].y + (puntos[i + 1].y - puntos[i].y) * t,
+  };
+}
+
+/** El atributo `d` de un `<path>` de SVG que une `puntos` con segmentos rectos. */
+export function trazoSvg(puntos: PuntoGrafica[]): string {
+  return puntos.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
+}
+
 /** El frasco tiene 4 estampas: de la primera moneda a la planta ya crecida. */
 export const ETAPAS_FRASCO = 4;
 

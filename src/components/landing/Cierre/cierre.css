@@ -1,24 +1,84 @@
 /* ============================================================
-   cierre.css — capítulo de cierre ("Tu primera lección dura tres minutos.").
-   Solo valores de tokens.css. `.lp-closing` / `.lp-closing-inner` /
-   `.lp-closing-avatar` vienen de landing.css: aquí solo se añade lo propio.
+   cierre.css — capítulo de cierre ("Tu primera lección dura tres minutos."),
+   puesta en escena v3 (docs/PLAN-LANDING-V3.md §3 fila 10). Solo valores de
+   tokens.css. `.lp-closing` / `.lp-closing-inner` / `.lp-closing-avatar` vienen
+   de landing.css: aquí solo se añade y sobrescribe lo propio del cierre.
    ============================================================ */
 
+/* La v3 pide más contraste entre la última tarjeta blanca y su fondo: se hunde
+   la sección un escalón (papel hundido) en vez de heredar el blanco puro de
+   `.lp-closing`. */
 .cie-section {
-  position: relative;
-  isolation: isolate; /* contiene el z-index negativo de FondoVelas */
-  overflow: hidden;
+  background: var(--paper-sunk);
+}
+
+/* El titular final, más grande que el resto de capítulos (display-1, no
+   display-2), sigue en una sola línea de hasta 3 palabras a 390px gracias a
+   `text-wrap: balance` heredado de `.lp-title`. */
+.cie-section .lp-closing-inner {
+  /* El titular final es el más grande de la página: necesita el ancho completo para
+     quedar en dos líneas. La tarjeta y el botón siguen centrados con su propio ancho. */
+  max-width: var(--page-max);
+}
+.cie-section .lp-title {
+  font-size: var(--font-size-display-1);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-display);
 }
 
 .cie-avatar {
-  position: relative;
+  /* El póster y el video tienen fondo blanco. La mezcla va en ESTE contenedor, no en la
+     imagen: la entrada de ApareceAlBajar le pone transform, eso lo aísla, y un multiply en
+     el hijo solo se mezclaría con el contenedor vacío (se veía un cuadro blanco). */
+  mix-blend-mode: multiply;
+  /* Más grande que el avatar genérico (96px): aquí Monedita es la despedida.
+     calc() de tokens: 3 × --space-16 = 192px. */
+  width: calc(var(--space-16) * 3);
+  aspect-ratio: 1;
 }
 
 .cie-avatar-media {
   display: block;
   width: 100%;
-  height: auto;
-  /* El video y su póster tienen fondo blanco: multiply lo funde con el papel del
-     cierre, igual que en /inicio (inicio.css). */
-  mix-blend-mode: multiply;
+  height: 100%;
+  object-fit: contain;
+  /* No es un control: sin puntero no aparece el botón de imagen en imagen. */
+  pointer-events: none;
+}
+
+/* La primera lección, tal como aparece en el temario. Tarjeta grande de galería
+   (v3 §4.2): radio de 28px, blanca sobre el papel hundido de `.cie-section`, sin
+   sombra — la profundidad la da el cambio de superficie y el borde fino. */
+.cie-leccion {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-8);
+  text-align: left;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card-lg);
+}
+.cie-leccion-meta {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--brand-700);
+}
+.cie-leccion-titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+}
+.cie-leccion-gancho {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
 }

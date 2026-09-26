@@ -1,149 +1,269 @@
 /* ============================================================
    asi-se-aprende.css — capítulo "Así se aprende en Bursa."
-   Solo valores de tokens.css. Prefijo `asi-`, propio de este componente:
-   no toca ni redefine `lp-`, `met-` ni `cam-`.
+   Carrusel horizontal "Highlights" (PLAN-LANDING-V3.md §3 fila 6). Solo valores
+   de tokens.css. Prefijo `asi-`, propio de este componente: no toca ni redefine
+   `lp-`, `met-` ni `cam-`.
    ============================================================ */
 
 .asi-section {
-  background: var(--paper);
+  background: var(--paper-sunk);
 }
 
-.asi-grid {
+.asi-wrap {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-8);
 }
 
 .asi-heading {
   max-width: 60ch;
-  margin-bottom: var(--space-8);
 }
 
-.asi-steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-12);
+/* ─── Pista de scroll: fuente de verdad del carrusel, nativa (touch y trackpad) ─── */
+.asi-pista {
+  display: flex;
+  gap: var(--space-6);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin-inline: calc(var(--space-4) * -1);
+  padding-inline: var(--space-4);
+  padding-block: var(--space-2);
+}
+.asi-pista::-webkit-scrollbar {
+  display: none;
+}
+.asi-pista:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 4px;
 }
 
-.asi-step {
+.asi-tarjeta {
+  flex: 0 0 auto;
+  width: 86vw;
+  scroll-snap-align: start;
   display: grid;
   gap: var(--space-2);
-  max-width: 52ch;
+  padding: var(--space-8);
+  background: var(--surface-raised);
+  border-radius: var(--radius-card-lg);
 }
 
-.asi-step-num {
+.asi-tarjeta-num {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--brand-600);
+  color: var(--brand-700);
   letter-spacing: var(--tracking-wide);
 }
 
-.asi-step-title {
+.asi-tarjeta-titulo {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(var(--font-size-2xl), 3vw, var(--font-size-3xl));
+  font-size: var(--font-size-display-3);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-display);
   color: var(--ink);
 }
 
-.asi-step-body {
+.asi-tarjeta-cuerpo {
   margin: 0;
-  font-size: var(--font-size-lg);
+  max-width: 48ch;
+  font-size: var(--font-size-lead);
+  font-weight: var(--font-weight-light);
   line-height: var(--line-height-normal);
   color: var(--ink-soft);
 }
 
-/* Captura estática: móvil, o cualquier ancho con prefers-reduced-motion (AGENTS.md: bajo
-   movimiento reducido se quita el cruce, nunca la información). */
-.asi-step-shot {
-  width: min(100%, 260px);
-  margin-top: var(--space-2);
-}
-.asi-step-shot img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-hairline);
-  box-shadow: var(--shadow-soft);
-}
-
-/* ─── Celular fijo (solo modo inmersivo: ≥900px y sin reduced-motion) ─── */
-.asi-phone-wrap {
-  position: sticky;
-  top: calc(var(--lp-nav-h) + var(--space-8));
-  align-self: start;
-}
-
-.asi-phone {
+/* ─── Capturas: solo celular en móvil; escritorio + celular superpuesto desde 900px ─── */
+.asi-capturas {
   position: relative;
-  width: min(100%, 340px, 38svh);
-  aspect-ratio: 390 / 844;
+  margin-top: var(--space-6);
+}
+
+.asi-marco-escritorio {
+  display: none;
+}
+
+.asi-marco-celular {
+  position: relative;
+  width: min(220px, 62vw);
   margin-inline: auto;
   padding: var(--space-2);
   background: var(--ink);
-  border-radius: calc(var(--radius-lg) * 1.7);
-  box-shadow: var(--shadow-md);
+  border-radius: calc(var(--radius-lg) * 1.4);
 }
 
-.asi-phone-notch {
+.asi-marco-celular-notch {
   position: absolute;
   top: var(--space-2);
   left: 50%;
   transform: translateX(-50%);
   width: 34%;
-  height: var(--space-3);
+  height: var(--space-2);
   background: var(--ink);
   border-radius: var(--radius-pill);
-  z-index: 2;
+  z-index: 1;
 }
 
-.asi-phone-screen {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.asi-marco-celular-pantalla {
   overflow: hidden;
-  border-radius: calc(var(--radius-lg) * 1.15);
+  border-radius: calc(var(--radius-lg) * 0.9);
   background: var(--surface);
-  isolation: isolate;
+}
+.asi-marco-celular-pantalla img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-.asi-screen {
-  object-fit: cover;
-  object-position: top center;
-  opacity: 0;
-  transition: opacity var(--duration-scene) var(--ease-out-expo);
-}
-.asi-screen[data-active='true'] {
-  opacity: 1;
-}
-
-@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-  .asi-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
-    gap: var(--space-16);
-    align-items: start;
+@media (min-width: 900px) {
+  .asi-tarjeta {
+    width: min(1000px, 84vw);
   }
-  /* Suficiente alto por paso para que el IntersectionObserver distinga uno de
-     otro con margen, sin convertir esto en un track fijo calculado a mano. */
-  .asi-step {
-    min-height: 62vh;
+
+  .asi-capturas {
+    margin-top: var(--space-8);
+  }
+
+  .asi-marco-escritorio {
+    display: block;
+    width: min(760px, 100%);
+    margin-inline: auto;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .asi-marco-barra {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .asi-marco-punto {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--border);
+  }
+
+  .asi-marco-pantalla img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* El celular se superpone en la esquina inferior derecha, inclinado (idea de Tomorro). */
+  .asi-marco-celular {
+    position: absolute;
+    right: calc(var(--space-8) * -1);
+    bottom: calc(var(--space-8) * -1);
+    width: 180px;
+    transform: rotate(-4deg);
   }
 }
 
-@media (max-width: 899px) {
-  .asi-heading {
-    margin-bottom: var(--space-6);
-  }
-  .asi-steps {
-    gap: var(--space-8);
+/* ─── Controles: píldora con puntos, pausa y flechas (estilo Apple "playback control") ─── */
+.asi-controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.asi-pildora {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+.asi-punto {
+  padding: 0;
+  width: var(--space-2);
+  height: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--ink-soft);
+  cursor: pointer;
+  transform: scaleX(1);
+  transform-origin: center;
+  transition: transform var(--duration-micro) var(--ease-out-quart),
+    background var(--duration-micro) var(--ease-out-quart);
+}
+.asi-punto[data-active='true'] {
+  background: var(--brand-600);
+  transform: scaleX(3);
+}
+.asi-punto:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 3px;
+}
+.asi-punto:active {
+  transform: scaleX(3) scale(var(--press-scale));
+}
+
+.asi-pausa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform var(--duration-micro) var(--ease-out-quart);
+}
+.asi-pausa:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 3px;
+}
+.asi-pausa:active {
+  transform: scale(var(--press-scale));
+}
+
+.asi-flecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform var(--duration-micro) var(--ease-out-quart),
+    border-color var(--duration-micro) var(--ease-out-quart),
+    opacity var(--duration-micro) var(--ease-out-quart);
+}
+.asi-flecha:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.asi-flecha:not(:disabled):active {
+  transform: scale(var(--press-scale));
+}
+.asi-flecha:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .asi-flecha:not(:disabled):hover {
+    border-color: var(--ink);
   }
 }

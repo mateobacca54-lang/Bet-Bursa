@@ -7,7 +7,9 @@ import { DURATION, ScrollTrigger, gsap, registerGsap } from '@/lib/gsap';
 import { useIndicadores } from '@/components/widgets/DatoReal';
 import { formatearPorcentaje } from '@/lib/indicadores/formato';
 import { formatCOP } from '@/lib/format';
-import { escalaPorArea, poderDeCompra } from '@/lib/crecimiento';
+import { poderDeCompra } from '@/lib/crecimiento';
+import { tiempoParaEscala } from '@/lib/videoEncoge';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import '../../landing.css';
 import '../capitulos.css';
 
@@ -19,8 +21,10 @@ const ANIOS_TOTAL = 10;
  * CapituloEncoge — "Tu plata se encoge" (docs/DIRECCION-LANDING.md §5.2).
  *
  * Capítulo oscuro anclado: al bajar, pasan los años de 2026 a 2036 y la moneda se
- * encoge mientras un contador dice cuánto compran hoy $100.000 con la inflación real
- * del Banco de la República. El movimiento ES la explicación — más scroll, más años,
+ * encoge sobre su pedestal (que no se mueve) mientras un contador dice cuánto compran
+ * hoy $100.000 con la inflación real del Banco de la República. La moneda es un video
+ * que el scroll recorre: cada año muestra el cuadro donde el ÁREA de la moneda es la
+ * fracción de poder de compra que queda (`tiempoParaEscala`). El movimiento ES la explicación — más scroll, más años,
  * menos plata — así que con `prefers-reduced-motion` se salta directo al año 2036,
  * sin pin ni scrub, pero con la misma información.
  *
@@ -35,7 +39,8 @@ export default function CapituloEncoge() {
   const pinRef = useRef<HTMLDivElement>(null);
   const anioRef = useRef<HTMLSpanElement>(null);
   const cifraRef = useRef<HTMLSpanElement>(null);
-  const monedaRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const reduced = usePrefersReducedMotion();
 
   useGSAP(
     () => {
@@ -45,12 +50,25 @@ export default function CapituloEncoge() {
         const valor = poderDeCompra(MONTO_BASE, inflacionDecimal, anios);
         if (anioRef.current) anioRef.current.textContent = String(Math.round(ANIO_INICIO + anios));
         if (cifraRef.current) cifraRef.current.textContent = formatCOP(Math.round(valor));
-        if (monedaRef.current) {
-          gsap.set(monedaRef.current, { scale: escalaPorArea(valor, MONTO_BASE), transformOrigin: '50% 100%' });
+        const video = videoRef.current;
+        if (video && video.readyState >= 1) {
+          // El área de la moneda sigue al poder de compra; el video guarda la altura.
+          const t = tiempoParaEscala(Math.sqrt(valor / MONTO_BASE));
+          if (Math.abs(video.currentTime - t) > 0.004) video.currentTime = t;
         }
       }
 
       aplicar(0);
+
+      // iOS no decodifica un video que nunca se reprodujo: se reproduce y pausa una vez
+      // (va sin sonido, así que el navegador lo permite) y luego el scroll lo recorre.
+      const video = videoRef.current;
+      let alListo: (() => void) | undefined;
+      if (video) {
+        video.play().then(() => video.pause()).catch(() => {});
+        alListo = () => ScrollTrigger.refresh();
+        video.addEventListener('loadedmetadata', alListo);
+      }
 
       const mm = gsap.matchMedia();
       mm.add(
@@ -88,9 +106,12 @@ export default function CapituloEncoge() {
         }
       );
 
-      return () => mm.revert();
+      return () => {
+        mm.revert();
+        if (video && alListo) video.removeEventListener('loadedmetadata', alListo);
+      };
     },
-    { scope: sectionRef, dependencies: [inflacionDecimal] }
+    { scope: sectionRef, dependencies: [inflacionDecimal, reduced] }
   );
 
   return (
@@ -101,27 +122,48 @@ export default function CapituloEncoge() {
             Tu plata se encoge.
           </h2>
 
-          <div className="cap-encoge-arte" ref={monedaRef} aria-hidden="true">
-            <Image
-              src="/landing/moneda-oscura.webp"
-              alt=""
-              width={1400}
-              height={1352}
-              sizes="(max-width: 799px) 40vw, 220px"
-              draggable={false}
-            />
+          <div className="cap-encoge-arte" aria-hidden="true">
+            {reduced ? (
+              <Image
+                src="/landing/moneda-encoge-fin.webp"
+                alt=""
+                width={800}
+                height={800}
+                sizes="(max-width: 799px) 80vw, 480px"
+                quality={90}
+                draggable={false}
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                muted
+                playsInline
+                preload="auto"
+                disablePictureInPicture
+                disableRemotePlayback
+                poster="/landing/moneda-encoge-inicio.webp"
+                width={800}
+                height={800}
+                tabIndex={-1}
+              >
+                <source src="/landing/moneda-encoge.webm" type="video/webm" />
+                <source src="/landing/moneda-encoge.mp4" type="video/mp4" />
+              </video>
+            )}
           </div>
 
-          <p className="cap-encoge-anio" aria-hidden="true">
-            Año <span ref={anioRef}>{ANIO_INICIO}</span>
-          </p>
-          <p className="cap-encoge-cifra" aria-hidden="true">
-            <span ref={cifraRef}>{formatCOP(MONTO_BASE)}</span>
-          </p>
-          <p className="cap-encoge-explica">
-            Eso es lo que compran hoy tus {formatCOP(MONTO_BASE)}, si la inflación —que los precios suban con el
-            tiempo— sigue como ahora.
-          </p>
+          <div className="cap-encoge-datos">
+            <p className="cap-encoge-anio" aria-hidden="true">
+              Año <span ref={anioRef}>{ANIO_INICIO}</span>
+            </p>
+            <p className="cap-encoge-cifra" aria-hidden="true">
+              <span ref={cifraRef}>{formatCOP(MONTO_BASE)}</span>
+            </p>
+            <p className="cap-encoge-explica">
+              Eso es lo que compran hoy tus {formatCOP(MONTO_BASE)}, si la inflación —que los precios suban con el
+              tiempo— sigue como ahora.
+            </p>
+          </div>
 
           <p className="lp-sr-only">
             Con la inflación de hoy, tus {formatCOP(MONTO_BASE)} de ahora compran cada vez menos: en el año{' '}

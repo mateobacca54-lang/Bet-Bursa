@@ -61,7 +61,7 @@ export default function Monedita({ reaction = 0, delay = 0 }: MoneditaProps) {
               poster="/monedita/monedita-saluda-poster.webp"
               aria-label="Monedita, la moneda que te acompaña en Bursa, te saluda"
               width={480}
-              height={464}
+              height={480}
             >
               <source src="/monedita/monedita-saluda.webm" type="video/webm" />
               <source src="/monedita/monedita-saluda.mp4" type="video/mp4" />
@@ -72,7 +72,7 @@ export default function Monedita({ reaction = 0, delay = 0 }: MoneditaProps) {
               src="/monedita/monedita-saluda-poster.webp"
               alt="Monedita, la moneda que te acompaña en Bursa"
               width={480}
-              height={464}
+              height={480}
               sizes="(min-width: 720px) 240px, 60vw"
               priority
               draggable={false}

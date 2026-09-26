@@ -1,35 +1,30 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useGSAP } from '@gsap/react';
 import { DURATION, ScrollTrigger, gsap, registerGsap } from '@/lib/gsap';
 import { useIndicadores } from '@/components/widgets/DatoReal';
 import { formatearPorcentaje } from '@/lib/indicadores/formato';
 import { formatCOP } from '@/lib/format';
-import { ahorroAcumulado, opacidadesFrasco, tasaMensualDesdeEA, valorFuturoMensual } from '@/lib/crecimiento';
+import {
+  ahorroAcumulado,
+  construirPuntosGrafica,
+  MONTO_MENSUAL_DEFECTO,
+  MONTOS_MENSUALES,
+  opacidadesFrasco,
+  puntoEnGrafica,
+  tasaMensualDesdeEA,
+  trazoSvg,
+  valorFuturoMensual,
+} from '@/lib/crecimiento';
 import '../../landing.css';
 import '../capitulos.css';
 
-const DEPOSITO = 100_000;
 const MESES_TOTAL = 120;
 const CHART_W = 320;
-const CHART_H = 110;
-const PASOS_GRAFICA = 40;
-
-/** Los puntos de las dos líneas del gráfico, para toda la década (0 a `MESES_TOTAL`). */
-function construirPuntosGrafica(tasaMensual: number): { puntosAhorro: string; puntosCdt: string } {
-  const max = Math.max(ahorroAcumulado(DEPOSITO, MESES_TOTAL), valorFuturoMensual(DEPOSITO, tasaMensual, MESES_TOTAL), 1);
-  const puntosAhorro: string[] = [];
-  const puntosCdt: string[] = [];
-  for (let i = 0; i <= PASOS_GRAFICA; i++) {
-    const m = (i / PASOS_GRAFICA) * MESES_TOTAL;
-    const x = (i / PASOS_GRAFICA) * CHART_W;
-    puntosAhorro.push(`${x.toFixed(1)},${(CHART_H - (ahorroAcumulado(DEPOSITO, m) / max) * CHART_H).toFixed(1)}`);
-    puntosCdt.push(`${x.toFixed(1)},${(CHART_H - (valorFuturoMensual(DEPOSITO, tasaMensual, m) / max) * CHART_H).toFixed(1)}`);
-  }
-  return { puntosAhorro: puntosAhorro.join(' '), puntosCdt: puntosCdt.join(' ') };
-}
+const CHART_H = 170;
+const CHART_PAD = 8;
 
 /**
  * CapituloCrece — "Mira crecer tu plata" (docs/DIRECCION-LANDING.md §5, la firma
@@ -50,6 +45,12 @@ export default function CapituloCrece() {
   const cdtDecimal = typeof cdt.valor === 'number' ? cdt.valor / 100 : 0;
   const tasaMensual = tasaMensualDesdeEA(cdtDecimal);
 
+  // Monto mensual elegido con las píldoras (§3 del plan v3). Vive en estado de React
+  // porque decide tanto lo que se pinta en cada render (premisa, conclusión, texto
+  // sr-only) como lo que GSAP recalcula (contadores y gráfica); no puede ser una
+  // constante de módulo como antes.
+  const [depositoMensual, setDepositoMensual] = useState(MONTO_MENSUAL_DEFECTO);
+
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const ahorroRef = useRef<HTMLSpanElement>(null);
@@ -58,14 +59,32 @@ export default function CapituloCrece() {
   const frasco2Ref = useRef<HTMLImageElement>(null);
   const frasco3Ref = useRef<HTMLImageElement>(null);
   const frasco4Ref = useRef<HTMLImageElement>(null);
-  const lineaAhorroRef = useRef<SVGPolylineElement>(null);
-  const lineaCdtRef = useRef<SVGPolylineElement>(null);
+  const lineaAhorroRef = useRef<SVGPathElement>(null);
+  const lineaCdtRef = useRef<SVGPathElement>(null);
+  const puntaAhorroRef = useRef<SVGCircleElement>(null);
+  const puntaCdtRef = useRef<SVGCircleElement>(null);
+  const pildoraRefs = useRef<Record<number, HTMLButtonElement | null>>({});
 
-  const ahorroFinal = ahorroAcumulado(DEPOSITO, MESES_TOTAL);
-  const fvFinal = valorFuturoMensual(DEPOSITO, tasaMensual, MESES_TOTAL);
+  const ahorroFinal = ahorroAcumulado(depositoMensual, MESES_TOTAL);
+  const fvFinal = valorFuturoMensual(depositoMensual, tasaMensual, MESES_TOTAL);
   const diferenciaFinal = Math.round(fvFinal - ahorroFinal);
 
-  const { puntosAhorro, puntosCdt } = construirPuntosGrafica(tasaMensual);
+  const grafica = construirPuntosGrafica(depositoMensual, tasaMensual, MESES_TOTAL, CHART_W, CHART_H, CHART_PAD);
+
+  /** Flechas mueven el foco Y eligen a la vez (el monto cambia de inmediato, como un
+   * radio nativo) — Home/End van a los extremos. */
+  function onKeyDownMonto(e: React.KeyboardEvent<HTMLButtonElement>, index: number) {
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % MONTOS_MENSUALES.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + MONTOS_MENSUALES.length) % MONTOS_MENSUALES.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = MONTOS_MENSUALES.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    const monto = MONTOS_MENSUALES[next];
+    setDepositoMensual(monto);
+    pildoraRefs.current[monto]?.focus();
+  }
 
   useGSAP(
     () => {
@@ -74,8 +93,8 @@ export default function CapituloCrece() {
       const frascoRefs = [frasco1Ref, frasco2Ref, frasco3Ref, frasco4Ref];
 
       function aplicar(m: number) {
-        const ahorro = ahorroAcumulado(DEPOSITO, m);
-        const fv = valorFuturoMensual(DEPOSITO, tasaMensual, m);
+        const ahorro = ahorroAcumulado(depositoMensual, m);
+        const fv = valorFuturoMensual(depositoMensual, tasaMensual, m);
         if (ahorroRef.current) ahorroRef.current.textContent = formatCOP(Math.round(ahorro));
         if (cdtRef.current) cdtRef.current.textContent = formatCOP(Math.round(fv));
 
@@ -84,16 +103,18 @@ export default function CapituloCrece() {
           if (ref.current) gsap.set(ref.current, { opacity: opacidades[i] });
         });
 
-        const progreso = Math.min(1, Math.max(0, m / MESES_TOTAL));
-        const dashoffset = String(1 - progreso);
-        // Sin unidad, a propósito: con `pathLength` normalizado a 1 (SVG), el valor
-        // se interpreta como fracción del trazo. gsap.set() le añade "px" por
-        // defecto a las propiedades numéricas que no reconoce, y con esa unidad
-        // el navegador deja de escalarlo por `pathLength` (el trazo dejaba de
-        // dibujarse con el scroll). Se escribe directo al estilo, igual que los
-        // contadores se escriben directo a `textContent`.
+        const mes = Math.min(MESES_TOTAL, Math.max(0, m));
+        const dashoffset = String(1 - mes / MESES_TOTAL);
+        // Sin unidad, a propósito: con `pathLength` normalizado a 1, el valor es una
+        // fracción del trazo. gsap.set() le añadiría "px" y el navegador dejaría de
+        // escalarlo por `pathLength`, así que se escribe directo al estilo.
         if (lineaAhorroRef.current) lineaAhorroRef.current.style.strokeDashoffset = dashoffset;
         if (lineaCdtRef.current) lineaCdtRef.current.style.strokeDashoffset = dashoffset;
+        // La punta de cada línea marca dónde va el mes: solo se mueve con transform.
+        const pa = puntoEnGrafica(grafica.ahorro, mes);
+        const pc = puntoEnGrafica(grafica.cdt, mes);
+        if (puntaAhorroRef.current) puntaAhorroRef.current.style.transform = `translate(${pa.x}px, ${pa.y}px)`;
+        if (puntaCdtRef.current) puntaCdtRef.current.style.transform = `translate(${pc.x}px, ${pc.y}px)`;
       }
 
       aplicar(0);
@@ -124,7 +145,8 @@ export default function CapituloCrece() {
             end: () => `+=${Math.round(window.innerHeight * (escritorio ? 1.8 : 1.2))}`,
             pin,
             pinSpacing: true,
-            scrub: DURATION.scene,
+            // Un segundo de alcance: la rueda del mouse avanza a saltos y el scrub los alisa.
+            scrub: DURATION.story,
             invalidateOnRefresh: true,
             onUpdate: (self) => aplicar(self.progress * MESES_TOTAL),
           });
@@ -136,26 +158,59 @@ export default function CapituloCrece() {
 
       return () => mm.revert();
     },
-    { scope: sectionRef, dependencies: [tasaMensual] }
+    // `depositoMensual` en las dependencias: al cambiar de píldora, useGSAP limpia el
+    // ScrollTrigger anterior y crea uno nuevo con los números del monto elegido, y ese
+    // nuevo `aplicar(st.progress * MESES_TOTAL)` deja los contadores y la gráfica en el
+    // mismo punto de scroll donde ya estaba el usuario — nunca vuelven a 0.
+    { scope: sectionRef, dependencies: [tasaMensual, depositoMensual] }
   );
 
   return (
-    <section id="capitulo-crece" ref={sectionRef} className="lp-section lp-section--paper cap-crece" aria-labelledby="cap-crece-titulo">
+    <section id="capitulo-crece" ref={sectionRef} className="lp-section cap-crece" aria-labelledby="cap-crece-titulo">
       <div className="cap-crece-pin" ref={pinRef}>
         <div className="lp-wrap cap-crece-inner">
           <h2 id="cap-crece-titulo" className="cap-title">
             Mira crecer tu plata.
           </h2>
-          <p className="cap-crece-premisa">Apartas {formatCOP(DEPOSITO)} cada mes durante 10 años.</p>
+          <p className="cap-crece-premisa">Apartas {formatCOP(depositoMensual)} cada mes durante 10 años.</p>
+
+          <div className="cap-crece-monto">
+            <span className="cap-crece-monto-leyenda" id="cap-crece-monto-leyenda">
+              ¿Cuánto apartas al mes?
+            </span>
+            <div className="cap-crece-monto-opciones" role="radiogroup" aria-labelledby="cap-crece-monto-leyenda">
+              {MONTOS_MENSUALES.map((monto, i) => {
+                const elegido = monto === depositoMensual;
+                return (
+                  <button
+                    key={monto}
+                    ref={(el) => {
+                      pildoraRefs.current[monto] = el;
+                    }}
+                    type="button"
+                    role="radio"
+                    aria-checked={elegido}
+                    tabIndex={elegido ? 0 : -1}
+                    className="cap-crece-monto-pildora"
+                    onClick={() => setDepositoMensual(monto)}
+                    onKeyDown={(e) => onKeyDownMonto(e, i)}
+                  >
+                    {formatCOP(monto)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <div className="cap-crece-comparacion">
-            <div className="cap-crece-col">
+            <div className="cap-crece-col cap-crece-col--ahorro">
               <div className="cap-crece-arte" aria-hidden="true">
                 <Image
                   src="/landing/alcancia.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain' }}
                   draggable={false}
                 />
@@ -167,7 +222,20 @@ export default function CapituloCrece() {
               <p className="cap-crece-caption">Quieta en la alcancía, sin ganar nada extra.</p>
             </div>
 
-            <div className="cap-crece-col">
+            <div className="cap-crece-grafica">
+              <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} aria-hidden="true">
+                <path ref={lineaAhorroRef} d={trazoSvg(grafica.ahorro)} pathLength={1} className="cap-crece-linea cap-crece-linea--ahorro" />
+                <path ref={lineaCdtRef} d={trazoSvg(grafica.cdt)} pathLength={1} className="cap-crece-linea cap-crece-linea--cdt" />
+                <circle ref={puntaAhorroRef} r={3.5} className="cap-crece-punta cap-crece-punta--ahorro" />
+                <circle ref={puntaCdtRef} r={4.5} className="cap-crece-punta cap-crece-punta--cdt" />
+              </svg>
+              <div className="cap-crece-leyenda" aria-hidden="true">
+                <span className="cap-crece-leyenda-item cap-crece-leyenda-item--ahorro">Guardada</span>
+                <span className="cap-crece-leyenda-item cap-crece-leyenda-item--cdt">En un CDT</span>
+              </div>
+            </div>
+
+            <div className="cap-crece-col cap-crece-col--cdt">
               <div className="cap-crece-arte" aria-hidden="true">
                 <Image
                   ref={frasco1Ref}
@@ -175,7 +243,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-1.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 1 }}
                   draggable={false}
                 />
@@ -185,7 +254,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-2.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 0 }}
                   draggable={false}
                 />
@@ -195,7 +265,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-3.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 0 }}
                   draggable={false}
                 />
@@ -205,7 +276,8 @@ export default function CapituloCrece() {
                   src="/landing/frasco-4.webp"
                   alt=""
                   fill
-                  sizes="(max-width: 799px) 36vw, 200px"
+                  sizes="(max-width: 799px) 42vw, 340px"
+                  quality={90}
                   style={{ objectFit: 'contain', opacity: 0 }}
                   draggable={false}
                 />
@@ -221,21 +293,12 @@ export default function CapituloCrece() {
             </div>
           </div>
 
-          <p className="lp-sr-only">
-            Guardando {formatCOP(DEPOSITO)} al mes durante 10 años, terminas con {formatCOP(Math.round(ahorroFinal))}. En un
-            CDT a la tasa de hoy, terminas con {formatCOP(Math.round(fvFinal))}: {formatCOP(diferenciaFinal)} más, gracias
-            al interés compuesto.
-          </p>
-
-          <div className="cap-crece-grafica">
-            <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} preserveAspectRatio="none" aria-hidden="true">
-              <polyline ref={lineaAhorroRef} points={puntosAhorro} pathLength={1} className="cap-crece-linea cap-crece-linea--ahorro" />
-              <polyline ref={lineaCdtRef} points={puntosCdt} pathLength={1} className="cap-crece-linea cap-crece-linea--cdt" />
-            </svg>
-            <div className="cap-crece-leyenda" aria-hidden="true">
-              <span className="cap-crece-leyenda-item cap-crece-leyenda-item--ahorro">Guardada</span>
-              <span className="cap-crece-leyenda-item cap-crece-leyenda-item--cdt">En un CDT</span>
-            </div>
+          <div className="lp-sr-only" aria-live="polite">
+            <p>
+              Guardando {formatCOP(depositoMensual)} al mes durante 10 años, terminas con {formatCOP(Math.round(ahorroFinal))}. En
+              un CDT a la tasa de hoy, terminas con {formatCOP(Math.round(fvFinal))}: {formatCOP(diferenciaFinal)} más, gracias
+              al interés compuesto.
+            </p>
           </div>
         </div>
       </div>

@@ -129,3 +129,10 @@ export function motionSafe<T extends Record<string, object>>(v: T, reduced: bool
 
   return safe as unknown as T;
 }
+
+/**
+ * Scroll suave de la landing (Lenis), solo en escritorio con puntero fino. `lerp` es la
+ * fracción de la distancia pendiente que se recorre en cada cuadro: 0.1 alisa los saltos
+ * de la rueda del mouse sin que el scroll se sienta pesado o atrasado.
+ */
+export const SCROLL_SUAVE = { lerp: 0.1 } as const;
