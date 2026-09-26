@@ -44,7 +44,7 @@ const PASOS: Paso[] = [
 ];
 
 /**
- * LeeLaLetra — "El papel sobre la mesa" (SPEC-LANDING-V2.md §10).
+ * LeeLaLetra — "El papel sobre la mesa" (docs/archivo/SPEC-LANDING-V2.md §10).
  *
  * Un papel de verdad (HTML, no el SVG de las lecciones) y una nota fija al margen.
  * La fila activa se resalta mientras cambia la explicación. En escritorio con movimiento,

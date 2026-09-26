@@ -34,7 +34,7 @@ export function pasoActivo(progreso: number, pasos: number): number {
   return Math.min(indice, pasos - 1);
 }
 
-// ─── LeeLaLetra v2 — "El papel sobre la mesa" (SPEC-LANDING-V2.md §10) ───
+// ─── LeeLaLetra v2 — "El papel sobre la mesa" (docs/archivo/SPEC-LANDING-V2.md §10) ───
 
 /** Qué ids de `leccion09Config.zones` resalta cada uno de los 3 pasos, en orden. */
 export const ZONAS_POR_PASO: readonly (readonly string[])[] = [

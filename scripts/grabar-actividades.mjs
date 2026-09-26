@@ -38,6 +38,11 @@
 //   actividad-<nombre>-inicio.webp  primer cuadro
 //   actividad-<nombre>-fin.webp     último cuadro (estado resuelto)
 //
+// Los `-inicio.webp`/`-fin.webp` no los usa ninguna página hoy (nadie los
+// referencia como `poster` ni de ninguna otra forma): quedan por si hacen
+// falta más adelante, pero no se les da uso sin revisar antes si de verdad
+// se necesitan.
+//
 // Necesita ffmpeg en PATH. Playwright usa el Chromium ya instalado del
 // proyecto — no corre `playwright install`.
 // ============================================================
