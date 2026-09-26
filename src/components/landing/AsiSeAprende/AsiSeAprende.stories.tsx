@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capítulo "Así se aprende en Bursa.": dos celulares que flotan delante de una cinta 3D de marca y, al bajar con el scroll, se apartan cada uno hacia su lado inclinándose (referencia de movimiento: la landing de Slush; colores y tipografía son los de Bursa). Cada celular reproduce en bucle un video de una actividad real de la app —mover el tiempo en el precio del almuerzo, predecir y comparar el interés compuesto—, con un botón de pausa para los dos. En escritorio la sección se ancla mientras se recorre; en celular y con movimiento reducido no hay pin ni scroll: la pose queda fija en el estado final, ya separado, con la misma información.',
+          'Capítulo "Así se aprende en Bursa.": video a sangre de dos celulares con pantallas reales de la app flotando y girando sobre la cinta de la marca (tres giros generados con Higgsfield, unidos en un bucle). Se reproduce solo mientras la sección está en pantalla; un botón lo pausa. Con movimiento reducido no arranca solo: queda el póster y el botón para reproducir.',
       },
     },
   },

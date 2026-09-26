@@ -1,235 +1,89 @@
 /* ============================================================
    asi-se-aprende.css — capítulo "Así se aprende en Bursa."
-   Dos celulares que flotan delante de la cinta 3D y, al bajar con el scroll, se
-   apartan cada uno hacia su lado inclinándose (referencia: la landing de Slush; los
-   colores y la tipografía son los de Bursa). Solo valores de tokens.css. Prefijo
-   `asi-`, propio de este componente: no toca ni redefine `lp-`.
-
-   Toda la geometría de la coreografía (grados, fracciones de separación, flotación)
-   vive en src/lib/celularesFlotantes.ts, no aquí: este archivo solo da forma, tamaño
-   y color a lo que esa función posiciona.
+   Titular arriba y, debajo, un video a sangre (dos celulares girando sobre la cinta).
+   El papel del video está igualado a --paper-sunk y sus bordes de arriba y abajo se
+   difuminan: la cinta nunca se ve cortada en seco. Solo valores de tokens.css. Prefijo `asi-`.
    ============================================================ */
 
 .asi-section {
   background: var(--paper-sunk);
-  /* `.lp-section` (landing.css) trae su propio padding-block (hasta --band-gap, 144px
-     en escritorio) — bien para una sección de scroll normal, pero aquí el ancla del
-     `ScrollTrigger` mide "top navH" contra el TOPE DE LA SECCIÓN, y `.asi-pin` es su
-     primer hijo: con el padding heredado, el cuadro anclado quedaba esos 144px más
-     abajo de donde debía (se salía del viewport por abajo). El espaciado vertical
-     de esta sección lo da `.asi-pin` a continuación, no `.lp-section`.  */
-  padding-block: 0;
-  /* La cinta va a sangre (más ancha que la pantalla): se recorta aquí, sin scroll horizontal. */
-  overflow-x: clip;
+  padding-top: 0;
 }
 
-.asi-pin {
-  overflow-x: clip;
-  display: flex;
-  flex-direction: column;
-  padding-block: var(--space-8) var(--space-6);
-}
-
-.asi-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  width: 100%;
-}
-
-/* En el cuadro anclado (ver más abajo) el alto es fijo (el viewport menos la barra):
-   título más chico y menos aire, para que cinta + celulares + pie quepan enteros sin
-   recortarse — el mismo criterio que ya usa `.lp-inst-copy .lp-title` en landing.css. */
-@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
-  .asi-pin {
-    padding-block: var(--space-4) var(--space-2);
-  }
-  .asi-wrap {
-    gap: var(--space-3);
-  }
-  .asi-heading .lp-title {
-    font-size: var(--font-size-display-3);
-  }
-  .asi-heading .lp-lead {
-    font-size: var(--font-size-sm);
-    max-width: 48ch;
-  }
-}
-
-.asi-heading {
-  max-width: 60ch;
-}
-
-/* ─── Escena: cinta detrás, celulares flotando delante, en el valle del centro ─── */
 .asi-escena {
   position: relative;
-  width: 100%;
-  /* Más alta que ancha: dos celulares verticales necesitan más aire vertical del que
-     da una proporción panorámica. Se ve solo el valle central de la cinta (el resto
-     lo recorta `object-fit: cover` de la imagen de abajo). */
-  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
-/* A sangre: del ancho de la pantalla y más alta que la escena, para que sus extremos
-   salgan siempre por los bordes y nunca se vea el corte de la imagen. */
-.asi-cinta {
-  position: absolute;
-  top: -20%;
-  bottom: -20%;
-  left: calc(50% - 50vw);
-  width: 100vw;
-  z-index: 0;
-}
-.asi-cinta img {
-  object-fit: cover;
-  object-position: center;
-}
-
-.asi-celulares {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-/* El <figure> (marco + pie) solo se desplaza; el giro lo lleva el marco, así el pie
-   queda derecho y legible. */
-.asi-celular {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(150px, 34vw);
-  margin: 0;
-  will-change: transform;
-}
-@media (min-width: 900px) {
-  .asi-celular {
-    /* Aproximado desde min(280px, 22vw) del plan: a ese ancho el celular con su pie
-       no cabía dentro del cuadro anclado (100svh - navH) sin recortarse. Anotado en
-       el reporte de la tarea. */
-    width: min(220px, 17vw);
-  }
-}
-/* A (almuerzo) va delante; B (interés) empieza detrás y tapado en parte (AGENTS.md:
-   el z-index no anima, es un valor fijo — lo que se mueve es transform). */
-.asi-celular--a {
-  z-index: 2;
-}
-.asi-celular--b {
-  z-index: 1;
-}
-
-/* Sin JS, o antes de que `useGSAP` tome el control, la pose queda en su valor final
-   (p=1) vía `style` inline calculado por `poseCelulares(1)` — no repetido aquí. */
-
-/* ─── Marco de celular: mismo patrón que ya existía (notch, pantalla redondeada) ─── */
-.asi-marco-celular {
-  position: relative;
-  padding: var(--space-2);
-  background: var(--ink);
-  border-radius: calc(var(--radius-lg) * 1.4);
-  box-shadow: var(--shadow-md);
-}
-
-.asi-marco-celular-notch {
-  position: absolute;
-  top: var(--space-2);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 34%;
-  height: var(--space-2);
-  background: var(--ink);
-  border-radius: var(--radius-pill);
-  z-index: 1;
-}
-
-.asi-marco-celular-pantalla {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 390 / 844;
-  border-radius: calc(var(--radius-lg) * 0.9);
-  background: var(--surface);
-}
 .asi-video {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 88%, transparent 100%);
 }
 
-/* ─── Pie de foto dentro de cada celular: visible desde 900px ─── */
+.asi-encabezado {
+  /* En la columna flexible, `.lp-wrap` (margen automático) se encogería a su texto. */
+  width: 100%;
+  padding-top: var(--space-12);
+}
+.asi-encabezado .lp-lead {
+  max-width: 34ch;
+}
+
 .asi-pie {
-  display: none;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin: 0;
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  text-align: center;
-  background: var(--paper-sunk);
-  border-radius: var(--radius-md);
-}
-.asi-pie-titulo {
-  font-family: var(--font-display);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--ink);
-}
-.asi-pie-cuerpo {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-normal);
-  color: var(--ink-soft);
+  display: grid;
+  gap: var(--space-6);
+  justify-items: center;
 }
 
-/* ─── Pies como lista aparte: solo en celular (<900px) ─── */
-.asi-pies-lista {
+.asi-actividades {
   display: grid;
   gap: var(--space-4);
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.asi-pies-lista-item {
+
+.asi-actividad {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  padding: var(--space-4);
-  background: var(--surface-raised);
-  border-radius: var(--radius-md);
+}
+.asi-actividad-titulo {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+}
+.asi-actividad-cuerpo {
+  font-size: var(--font-size-base);
+  color: var(--ink-soft);
 }
 
 @media (min-width: 900px) {
-  .asi-escena {
+  .asi-video {
     aspect-ratio: 16 / 9;
+  }
+  .asi-encabezado {
+    padding-top: var(--band-gap);
   }
 
   .asi-pie {
-    display: flex;
+    position: relative;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    justify-items: start;
   }
-
-  .asi-pies-lista {
-    display: none;
+  .asi-actividades {
+    grid-template-columns: repeat(2, minmax(0, 32ch));
+    gap: var(--space-8);
   }
-}
-
-@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
-  .asi-pin {
-    min-height: calc(100svh - var(--lp-nav-h));
-  }
-  .asi-wrap {
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .asi-escena {
-    flex: 1 1 auto;
-    min-height: 0;
-    aspect-ratio: auto;
-  }
-}
-
-/* ─── Pastilla de pausa (única, para los dos videos) ─── */
-.asi-pildora {
-  display: flex;
-  justify-content: center;
 }
 
 .asi-pausa {
