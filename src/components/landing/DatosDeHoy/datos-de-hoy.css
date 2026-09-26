@@ -1,0 +1,131 @@
+/* ============================================================
+   datos-de-hoy.css — banda "Datos de hoy" (docs/PLAN-LANDING-V3.md §3, fila 2).
+   Solo valores de tokens.css, compuestos con calc()/clamp()/color-mix() cuando hace
+   falta (AGENTS.md). Prefijo `ddh-`.
+
+   Banda oscura fija sobre --ink: por eso el texto atenuado usa color-mix con --paper
+   (igual patrón que --cap-paper-soft en capitulos.css), nunca --ink-soft, que está
+   pensado para fondos claros.
+   ============================================================ */
+
+.ddh {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.ddh-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.ddh-eyebrow {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+.ddh-title {
+  color: var(--paper);
+  text-align: left;
+}
+
+/* ─── La fila de indicadores ───
+   Lista semántica (dl/dt/dd): un grupo por indicador, cada uno un <div> con su
+   nombre, su valor, su explicación y su fuente. */
+.ddh-lista {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8) var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .ddh-lista {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .ddh-lista {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+  }
+}
+
+.ddh-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* Borde fino vertical entre columnas solo cuando de verdad hay 5 columnas
+   (mismo patrón de color-mix sobre --paper que usa cap-encoge, pero al 16 % en vez
+   del 70 %: aquí separa bloques, no atenúa texto). El primer indicador de cada fila
+   no lleva borde a su izquierda. */
+@media (min-width: 960px) {
+  .ddh-item {
+    padding-inline: var(--space-6);
+    border-left: 1px solid color-mix(in srgb, var(--paper) 16%, transparent);
+  }
+  .ddh-item:first-child {
+    padding-left: 0;
+    border-left: none;
+  }
+}
+
+.ddh-nombre {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+.ddh-valor {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-display-3);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+}
+
+.ddh-explica {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: color-mix(in srgb, var(--paper) 85%, transparent);
+}
+
+.ddh-fuente {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+.ddh-fuente a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ddh-fuente a:hover {
+    color: var(--paper);
+  }
+}
+
+/* El foco de `.lp a:focus-visible` (landing.css) es un anillo --ink: invisible sobre
+   esta banda oscura. Aquí, sobre --ink, el anillo pasa a --paper. */
+.ddh-fuente a:focus-visible {
+  outline-color: var(--paper);
+}

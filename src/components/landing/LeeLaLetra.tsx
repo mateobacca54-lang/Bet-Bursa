@@ -55,16 +55,16 @@ const PASOS: Paso[] = [
 export default function LeeLaLetra() {
   const reduced = usePrefersReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
-  const papelRef = useRef<HTMLDivElement>(null);
   const [paso, setPaso] = useState(0);
 
   // El escenario sticky + scroll-driven solo existe en escritorio Y con movimiento
   // (las dos condiciones ya deciden el layout en CSS); en JS hace falta la misma
   // condición para no dejar que un scroll de fondo le pise el paso a un clic en
-  // "Anterior"/"Siguiente" en móvil, donde no hay scroll que seguir.
+  // "Anterior"/"Siguiente" en móvil, donde no hay scroll que seguir. 960px: mismo
+  // punto de quiebre que la composición editorial asimétrica de la v3.
   const [anchoDesktop, setAnchoDesktop] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 900px)');
+    const mq = window.matchMedia('(min-width: 960px)');
     const update = () => setAnchoDesktop(mq.matches);
     update();
     mq.addEventListener('change', update);
@@ -107,7 +107,7 @@ export default function LeeLaLetra() {
               </p>
             </div>
             <div className="llp-papel-col">
-              <Papel paso={paso} reduced={reduced} papelRef={papelRef} />
+              <Papel paso={paso} reduced={reduced} />
             </div>
             <div className="llp-nota-col">
               <Nota
@@ -124,27 +124,16 @@ export default function LeeLaLetra() {
   );
 }
 
-/** El papel: una hoja HTML con las filas de la simulación (datos de `leccion09Config`, no escritos a mano). */
-function Papel({
-  paso,
-  reduced,
-  papelRef,
-}: {
-  paso: number;
-  reduced: boolean;
-  papelRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  const enVista = useInView(papelRef, { once: true, amount: 0.4 });
-  const erguido = reduced || enVista;
-
+/**
+ * El papel: una hoja HTML con las filas de la simulación (datos de `leccion09Config`,
+ * no escritos a mano). Objeto de la galería: en escritorio se inclina -3° de forma
+ * ESTÁTICA (CSS, no animación) para dar profundidad, como las capturas de Tomorro;
+ * en móvil queda recto. El único movimiento real del documento es el resaltado de
+ * fila que hace `Fila` — eso sí explica algo.
+ */
+function Papel({ paso, reduced }: { paso: number; reduced: boolean }) {
   return (
-    <motion.div
-      ref={papelRef}
-      className="llp-papel"
-      initial={false}
-      animate={{ rotate: erguido ? 0 : -2 }}
-      transition={reduced ? { duration: REDUCED_DURATION } : { duration: DURATION.scene, ease: EASE_OUT_EXPO }}
-    >
+    <div className="llp-papel">
       <div className="llp-papel-header">
         <span className="llp-papel-icono" aria-hidden="true">
           %
@@ -167,7 +156,7 @@ function Papel({
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

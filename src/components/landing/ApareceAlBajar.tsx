@@ -110,10 +110,8 @@ export default function ApareceAlBajar() {
           if (el.closest('.lp-closing')) return;
           onEnterOnce(el, buildLines(el));
         });
-        document.querySelectorAll<HTMLElement>('.lp-lead').forEach((el) => {
-          if (el.closest('.lp-closing')) return;
-          onEnterOnce(el, buildRise(el, 12, 0.1));
-        });
+        // Los párrafos (.lp-lead) ya no aparecen al bajar: un fade por defecto no explica
+        // nada (docs/PLAN-LANDING-V3.md §5). Solo los titulares llevan máscara de línea.
 
         // ─── Promesa única: se dibuja la línea y entra el texto ───
         document.querySelectorAll<HTMLElement>('.lp-promise').forEach((col, i) => {
@@ -123,14 +121,6 @@ export default function ApareceAlBajar() {
           if (line) tl.add(buildDraw(line, false));
           if (body) tl.add(buildRise(body, 12, 0, false), '-=0.15');
           if (line || body) onEnterOnce(col, tl);
-        });
-
-        // ─── Bloques sueltos marcados por A: tarjeta de instituciones, cada pregunta,
-        // paradas del camino de B (.cam-parada, buscado por selector, sin tocar su archivo).
-        // Las de dentro de .lp-promise y .lp-closing ya se manejaron aparte. ───
-        document.querySelectorAll<HTMLElement>('[data-aparece="subir"], .cam-parada').forEach((el) => {
-          if (el.closest('.lp-promise') || el.closest('.lp-closing')) return;
-          onEnterOnce(el, buildRise(el, 24));
         });
 
         // ─── Cierre: Monedita con un pequeño rebote, luego el título por líneas,

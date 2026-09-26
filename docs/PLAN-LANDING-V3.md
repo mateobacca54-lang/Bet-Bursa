@@ -1,7 +1,7 @@
 # Plan de la landing v3 — "La galería de tu plata"
 
-26 de septiembre de 2026. **Propuesta, pendiente de aprobación del dueño.** Cuando se apruebe,
-reemplaza las secciones 5, 7 y 8 de `docs/DIRECCION-LANDING.md`; lo demás de ese documento
+26 de septiembre de 2026. **Aprobada por el dueño el 26 de septiembre ("desarrolla todo") y
+construida la primera tanda** (ver §11). Reemplaza las secciones 5, 7 y 8 de `docs/DIRECCION-LANDING.md`; lo demás de ese documento
 (qué debe transmitir la primera pantalla, por qué no hay juego en el héroe, quien vuelve) sigue
 vigente.
 
@@ -260,3 +260,32 @@ Cada una con mi recomendación. Hasta que no estén resueltas, no se empieza la 
 - Monedita solo aparece donde se muestra la app y en el cierre; nunca en la misma escena que los
   objetos de vidrio y oro (`DIRECCION-LANDING.md` §4).
 - El naranja sigue siendo el único color de acción.
+
+## 11. Estado (26 de septiembre de 2026)
+
+Construido, con las recomendaciones de §9 como decisiones:
+
+| Pieza | Estado |
+|---|---|
+| Tokens de §4 | En `tokens.css`, bloque "Landing v3". Montserrat suma el peso 300 |
+| Navegación en píldora con anclas | `NavPildora/`. La raya naranja marca el capítulo activo |
+| Scroll suave (D4) | `useScrollSuave` con Lenis, solo escritorio, sin movimiento reducido ni táctil |
+| Héroe "La galería" | `HeroGaleria/`. La moneda gira con el scroll (`moneda-gira.webm/.mp4`, Kling 3.0) |
+| Datos de hoy (D7) | `DatosDeHoy/`. Los cinco indicadores, con fuente y fecha |
+| Se encoge / Crece (D6) | Tipografía nueva. "Crece" en tarjeta grande con píldoras de monto |
+| Letra pequeña | Composición editorial con el documento inclinado |
+| Así se aprende | Carrusel "Highlights" con capturas reales de escritorio y celular |
+| La ruta | Un pedestal por módulo (`public/landing/ruta/`); los que vienen, atenuados |
+| Instituciones, preguntas, cierre | Bloques editoriales y titular final gigante |
+| Movimiento | Se quitaron los "aparecer al bajar" de párrafos y bloques. Quedan los cinco tipos de §5 |
+
+Pendiente:
+
+- **D2, tipografía de cuerpo:** se dejó Montserrat. La comparación con Inter/Geist sigue
+  abierta porque cambiaría también la app.
+- **Segunda tanda de Higgsfield (D5):** los videos de transición de la cámara entre
+  pedestales, para unir los capítulos en un solo recorrido.
+- **Safari real:** el recorrido de video por scroll no se pudo probar en WebKit (el entorno
+  solo tiene Chromium).
+- **Lighthouse:** medir en escritorio y celular contra el presupuesto de §7. El video del
+  héroe pesa 1,65 MB en MP4 (1,28 MB en WebM), un poco por encima de los 1,5 MB.

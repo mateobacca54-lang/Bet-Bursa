@@ -1,6 +1,8 @@
 # Dirección de la landing de Bursa
 
-25 de septiembre de 2026. **Aprobada por el dueño el 25 de septiembre.** Reemplaza la idea de
+25 de septiembre de 2026. **Aprobada por el dueño el 25 de septiembre.** Desde el 26 de
+septiembre, las secciones 5, 7 y 8 las reemplaza `docs/PLAN-LANDING-V3.md` ("La galería de tu
+plata"); el resto sigue vigente. Reemplaza la idea de
 abrir la landing con un widget jugable, que el dueño rechazó con razón.
 
 ## 1. Qué tiene que transmitir la primera pantalla

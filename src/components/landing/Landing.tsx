@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import BursaLogo from './BursaLogo';
 import { Imagotipo } from '@/components/brand';
 import { nombreModulo } from '@/content/modulos';
 import ApareceAlBajar from './ApareceAlBajar';
@@ -9,9 +8,22 @@ import LeeLaLetra from './LeeLaLetra';
 import CaminoParadas from './CaminoParadas';
 import AsiSeAprende from './AsiSeAprende';
 import Cierre from './Cierre';
-import { HeroMoneda, CapituloEncoge, CapituloCrece } from './capitulos';
+import { CapituloEncoge, CapituloCrece } from './capitulos';
+import HeroGaleria from './HeroGaleria';
+import { DatosDeHoy } from './DatosDeHoy';
+import NavPildora, { type AnclaNav } from './NavPildora';
+import { useScrollSuave } from '@/lib/useScrollSuave';
 import { useCtaProgreso } from '@/lib/useCtaProgreso';
 import './landing.css';
+
+const ANCLAS: readonly AnclaNav[] = [
+  { id: 'capitulo-encoge', etiqueta: 'Inflación' },
+  { id: 'capitulo-crece', etiqueta: 'Interés' },
+  { id: 'lee-la-letra', etiqueta: 'Crédito' },
+  { id: 'como-aprendes-app', etiqueta: 'La app' },
+  { id: 'camino', etiqueta: 'La ruta' },
+  { id: 'instituciones', etiqueta: 'Instituciones' },
+];
 
 const INSTITUCIONES_MAILTO = 'mailto:soy.bursa.co@gmail.com?subject=Bursa%20para%20instituciones';
 
@@ -45,16 +57,18 @@ const PREGUNTAS = [
 ];
 
 /**
- * Landing — la página pública de Bursa (`/`), dirección "Un objeto, un capítulo por
- * pantalla" (docs/DIRECCION-LANDING.md).
+ * Landing — la página pública de Bursa (`/`), dirección "La galería de tu plata"
+ * (docs/PLAN-LANDING-V3.md).
  *
- * Estructura: barra → héroe (la moneda) → "tu plata se encoge" (capítulo oscuro,
- * inflación) → "mira crecer tu plata" (ahorro vs. CDT) → crédito → así se aprende (celular) → camino →
- * instituciones → preguntas → cierre → pie. Página blanca salvo el capítulo oscuro:
- * el naranja se reserva para el botón principal, Monedita y la elección activa.
+ * Estructura: navegación en píldora → héroe (la moneda gira hasta mirarte) → datos de hoy
+ * (banda oscura con los indicadores reales) → "tu plata se encoge" (inflación) → "mira
+ * crecer tu plata" (ahorro vs. CDT, con el monto que elijas) → crédito → así se aprende
+ * (carrusel con la app real) → la ruta (un pedestal por módulo) → instituciones → preguntas
+ * → cierre → pie. El naranja se reserva para la acción y el dato.
  */
 export default function Landing() {
   const cta = useCtaProgreso();
+  useScrollSuave();
 
   return (
     <div className="lp">
@@ -63,26 +77,11 @@ export default function Landing() {
         Saltar al contenido
       </a>
 
-      <header className="lp-nav">
-        <BursaLogo />
-        <nav aria-label="Principal" className="lp-nav-links">
-          <a className="lp-nav-link" href="#como-aprendes-app">
-            Aprender
-          </a>
-          <a className="lp-nav-link" href="#instituciones">
-            Para instituciones
-          </a>
-          <Link className="lp-nav-link" href="/sobre">
-            Quiénes somos
-          </Link>
-        </nav>
-        <Link href={cta.href} className="lp-btn lp-btn--primary">
-          {cta.label}
-        </Link>
-      </header>
+      <NavPildora anclas={ANCLAS} cta={cta} />
 
       <main id="main-content">
-        <HeroMoneda />
+        <HeroGaleria />
+        <DatosDeHoy />
         <CapituloEncoge />
         <CapituloCrece />
         <LeeLaLetra />
@@ -91,7 +90,7 @@ export default function Landing() {
 
         <section id="instituciones" className="lp-section lp-inst" aria-labelledby="instituciones-titulo">
           <div className="lp-wrap">
-            <div className="lp-inst-card" data-aparece="subir">
+            <div className="lp-inst-card">
               <div className="lp-inst-copy">
                 <h2 id="instituciones-titulo" className="lp-title">
                   ¿Enseñas en un colegio, una universidad o una caja de compensación?
@@ -117,13 +116,13 @@ export default function Landing() {
         </section>
 
         <section id="preguntas" className="lp-section lp-section--paper lp-faq" aria-labelledby="preguntas-titulo">
-          <div className="lp-wrap" style={{ maxWidth: 760 }}>
+          <div className="lp-wrap lp-faq-grid">
             <h2 id="preguntas-titulo" className="lp-title">
               Antes de empezar
             </h2>
             <ul className="lp-faq-list">
               {PREGUNTAS.map((item, i) => (
-                <li key={item.q} className="lp-faq-item" data-aparece="subir">
+                <li key={item.q} className="lp-faq-item">
                   <details open={i === 0}>
                     <summary className="lp-faq-summary">
                       <span>{item.q}</span>

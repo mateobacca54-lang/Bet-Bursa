@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capítulo "Así se aprende en Bursa.": un celular (marco CSS) muestra tres capturas reales de una lección — predices, lo ves, entiendes por qué. En escritorio el celular queda fijo y su pantalla cruza en opacidad según el paso activo; en móvil o con movimiento reducido cada paso lleva su propia captura.',
+          'Capítulo "Así se aprende en Bursa.": carrusel horizontal "Highlights" con una tarjeta grande por momento de la lección —predices, lo ves, entiendes por qué—, cada una con capturas reales de escritorio y celular. Se recorre con touch, trackpad, teclado (flechas) o los controles de la píldora (puntos y pausa); avanza solo cada 6s si la sección está visible, no hay movimiento reducido y nadie interactuó.',
       },
     },
   },

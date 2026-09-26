@@ -1,244 +1,140 @@
 /* ============================================================
-   camino.css — "Un camino de seis paradas."
-   La línea es decorativa (aria-hidden); el orden real vive en el <ol>.
+   camino.css — "La ruta", galería de pedestales (docs/PLAN-LANDING-V3.md §3, fila 7).
+   Cada módulo es un pedestal: la imagen arriba, el nombre y la pregunta debajo. El
+   Módulo 1 (disponible) se ve completo; los demás, en silueta atenuada y estática.
    ============================================================ */
 
-.cam-track {
-  position: relative;
+.cam-section {
+  --cam-pedestal-size: calc(var(--space-16) * 2.5); /* 160px en móvil */
+}
+@media (min-width: 1024px) {
+  .cam-section {
+    --cam-pedestal-size: clamp(calc(var(--space-16) * 3), 14vw, calc(var(--space-16) * 3.75)); /* 192–240px */
+  }
+}
+
+.cam-tramos {
+  display: grid;
+  /* Sin esto, el carril horizontal de cada tramo (móvil) ensancha la columna del grid
+     y con ella toda la página. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
   margin-top: var(--space-12);
 }
 
-.cam-line {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: var(--space-6);
-  height: 100%;
-  pointer-events: none;
-}
-.cam-line-base,
-.cam-line-progreso {
-  fill: none;
-  stroke-width: 2;
-}
-.cam-line-base {
-  stroke: var(--border-hairline);
-}
-.cam-line-progreso {
-  stroke: var(--brand-600);
-}
-
-.cam-list {
-  position: relative;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-4);
-}
-
-.cam-parada {
-  position: relative;
-  display: grid;
-  grid-template-columns: var(--space-6) minmax(0, 1fr);
-  gap: var(--space-4);
-  align-items: start;
-}
-
-.cam-dot {
-  display: block;
-  width: var(--space-4);
-  height: var(--space-4);
-  margin-top: var(--space-1);
-  border-radius: var(--radius-pill);
-  background: var(--ink);
-  border: 3px solid var(--surface-raised);
-  box-shadow: 0 0 0 1px var(--border-hairline);
-  justify-self: center;
-}
-
-.cam-card {
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  display: grid;
-  gap: var(--space-2);
-  align-content: start;
-  /* Superficie neutra única para las paradas en preparación (SPEC §6): nada de
-     colores por módulo. La disponible rompe con un tinte de marca, a propósito. */
-  background: var(--surface-raised);
-  border: 1px solid var(--border-hairline);
-}
-
-.cam-card--disponible {
-  background: var(--brand-100);
-  border-color: transparent;
-}
-
-.cam-parada--grande .cam-card {
-  padding: var(--space-8);
-}
-.cam-parada--grande .cam-titulo {
-  font-size: var(--font-size-3xl);
-}
-
-/* Paradas 2-6: fila compacta, no una banda a todo lo alto. Título y estado comparten
-   línea (mismo patrón que .llp-stepnav-btn/.cam-temas-btn: información, no relleno). */
-.cam-card--compacta {
-  padding: var(--space-4) var(--space-6);
-}
-.cam-compacta-fila {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-.cam-card--compacta .cam-titulo {
-  font-size: var(--font-size-lg);
-}
-.cam-card--compacta .cam-estado {
-  flex: 0 0 auto;
-}
-
-.cam-numero {
-  margin: 0;
-  font-size: var(--font-size-sm);
+.cam-tramo-etiqueta {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   color: var(--ink-soft);
 }
-.cam-titulo {
+
+/* Móvil: vitrina con scroll horizontal nativo y scroll-snap por tramo (decisión de
+   puesta en escena, PLAN §3 fila 7 deja elegir). En escritorio pasa a una fila fija:
+   con 4/3/3 pedestales de hasta 240px caben dentro de --page-max sin envolver. */
+.cam-galeria {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  display: flex;
+  gap: var(--space-6);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.cam-galeria::-webkit-scrollbar {
+  display: none;
+}
+@media (min-width: 1024px) {
+  /* Cuatro columnas fijas en todos los tramos: los pedestales de un tramo quedan en la
+     misma columna que los del tramo de arriba y la fila ocupa todo el ancho. */
+  .cam-galeria {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+  .cam-pedestal {
+    width: auto;
+  }
+}
+
+.cam-pedestal {
+  flex: 0 0 auto;
+  width: calc(var(--cam-pedestal-size) + var(--space-4));
+  scroll-snap-align: start;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  text-align: center;
+}
+
+.cam-pedestal-imagen {
+  position: relative;
+  width: var(--cam-pedestal-size);
+  height: var(--cam-pedestal-size);
+}
+
+.cam-pedestal-img {
+  object-fit: contain;
+}
+/* Silueta atenuada y ESTÁTICA para los módulos que vienen (AGENTS.md: solo transform
+   y opacity se animan; esto no se anima, es un filtro fijo). */
+.cam-pedestal-img--proximo {
+  /* Atenuado, pero con su color: el pedestal naranja sigue diciendo "esto es Bursa". */
+  opacity: 0.45;
+}
+
+.cam-pedestal-nombre {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--ink);
-}
-.cam-descripcion {
-  margin: 0;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--ink-soft);
-  max-width: 56ch;
+  line-height: var(--line-height-tight);
 }
 
-.cam-estado {
-  justify-self: start;
+.cam-pedestal-enlace {
+  color: inherit;
+  text-decoration: none;
+}
+.cam-pedestal-enlace:hover,
+.cam-pedestal-enlace:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* El objeto sube al pasar el puntero: dice "esto se puede abrir" (único módulo
+   disponible). Solo con puntero fino y sin movimiento reducido; nunca al entrar. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .cam-pedestal-img {
+    transition: transform var(--duration-micro) var(--ease-out-quart);
+  }
+  .cam-pedestal:has(.cam-pedestal-enlace:hover) .cam-pedestal-img {
+    transform: translateY(-4px);
+  }
+}
+
+.cam-pedestal-pregunta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--ink-soft);
+  max-width: 24ch;
+}
+
+.cam-pedestal-estado {
+  justify-self: center;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
-  /* --ink-secondary sobre los tintes de módulo medía 4.33-4.46: bajo el mínimo AA
-     (4.5) de axe. --ink sí llega de sobra sobre cualquiera de los tintes. */
-  color: var(--ink);
-}
-/* "Disponible" va en tinta, no en naranja: el naranja se reserva para el botón
-   principal, Monedita y "tu elección" (SPEC §2). */
-.cam-estado--on {
-  background: var(--ink);
-  color: var(--surface-raised);
-}
-
-.cam-modulo1-acciones {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
-}
-
-.cam-temas-btn {
-  min-height: var(--touch-min);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-pill);
-  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
-  background: var(--surface-raised);
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-}
-
-.cam-temas-wrap {
-  flex-basis: 100%;
-  overflow: hidden;
-}
-
-.cam-temas {
-  margin: 0;
-  padding-left: var(--space-6);
-  display: grid;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
   color: var(--ink-soft);
 }
-
-@media (hover: hover) and (pointer: fine) {
-  .cam-temas-btn:hover {
-    border-color: var(--ink);
-  }
-}
-
-/* ─── Las dos ramas: solo se nombran, no son paradas (SPEC §3) ─── */
-.cam-ramas {
-  margin-top: var(--space-12);
-  padding-top: var(--space-8);
-  border-top: 1px dashed var(--border-warm);
-}
-
-.cam-ramas-intro {
-  margin: 0 0 var(--space-6);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  color: var(--ink);
-  max-width: 56ch;
-}
-
-.cam-ramas-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-4);
-}
-
-@media (min-width: 720px) {
-  .cam-ramas-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-6);
-  }
-}
-
-.cam-rama {
-  padding: var(--space-6);
-  background: var(--surface-raised);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-lg);
-}
-
-.cam-rama-eyebrow {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--ink-soft);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
-}
-
-.cam-rama-lista {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: var(--space-2);
-}
-
-.cam-rama-lista li {
-  padding: var(--space-2) 0;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--ink);
-  border-top: 1px solid var(--border-hairline);
-}
-
-.cam-rama-lista li:first-child {
-  border-top: none;
+.cam-pedestal-estado--on {
+  background: var(--brand-50);
+  color: var(--brand-700);
 }

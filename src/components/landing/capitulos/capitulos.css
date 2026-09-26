@@ -1,44 +1,26 @@
 /* ============================================================
-   capitulos.css — HeroMoneda, CapituloEncoge y CapituloCrece
+   capitulos.css — CapituloEncoge y CapituloCrece
    (docs/DIRECCION-LANDING.md §5.1–5.3). Solo valores de tokens.css, igual que
    landing.css: ningún color, espaciado, radio ni tipografía se escribe a mano.
 
-   Prefijos: `hm-` para HeroMoneda, `cap-encoge-` y `cap-crece-` para cada capítulo,
+   Prefijos: `cap-encoge-` y `cap-crece-` para cada capítulo,
    y `cap-title` como título compartido por los dos capítulos (deliberadamente NO
    `.lp-title`: ApareceAlBajar.tsx anima automáticamente cualquier `.lp-title` al
    entrar en pantalla, y estos títulos ya llevan SU PROPIA animación —el pin y el
    scrub de GSAP— así que compartir la clase animaría el mismo elemento dos veces).
    ============================================================ */
 
-/* ─── HeroMoneda ─── */
-.hm-art {
-  display: flex;
-  justify-content: center;
-}
-.hm-art img {
-  width: 100%;
-  /* Casi cuadrada: se acota también por el alto para que el héroe quepa en pantalla. */
-  max-width: min(680px, 92vw, 68svh);
-  height: auto;
-  display: block;
-}
-.hm-confianza {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--ink-soft);
-}
-.hm-confianza span {
-  padding-inline: var(--space-1);
-}
-
-/* ─── Título compartido de capítulo: centrado, una idea por pantalla ─── */
+/* ─── Título compartido de capítulo: centrado, una idea por pantalla ───
+   Landing v3 (docs/PLAN-LANDING-V3.md §4.1): mismo titular de capítulo que el resto de
+   la página (`--font-size-display-2`), pero SIN compartir la clase `.lp-title` — ver la
+   nota del encabezado de este archivo sobre por qué. */
 .cap-title {
   margin: 0;
   font-family: var(--font-display);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--line-height-tight);
-  font-size: clamp(var(--font-size-3xl), 6vw, calc(var(--font-size-4xl) * 1.6));
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-display);
+  font-size: var(--font-size-display-2);
   text-wrap: balance;
   text-align: center;
   color: var(--ink);
@@ -54,6 +36,13 @@
 .cap-encoge,
 .cap-crece {
   padding-block: 0;
+}
+
+/* "Mira crecer tu plata" es banda de papel hundido, con el contenido anclado dentro de
+   una tarjeta grande estilo Apple (PLAN-LANDING-V3.md §3, fila 4): sin sombra, sin
+   borde, solo el cambio de superficie hace la profundidad. */
+.cap-crece {
+  background: var(--paper-sunk);
 }
 
 /* ============================================================
@@ -170,15 +159,17 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  font-size: clamp(var(--font-size-4xl), 11vw, calc(var(--font-size-4xl) * 2));
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-display);
+  font-size: var(--font-size-display-1);
   font-variant-numeric: tabular-nums;
   color: var(--paper);
 }
 .cap-encoge-explica {
   margin: 0;
   max-width: 42ch;
-  font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+  font-size: var(--font-size-lead);
+  font-weight: var(--font-weight-light);
   line-height: var(--line-height-normal);
   color: var(--cap-paper-soft);
 }
@@ -204,20 +195,97 @@
     min-height: calc(100svh - var(--lp-nav-h));
   }
 }
+/* La tarjeta: todo lo anclado (título, premisa, píldoras y la comparación con la
+   gráfica) vive dentro de ella. `--surface-raised` es blanco puro, así resalta sobre
+   el papel hundido de `.cap-crece`. Sin sombra, sin borde (regla de la v3): la
+   profundidad la da solo el cambio de superficie. El padding-block se queda igual de
+   generoso que antes de tener tarjeta (para no gastar el presupuesto de alto del
+   cuadro anclado); el padding-inline crece en escritorio, donde sí sobra aire. */
 .cap-crece-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
+  /* Un poco más apretado que `--space-4` en celular: con la píldora de monto nueva, hay
+     un bloque más en la columna, y el cuadro anclado tiene que seguir cabiendo en
+     390×844 (PLAN-LANDING-V3.md §3, fila 4). */
+  gap: var(--space-3);
   text-align: center;
-  padding-block: var(--space-8);
   width: 100%;
+  background: var(--surface-raised);
+  border-radius: var(--radius-card-lg);
+  padding: var(--space-6) var(--space-4);
+}
+@media (min-width: 600px) {
+  .cap-crece-inner {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+@media (min-width: 900px) {
+  .cap-crece-inner {
+    padding: var(--space-8) var(--space-12);
+    gap: var(--space-4);
+  }
 }
 .cap-crece-premisa {
   margin: 0;
   max-width: 46ch;
-  font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+  font-size: var(--font-size-lead);
+  font-weight: var(--font-weight-light);
   color: var(--ink-soft);
+}
+
+/* ─── Píldoras de monto mensual ─── */
+.cap-crece-monto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cap-crece-monto-leyenda {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink-soft);
+}
+.cap-crece-monto-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.cap-crece-monto-pildora {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hairline);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  /* Solo transform se anima (AGENTS.md); el color de fondo/texto cambia de golpe. */
+  transition: transform var(--duration-micro) var(--ease-out-quart);
+}
+.cap-crece-monto-pildora:active {
+  transform: scale(var(--press-scale));
+}
+@media (max-width: 599px) {
+  /* Las tres caben en una fila a 390px: si se parten, la gráfica se sale del cuadro anclado. */
+  .cap-crece-monto-opciones {
+    flex-wrap: nowrap;
+  }
+  .cap-crece-monto-pildora {
+    padding-inline: var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+}
+.cap-crece-monto-pildora[aria-checked='true'] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
 }
 
 .cap-crece-comparacion {
@@ -239,6 +307,12 @@
 .cap-crece-comparacion .cap-crece-grafica {
   grid-area: grafica;
   justify-self: center;
+  width: min(100%, 300px, 32svh);
+}
+@media (min-width: 900px) {
+  .cap-crece-comparacion .cap-crece-grafica {
+    width: 100%;
+  }
 }
 /* Escritorio: la gráfica va EN MEDIO de la alcancía y el frasco, así el cuadro
    anclado cabe entero en pantalla y las dos líneas quedan entre sus dos objetos. */
@@ -264,7 +338,8 @@
 }
 .cap-crece-arte {
   position: relative;
-  width: min(200px, 42vw);
+  /* En celular, más chicos: el cuadro anclado debe dejar ver la gráfica completa. */
+  width: min(150px, 34vw, 17svh);
   aspect-ratio: 1120 / 1195;
   margin-bottom: var(--space-1);
 }

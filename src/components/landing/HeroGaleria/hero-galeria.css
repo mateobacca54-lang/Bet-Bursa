@@ -1,0 +1,167 @@
+/* ============================================================
+   hero-galeria.css — héroe de la landing v3 ("La galería de tu plata").
+   Solo valores de tokens.css.
+   ============================================================ */
+
+.hg {
+  background: var(--paper);
+}
+.hg-pin {
+  /* El pin de GSAP aísla este cuadro: sin fondo propio, el darken del video se mezclaría
+     contra nada y el recuadro volvería a verse. */
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-8) var(--space-12);
+}
+@media (min-width: 900px) {
+  .hg-pin {
+    /* El cuadro anclado mide lo que se ve bajo la barra flotante. */
+    min-height: calc(100svh - var(--lp-nav-h));
+    padding-block: var(--space-6);
+  }
+}
+
+.hg-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.hg-marca {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hg-titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-display-1);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-display);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* La escena: la moneda en su pedestal, y la cápsula flotando sobre su borde inferior. */
+.hg-escena {
+  position: relative;
+  width: min(100%, 560px);
+  margin-top: var(--space-6);
+}
+@media (min-width: 900px) {
+  .hg-escena {
+    /* 3:2 como el video, acotada por el alto para que titular + escena + pie quepan. */
+    width: min(100%, 900px, calc((100svh - var(--lp-nav-h)) * 0.52 * 1.5));
+    margin-top: var(--space-2);
+  }
+}
+.hg-media {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+@media (min-width: 900px) {
+  .hg-media {
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+}
+/* El video no es idéntico al papel (la compresión mueve el fondo un par de niveles): los
+   cuatro bordes se funden con la página. La máscara solo usa el alfa. */
+video.hg-media {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, var(--ink) 10%, var(--ink) 90%, transparent),
+    linear-gradient(to bottom, transparent, var(--ink) 8%, var(--ink) 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, var(--ink) 10%, var(--ink) 90%, transparent),
+    linear-gradient(to bottom, transparent, var(--ink) 8%, var(--ink) 92%, transparent);
+  mask-composite: intersect;
+  /* El navegador oscurece el video unos niveles al decodificarlo, y el fondo se veía como
+     un recuadro. El archivo viene aclarado un 2,5 % para quedar siempre por encima del
+     papel, y con darken gana el más oscuro de los dos: el fondo se vuelve papel exacto y
+     la moneda y el pedestal (más oscuros que el papel) quedan intactos. */
+  mix-blend-mode: darken;
+}
+
+/* Cápsula flotante (Apple): lo único que hay que saber para empezar, y el botón. */
+.hg-capsula {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: fit-content;
+  max-width: 100%;
+  margin: var(--space-4) auto 0;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-6);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+  text-align: left;
+}
+@media (min-width: 900px) {
+  .hg-capsula {
+    /* Debajo del pedestal, nunca encima: la onda grabada al frente es la firma de la marca.
+       Sube un poco sobre el borde del video, donde solo hay reflejo y papel. */
+    margin-top: calc(var(--space-4) * -1);
+    white-space: nowrap;
+  }
+}
+.hg-capsula-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+  color: var(--ink-soft);
+}
+.hg-capsula-texto strong {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+}
+.hg-capsula-cta {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-height: calc(var(--space-8) + var(--space-2));
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--font-size-sm);
+}
+
+.hg-pie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+.hg-lead {
+  text-align: center;
+  max-width: 46ch;
+}
+.hg-confianza {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--ink-soft);
+}
+.hg-enlace {
+  color: var(--brand-700);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

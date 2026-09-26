@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
   ahorroAcumulado,
+  construirPuntosGrafica,
   escalaPorArea,
   etapaFrasco,
+  MONTO_MENSUAL_DEFECTO,
+  MONTOS_MENSUALES,
   opacidadesFrasco,
   poderDeCompra,
+  puntoEnGrafica,
   tasaMensualDesdeEA,
+  trazoSvg,
   valorFuturoMensual,
 } from './crecimiento';
 
@@ -78,6 +83,72 @@ describe('valorFuturoMensual', () => {
     const guardado = ahorroAcumulado(100000, 120);
     expect(fv).toBeGreaterThan(guardado);
     expect(fv - guardado).toBeCloseTo(8_259_555.7, 0);
+  });
+});
+
+describe('MONTOS_MENSUALES / MONTO_MENSUAL_DEFECTO', () => {
+  it('trae las tres píldoras en orden de menos a más', () => {
+    expect(MONTOS_MENSUALES).toEqual([50_000, 100_000, 200_000]);
+  });
+  it('el monto por defecto es una de las opciones', () => {
+    expect(MONTOS_MENSUALES).toContain(MONTO_MENSUAL_DEFECTO);
+  });
+});
+
+describe('construirPuntosGrafica', () => {
+  it('el primer punto de cada línea está en el mes 0, sin nada acumulado', () => {
+    const { ahorro, cdt } = construirPuntosGrafica(100000, 0.008, 120, 320, 170, 8);
+    expect(ahorro[0].y).toBeCloseTo(170 - 8, 5); // altura máxima: 0 pesos
+    expect(cdt[0].y).toBeCloseTo(170 - 8, 5);
+  });
+  it('el CDT (con interés) termina más arriba que lo guardado (menor y = más alto)', () => {
+    const r = tasaMensualDesdeEA(0.1026);
+    const { ahorro, cdt } = construirPuntosGrafica(100000, r, 120, 320, 170, 8);
+    expect(cdt[cdt.length - 1].y).toBeLessThan(ahorro[ahorro.length - 1].y);
+  });
+  it('tiene un punto por cada mes de 0 a mesesTotal, inclusive', () => {
+    const { ahorro } = construirPuntosGrafica(100000, 0.008, 120, 320, 170, 8);
+    expect(ahorro).toHaveLength(121);
+  });
+  it('todos los puntos quedan dentro del viewBox (respetan el padding)', () => {
+    const { ahorro, cdt } = construirPuntosGrafica(200000, 0.01, 120, 320, 170, 8);
+    for (const p of [...ahorro, ...cdt]) {
+      expect(p.x).toBeGreaterThanOrEqual(8);
+      expect(p.x).toBeLessThanOrEqual(320 - 8);
+      expect(p.y).toBeGreaterThanOrEqual(8);
+      expect(p.y).toBeLessThanOrEqual(170 - 8);
+    }
+  });
+});
+
+describe('puntoEnGrafica', () => {
+  const puntos = [
+    { x: 0, y: 100 },
+    { x: 10, y: 80 },
+    { x: 20, y: 0 },
+  ];
+  it('en un mes entero, devuelve exactamente ese punto', () => {
+    expect(puntoEnGrafica(puntos, 1)).toEqual({ x: 10, y: 80 });
+  });
+  it('a mitad de un tramo, interpola entre los dos puntos que lo rodean', () => {
+    expect(puntoEnGrafica(puntos, 0.5)).toEqual({ x: 5, y: 90 });
+  });
+  it('se recorta a los extremos si el mes se sale del rango', () => {
+    expect(puntoEnGrafica(puntos, -5)).toEqual({ x: 0, y: 100 });
+    expect(puntoEnGrafica(puntos, 50)).toEqual({ x: 20, y: 0 });
+  });
+});
+
+describe('trazoSvg', () => {
+  it('arranca con M y sigue con L, uniendo todos los puntos', () => {
+    const puntos = [
+      { x: 0, y: 1 },
+      { x: 2.5, y: 3 },
+    ];
+    expect(trazoSvg(puntos)).toBe('M0.00 1.00 L2.50 3.00');
+  });
+  it('una lista vacía da un trazo vacío', () => {
+    expect(trazoSvg([])).toBe('');
   });
 });
 

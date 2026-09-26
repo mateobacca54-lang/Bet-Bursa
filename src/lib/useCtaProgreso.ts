@@ -7,7 +7,7 @@ import { useProgress } from './useProgress';
 // ============================================================
 // useCtaProgreso — qué dice y a dónde lleva el botón principal de la landing.
 //
-// Lo comparten el héroe (HeroMoneda) y la barra de arriba (Landing.tsx): los dos
+// Lo comparten el héroe (HeroGaleria) y la barra de arriba (Landing.tsx): los dos
 // necesitan el mismo CTA, así que viven de la misma función pura en vez de que cada
 // uno la reinvente. La función (`ctaProgreso`) se prueba sin DOM; el hook solo le
 // pasa lo que useProgress ya lee de localStorage.
