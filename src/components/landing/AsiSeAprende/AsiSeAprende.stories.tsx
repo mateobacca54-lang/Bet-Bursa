@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capítulo "Así se aprende en Bursa.": carrusel horizontal "Highlights" con una tarjeta grande por momento de la lección —predices, lo ves, entiendes por qué—, cada una con capturas reales de escritorio y celular. Se recorre con touch, trackpad, teclado (flechas) o los controles de la píldora (puntos y pausa); avanza solo cada 6s si la sección está visible, no hay movimiento reducido y nadie interactuó.',
+          'Capítulo "Así se aprende en Bursa.": dos celulares con pantallas reales de la app flotan y giran sobre la cinta de la marca (tres giros generados con Higgsfield). La sección se ancla y el scroll avanza el giro: en escritorio moviendo el video, como la moneda del héroe; en celular dibujando a mano una secuencia de imágenes en un canvas (más fluida en iOS que un seek de video). Con movimiento reducido o ahorro de datos se ve un cuadro fijo como imagen.',
       },
     },
   },

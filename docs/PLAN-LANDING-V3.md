@@ -274,7 +274,7 @@ Construido, con las recomendaciones de §9 como decisiones:
 | Datos de hoy (D7) | `DatosDeHoy/`. Los cinco indicadores, con fuente y fecha |
 | Se encoge / Crece (D6) | Tipografía nueva. "Crece" en tarjeta grande con píldoras de monto |
 | Letra pequeña | Composición editorial con el documento inclinado |
-| Así se aprende | Carrusel "Highlights" con capturas reales de escritorio y celular |
+| Así se aprende | Dos celulares con la app real que giran sobre la cinta (tres giros de Higgsfield, MiniMax H3). La sección se ancla y el scroll recorre la animación: video en escritorio, secuencia de 185 imágenes en canvas en celular (`public/landing/celulares-movil/`), con suavizado (`src/lib/secuencia.ts`) |
 | La ruta | Un pedestal por módulo (`public/landing/ruta/`); los que vienen, atenuados |
 | Instituciones, preguntas, cierre | Bloques editoriales y titular final gigante |
 | Movimiento | Se quitaron los "aparecer al bajar" de párrafos y bloques. Quedan los cinco tipos de §5 |
@@ -289,3 +289,9 @@ Pendiente:
   solo tiene Chromium).
 - **Lighthouse:** medir en escritorio y celular contra el presupuesto de §7. El video del
   héroe pesa 1,65 MB en MP4 (1,28 MB en WebM), un poco por encima de los 1,5 MB.
+
+**Cierre (26 de septiembre de 2026):** el dueño da la landing v3 por terminada tal como está en
+la vista previa de la rama `claude/charming-knuth-0n244m`. No se sigue iterando sobre ella salvo
+pedido explícito; el foco pasa a marketing. Lo pendiente de arriba queda anotado, no en curso.
+Se guardan sin borrar los archivos que la landing ya no usa (`public/landing/cinta.webp`,
+`actividad-*.mp4/.webm`, `celulares.webm`): el dueño pidió conservarlos.

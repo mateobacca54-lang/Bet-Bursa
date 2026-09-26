@@ -15,6 +15,16 @@ Bursa es una escuela de dinero y mercados para jóvenes colombianos. Este repo e
 Antes de trabajar, lee `docs/PLAN-MODULO-1.md` (qué se construye) y
 `docs/ANTIGRAVITY-WORKPLAN.md` (cómo se ejecuta y qué artefactos entregar).
 
+## Forma de trabajo
+
+- **Opus planea, modelos livianos programan.** El modelo principal (Opus) piensa, diagnostica,
+  decide el plan y revisa el resultado; la implementación se delega a un agente con un modelo
+  más liviano (Sonnet o Haiku) con instrucciones precisas. Es la prioridad del dueño para
+  gastar menos.
+- **Si cambia el enfoque, se consulta antes.** Descartar una herramienta o un camino que el
+  dueño pidió (por ejemplo, dejar de usar Higgsfield), gastar créditos o borrar archivos: se
+  explica y se pregunta primero. No se decide solo.
+
 ## Diseño
 
 - **`src/styles/tokens.css` es la única fuente de valores.** Ningún color, espaciado,

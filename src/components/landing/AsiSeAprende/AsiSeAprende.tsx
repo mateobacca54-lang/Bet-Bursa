@@ -1,316 +1,396 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger, registerGsap } from '@/lib/gsap';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import { anteriorIndice, clampIndice, debeAvanzarAuto, siguienteIndice } from '@/lib/carrusel';
+import { acercar, cuadroParaProgreso } from '@/lib/secuencia';
 import '../landing.css';
 import './asi-se-aprende.css';
 
-interface Paso {
-  id: string;
-  titulo: string;
-  cuerpo: string;
-  srcEscritorio: string;
-  srcCelular: string;
-  alt: string;
+const ESCRITORIO = '(min-width: 900px)';
+
+/** Cuánto de la distancia que falta recorre el suavizado en cada cuadro (0..1). */
+const FACTOR_SUAVIZADO = 0.18;
+/** Bajo esta diferencia (segundos) no vale la pena reasignar video.currentTime. */
+const UMBRAL_SEEK = 1 / 48;
+/** Cuántos cuadros de la secuencia se descargan a la vez (ver scripts/secuencia-celulares.mjs). */
+const CONCURRENCIA_CARGA = 6;
+/** Cuadros que tiene public/landing/celulares-movil/ (generados por ese mismo script). */
+const TOTAL_CUADROS_MOVIL = 185;
+
+const ACTIVIDADES = [
+  { id: 'almuerzo', titulo: 'Mueves el tiempo.', cuerpo: 'Arrastras los años y ves cuánto sube tu almuerzo.' },
+  { id: 'interes', titulo: 'Predices y comparas.', cuerpo: 'Adivinas cuánto crece tu plata y ves cuánto crece de verdad.' },
+] as const;
+
+const VIDEO_ESCRITORIO = { mp4: '/landing/celulares.mp4', webm: '/landing/celulares.webm' } as const;
+const POSTER = {
+  escritorio: '/landing/celulares-poster.webp',
+  movil: '/landing/celulares-movil-poster.webp',
+} as const;
+
+/** Ruta del cuadro `indice` (0-based) de la secuencia móvil: 0 → 0001.webp. */
+function cuadroSrc(indice: number): string {
+  return `/landing/celulares-movil/${String(indice + 1).padStart(4, '0')}.webp`;
 }
 
-const AVANCE_AUTO_MS = 6000;
-
-// Las capturas son reales, tomadas del propio flujo predecir → interactuar → entender de
-// WidgetShell en la Lección 2 (la inflación y el precio del almuerzo). No se dibujan: son
-// la app tal cual la ve quien la usa (DIRECCION-LANDING.md §5.5).
-const PASOS: readonly Paso[] = [
-  {
-    id: 'predices',
-    titulo: 'Predices.',
-    cuerpo: 'Antes de ver la respuesta, eliges qué crees que va a pasar.',
-    srcEscritorio: '/landing/app-escritorio-predices.webp',
-    srcCelular: '/landing/app-predices.webp',
-    alt: 'Una lección de Bursa en escritorio y en celular: antes de mover el slider, Monedita invita a predecir en qué año el almuerzo de $8.000 va a costar más de $15.000.',
-  },
-  {
-    id: 'lo-ves',
-    titulo: 'Lo ves.',
-    cuerpo: 'Mueves algo real —un año, un peso— y el resultado cambia frente a tus ojos.',
-    srcEscritorio: '/landing/app-escritorio-lo-ves.webp',
-    srcCelular: '/landing/app-lo-ves.webp',
-    alt: 'La misma lección en escritorio y en celular con el slider movido al año 2020: la gráfica de barras muestra cómo sube el precio del almuerzo a medida que pasan los años.',
-  },
-  {
-    id: 'entiendes',
-    titulo: 'Entiendes por qué.',
-    cuerpo: 'Monedita te explica la respuesta con la pregunta todavía fresca.',
-    srcEscritorio: '/landing/app-escritorio-entiendes.webp',
-    srcCelular: '/landing/app-entiendes.webp',
-    alt: 'La misma lección en escritorio y en celular con la respuesta correcta: un aviso con un check y Monedita celebrando explican por qué la inflación hace que el almuerzo cueste más de $15.000 en 2025.',
-  },
-];
-
 /**
- * AsiSeAprende — capítulo "Así se aprende en Bursa.": un carrusel horizontal de
- * tarjetas grandes, al estilo "Highlights" de Apple (PLAN-LANDING-V3.md §3 fila 6).
+ * AsiSeAprende — capítulo "Así se aprende en Bursa.": dos celulares con pantallas
+ * reales de la app flotan y giran sobre la cinta de la marca (referencia: la landing
+ * de Slush). La sección se queda quieta al llegar y el scroll recorre tres giros
+ * (generados con Higgsfield) de principio a fin; al terminar, la página sigue.
+ * Con movimiento reducido o ahorro de datos se ve un cuadro fijo, con la misma
+ * información.
  *
- * El scroll horizontal nativo (`scroll-snap`) es la fuente de verdad: funciona con touch
- * y trackpad sin JS. Un `IntersectionObserver` sobre las tarjetas lee cuál está más
- * visible para marcar el punto activo y mover el foco de los controles; los controles
- * (puntos, flechas) mueven el scroll con `scrollTo`. El avance automático es un cambio de
- * estado más: usa el mismo camino que un clic en "siguiente".
+ * En escritorio se usa el video entero: se descarga como blob antes de conectarlo
+ * (Safari no deja saltar a un cuadro que no ha bajado) y el scroll mueve
+ * `video.currentTime`. En celular un video no sirve: cada seek en un H.264 con un
+ * cuadro clave cada 0,5 s obliga a decodificar hasta 11 cuadros, e iOS encola esos
+ * seeks — se ve a tirones. Por eso en celular se usa una SECUENCIA DE IMÁGENES
+ * (public/landing/celulares-movil/, generada por scripts/secuencia-celulares.mjs)
+ * dibujada a mano en un <canvas>: cada cuadro es independiente, no hay nada que
+ * decodificar de más.
+ *
+ * En los dos casos el progreso del scroll es solo un OBJETIVO: un bucle
+ * requestAnimationFrame (activo solo mientras la sección está pineada) lo persigue
+ * con `acercar()` (src/lib/secuencia.ts) en vez de aplicarlo en crudo, para que un
+ * scroll brusco no salte de golpe. En escritorio esto además evita encolar seeks:
+ * solo se reasigna `video.currentTime` si el video no está buscando ya y la
+ * diferencia importa.
  */
 export default function AsiSeAprende() {
   const reducirMovimiento = usePrefersReducedMotion();
-  const [activo, setActivo] = useState(0);
-  const [pausado, setPausado] = useState(false);
-  const [seccionVisible, setSeccionVisible] = useState(false);
-  const [interactuando, setInteractuando] = useState(false);
-
-  const pistaRef = useRef<HTMLDivElement>(null);
-  const tarjetasRef = useRef<Array<HTMLDivElement | null>>([]);
-  const activoRef = useRef(0);
-  const desplazandoRef = useRef(false);
+  const [conVideo, setConVideo] = useState(false);
+  const [esEscritorio, setEsEscritorio] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    activoRef.current = activo;
-  }, [activo]);
+    const query = window.matchMedia(ESCRITORIO);
+    const conexion = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const actualizar = () => {
+      setEsEscritorio(query.matches);
+      setConVideo(!reducirMovimiento && !conexion?.saveData);
+    };
+    actualizar();
+    query.addEventListener('change', actualizar);
+    return () => query.removeEventListener('change', actualizar);
+  }, [reducirMovimiento]);
 
-  const irA = useCallback(
-    (i: number) => {
-      const pista = pistaRef.current;
-      const tarjeta = tarjetasRef.current[i];
-      if (!pista || !tarjeta) return;
-      desplazandoRef.current = true;
-      pista.scrollTo({
-        left: tarjeta.offsetLeft - pista.offsetLeft,
-        behavior: reducirMovimiento ? 'auto' : 'smooth',
+  useGSAP(
+    () => {
+      if (!conVideo) return;
+      registerGsap();
+      // iOS cambia el alto del viewport al ocultar/mostrar la barra de direcciones;
+      // sin esto ScrollTrigger se recalcula solo por eso y el pin salta.
+      ScrollTrigger.config({ ignoreMobileResize: true });
+
+      const section = sectionRef.current;
+      const pin = pinRef.current;
+      if (!section || !pin) return;
+
+      let vivo = true;
+      let activo = false;
+      let rafId: number | null = null;
+      let objetivoProgreso = 0;
+
+      const detener = () => {
+        activo = false;
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      };
+      // Al soltarse la sección, el bucle sigue hasta alcanzar el cuadro final (o el
+      // inicial, al subir) y ahí se apaga: si se corta de golpe, un scroll rápido deja
+      // la animación congelada a medias.
+      const soltar = () => {
+        activo = false;
+      };
+
+      const opcionesScroll = {
+        trigger: section,
+        start: () => `top ${Math.round(document.querySelector('.lp-nav')?.getBoundingClientRect().height ?? 0)}px`,
+        end: () => `+=${Math.round(window.innerHeight * 2.5)}`,
+        pin,
+        pinSpacing: true,
+        invalidateOnRefresh: true,
+        anticipatePin: 1 as const,
+      };
+
+      // === Escritorio: <video>, con el mismo suavizado pero sin cambiar de fuente ===
+      if (esEscritorio) {
+        const video = videoRef.current;
+        if (!video) return;
+        let tiempoActual = 0;
+        let objeto: string | null = null;
+
+        const tick = () => {
+          let llego = true;
+          if (video.readyState >= 1 && Number.isFinite(video.duration)) {
+            const objetivoTiempo = objetivoProgreso * video.duration;
+            tiempoActual = acercar(tiempoActual, objetivoTiempo, FACTOR_SUAVIZADO);
+            if (!video.seeking && Math.abs(video.currentTime - tiempoActual) > UMBRAL_SEEK) {
+              video.currentTime = tiempoActual;
+            }
+            llego =
+              tiempoActual === objetivoTiempo &&
+              !video.seeking &&
+              Math.abs(video.currentTime - objetivoTiempo) <= UMBRAL_SEEK;
+          }
+          if (!activo && llego) {
+            rafId = null;
+            return;
+          }
+          rafId = requestAnimationFrame(tick);
+        };
+        const iniciar = () => {
+          if (activo) return;
+          activo = true;
+          if (rafId === null) {
+            tiempoActual = video.currentTime;
+            rafId = requestAnimationFrame(tick);
+          }
+        };
+
+        // Descarga entera antes de conectar el video: Safari en iPhone no deja saltar a
+        // un cuadro que no ha bajado, y recorrerlo con el dedo lo exige.
+        const url = video.canPlayType('video/mp4; codecs="avc1.640028"') ? VIDEO_ESCRITORIO.mp4 : VIDEO_ESCRITORIO.webm;
+        fetch(url)
+          .then((r) => r.blob())
+          .then((blob) => {
+            if (!vivo) return;
+            objeto = URL.createObjectURL(blob);
+            video.src = objeto;
+          })
+          .catch(() => {
+            // Sin red: queda el póster, con la misma información.
+          });
+
+        const st = ScrollTrigger.create({
+          ...opcionesScroll,
+          onUpdate: (self) => {
+            objetivoProgreso = self.progress;
+            // Un salto que cruza la sección entera no la activa: igual hay que ir al cuadro nuevo.
+            if (rafId === null) rafId = requestAnimationFrame(tick);
+          },
+          onToggle: (self) => {
+            if (self.isActive) iniciar();
+            else soltar();
+          },
+        });
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+
+        return () => {
+          vivo = false;
+          detener();
+          if (objeto) URL.revokeObjectURL(objeto);
+          st.kill();
+        };
+      }
+
+      // === Celular: <canvas> con la secuencia de imágenes ===
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const bitmaps: (ImageBitmap | null)[] = new Array(TOTAL_CUADROS_MOVIL).fill(null);
+      const controladores: AbortController[] = [];
+      let cuadroDibujado = -1;
+      let progresoActual = 0;
+
+      /** Dibuja el cuadro `indice`, o el cargado más cercano si ese todavía no llegó. */
+      const dibujar = (indice: number) => {
+        let mejor = bitmaps[indice] ? indice : -1;
+        for (let d = 1; mejor === -1 && d < TOTAL_CUADROS_MOVIL; d++) {
+          const abajo = indice - d;
+          const arriba = indice + d;
+          if (abajo >= 0 && bitmaps[abajo]) mejor = abajo;
+          else if (arriba < TOTAL_CUADROS_MOVIL && bitmaps[arriba]) mejor = arriba;
+        }
+        if (mejor === -1) return;
+        const bitmap = bitmaps[mejor];
+        if (!bitmap) return;
+        const cw = canvas.width;
+        const ch = canvas.height;
+        if (cw === 0 || ch === 0) return;
+        const escala = Math.min(cw / bitmap.width, ch / bitmap.height);
+        const w = bitmap.width * escala;
+        const h = bitmap.height * escala;
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.drawImage(bitmap, (cw - w) / 2, (ch - h) / 2, w, h);
+      };
+
+      const redimensionar = () => {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const w = Math.max(1, Math.round(rect.width * dpr));
+        const h = Math.max(1, Math.round(rect.height * dpr));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+          if (cuadroDibujado >= 0) dibujar(cuadroDibujado);
+        }
+      };
+      redimensionar();
+      const observador = new ResizeObserver(redimensionar);
+      observador.observe(canvas);
+
+      const cargarCuadro = async (indice: number) => {
+        const controller = new AbortController();
+        controladores.push(controller);
+        try {
+          const resp = await fetch(cuadroSrc(indice), { signal: controller.signal });
+          const blob = await resp.blob();
+          if (!vivo) return;
+          const bitmap = await createImageBitmap(blob);
+          if (!vivo) {
+            bitmap.close();
+            return;
+          }
+          bitmaps[indice] = bitmap;
+          if (cuadroDibujado === -1) {
+            cuadroDibujado = indice;
+            canvas.dataset.cuadro = String(indice);
+          }
+          dibujar(cuadroDibujado);
+        } catch {
+          // Cancelado al desmontar, o sin red: se queda con el cuadro más cercano ya cargado.
+        }
+      };
+
+      const cargarConLimite = async (indices: number[], limite: number) => {
+        let cursor = 0;
+        const trabajador = async () => {
+          while (vivo && cursor < indices.length) {
+            const i = indices[cursor++];
+            await cargarCuadro(i);
+          }
+        };
+        await Promise.all(Array.from({ length: Math.min(limite, indices.length) }, trabajador));
+      };
+
+      // Primero el cuadro 1 (para dibujar algo ya), luego el resto en orden.
+      cargarCuadro(0).then(() => {
+        if (!vivo) return;
+        const restantes = Array.from({ length: TOTAL_CUADROS_MOVIL - 1 }, (_, i) => i + 1);
+        cargarConLimite(restantes, CONCURRENCIA_CARGA);
       });
-      setActivo(i);
-      // El scroll suave dispara varios eventos de IntersectionObserver mientras viaja;
-      // se ignoran hasta que termine, para no pisar el índice que el usuario eligió.
-      window.setTimeout(() => {
-        desplazandoRef.current = false;
-      }, reducirMovimiento ? 50 : 500);
+
+      const tick = () => {
+        progresoActual = acercar(progresoActual, objetivoProgreso, FACTOR_SUAVIZADO);
+        const indice = cuadroParaProgreso(progresoActual, TOTAL_CUADROS_MOVIL);
+        if (indice !== cuadroDibujado) {
+          cuadroDibujado = indice;
+          canvas.dataset.cuadro = String(indice);
+          dibujar(indice);
+        }
+        if (!activo && progresoActual === objetivoProgreso) {
+          rafId = null;
+          return;
+        }
+        rafId = requestAnimationFrame(tick);
+      };
+      const iniciar = () => {
+        if (activo) return;
+        activo = true;
+        if (rafId === null) rafId = requestAnimationFrame(tick);
+      };
+
+      const st = ScrollTrigger.create({
+        ...opcionesScroll,
+        onUpdate: (self) => {
+          objetivoProgreso = self.progress;
+          // Un salto que cruza la sección entera no la activa: igual hay que ir al cuadro nuevo.
+          if (rafId === null) rafId = requestAnimationFrame(tick);
+        },
+        onToggle: (self) => {
+          if (self.isActive) iniciar();
+          else soltar();
+        },
+      });
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
+
+      return () => {
+        vivo = false;
+        detener();
+        observador.disconnect();
+        controladores.forEach((c) => c.abort());
+        bitmaps.forEach((b) => b?.close());
+        st.kill();
+      };
     },
-    [reducirMovimiento]
+    { scope: sectionRef, dependencies: [conVideo, esEscritorio] }
   );
 
-  // Paso activo: la tarjeta más visible dentro de la pista, según IntersectionObserver.
-  useEffect(() => {
-    const pista = pistaRef.current;
-    if (!pista) return;
-
-    const observer = new IntersectionObserver(
-      (entradas) => {
-        if (desplazandoRef.current) return;
-        let mejor: IntersectionObserverEntry | null = null;
-        for (const entrada of entradas) {
-          if (!mejor || entrada.intersectionRatio > mejor.intersectionRatio) {
-            mejor = entrada;
-          }
-        }
-        if (mejor && mejor.intersectionRatio > 0) {
-          const i = tarjetasRef.current.indexOf(mejor.target as HTMLDivElement);
-          if (i >= 0) setActivo(i);
-        }
-      },
-      { root: pista, threshold: [0.5, 0.75, 1] }
-    );
-
-    for (const tarjeta of tarjetasRef.current) {
-      if (tarjeta) observer.observe(tarjeta);
-    }
-    return () => observer.disconnect();
-  }, []);
-
-  // La sección cuenta como "visible" (para el avance automático) al 50% o más en pantalla.
-  useEffect(() => {
-    const pista = pistaRef.current;
-    const section = pista?.closest('section');
-    if (!section) return;
-    const observer = new IntersectionObserver(([entrada]) => setSeccionVisible(entrada.isIntersecting), {
-      threshold: 0.5,
-    });
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
-
-  // Avance automático: cada AVANCE_AUTO_MS, solo si la sección está visible, sin
-  // movimiento reducido, sin pausa manual y sin puntero/foco dentro del carrusel. Se
-  // detiene solo al llegar al último paso (PLAN §3 fila 6, AGENTS.md movimiento).
-  useEffect(() => {
-    if (reducirMovimiento || pausado || interactuando || !seccionVisible) return;
-    if (!debeAvanzarAuto(activo, PASOS.length)) return;
-
-    const id = window.setTimeout(() => {
-      irA(siguienteIndice(activoRef.current, PASOS.length));
-    }, AVANCE_AUTO_MS);
-    return () => window.clearTimeout(id);
-  }, [activo, reducirMovimiento, pausado, interactuando, seccionVisible, irA]);
-
-  function alTeclado(evento: React.KeyboardEvent<HTMLDivElement>) {
-    if (evento.key === 'ArrowRight') {
-      evento.preventDefault();
-      irA(siguienteIndice(activo, PASOS.length));
-    } else if (evento.key === 'ArrowLeft') {
-      evento.preventDefault();
-      irA(anteriorIndice(activo, PASOS.length));
-    }
-  }
-
   return (
-    <section id="como-aprendes-app" className="lp-section asi-section" aria-labelledby="asi-titulo">
-      <div className="lp-wrap asi-wrap">
-        <div className="asi-heading">
+    <section id="como-aprendes-app" ref={sectionRef} className="lp-section asi-section" aria-labelledby="asi-titulo">
+      <div ref={pinRef} className="asi-pin" data-video={conVideo}>
+        <div className="lp-wrap asi-encabezado">
           <h2 id="asi-titulo" className="lp-title">
             Así se aprende en Bursa.
           </h2>
-          <p className="lp-lead">Los tres momentos de una lección real, tal como se ven en tu pantalla.</p>
+          <p className="lp-lead">Cada lección es una actividad: mueves algo y ves qué le pasa a tu plata.</p>
         </div>
 
-        <div
-          ref={pistaRef}
-          className="asi-pista"
-          role="region"
-          aria-roledescription="carrusel"
-          aria-label="Así se aprende en Bursa"
-          tabIndex={0}
-          onKeyDown={alTeclado}
-          onPointerEnter={() => setInteractuando(true)}
-          onPointerLeave={() => setInteractuando(false)}
-          onFocus={() => setInteractuando(true)}
-          onBlur={() => setInteractuando(false)}
-          onPointerDown={() => setPausado(true)}
-        >
-          {PASOS.map((paso, i) => (
-            <div
-              key={paso.id}
-              ref={(el) => {
-                tarjetasRef.current[i] = el;
-              }}
-              className="asi-tarjeta"
-              role="group"
-              aria-roledescription="paso"
-              aria-label={`${i + 1} de ${PASOS.length}`}
-            >
-              <p className="asi-tarjeta-num" aria-hidden="true">
-                0{i + 1}
-              </p>
-              <h3 className="asi-tarjeta-titulo">{paso.titulo}</h3>
-              <p className="asi-tarjeta-cuerpo">{paso.cuerpo}</p>
-
-              <div className="asi-capturas">
-                <div className="asi-marco-escritorio" aria-hidden="true">
-                  <div className="asi-marco-barra">
-                    <span className="asi-marco-punto" />
-                    <span className="asi-marco-punto" />
-                    <span className="asi-marco-punto" />
-                  </div>
-                  <div className="asi-marco-pantalla">
-                    <Image
-                      src={paso.srcEscritorio}
-                      alt=""
-                      width={2000}
-                      height={1800}
-                      sizes="(min-width: 900px) min(760px, 62vw), 0px"
-                      quality={90}
-                    />
-                  </div>
-                </div>
-
-                <div className="asi-marco-celular" role="img" aria-label={paso.alt}>
-                  <span className="asi-marco-celular-notch" />
-                  <div className="asi-marco-celular-pantalla">
-                    <Image
-                      src={paso.srcCelular}
-                      alt=""
-                      width={1170}
-                      height={2532}
-                      sizes="(min-width: 900px) 180px, 62vw"
-                      quality={90}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="asi-controles">
-          <button
-            type="button"
-            className="asi-flecha"
-            onClick={() => irA(anteriorIndice(activo, PASOS.length))}
-            disabled={activo === 0}
-            aria-label="Paso anterior"
-          >
-            <FlechaIcono direccion="izquierda" />
-          </button>
-
-          <div className="asi-pildora">
-            {PASOS.map((paso, i) => (
-              <button
-                key={paso.id}
-                type="button"
-                className="asi-punto"
-                data-active={activo === i}
-                aria-current={activo === i ? 'true' : undefined}
-                aria-label={`Ir al paso ${i + 1}: ${paso.titulo}`}
-                onClick={() => irA(clampIndice(i, PASOS.length))}
+        <div className="asi-escena">
+          {conVideo ? (
+            esEscritorio ? (
+              <video
+                ref={videoRef}
+                className="asi-media"
+                muted
+                playsInline
+                preload="none"
+                disablePictureInPicture
+                disableRemotePlayback
+                tabIndex={-1}
+                poster={POSTER.escritorio}
+                width={1920}
+                height={1080}
+                aria-hidden="true"
               />
-            ))}
-            <button
-              type="button"
-              className="asi-pausa"
-              onClick={() => setPausado((p) => !p)}
-              aria-label={pausado ? 'Reanudar avance automático' : 'Pausar avance automático'}
-              aria-pressed={pausado}
-            >
-              {pausado ? <ReproducirIcono /> : <PausaIcono />}
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className="asi-flecha"
-            onClick={() => irA(siguienteIndice(activo, PASOS.length))}
-            disabled={activo === PASOS.length - 1}
-            aria-label="Paso siguiente"
-          >
-            <FlechaIcono direccion="derecha" />
-          </button>
+            ) : (
+              <canvas ref={canvasRef} className="asi-media" width={720} height={720} aria-hidden="true" />
+            )
+          ) : (
+            <picture>
+              <source media="(min-width: 900px)" srcSet={POSTER.escritorio} />
+              <Image
+                className="asi-media"
+                src={POSTER.movil}
+                alt=""
+                width={1080}
+                height={1080}
+                sizes="100vw"
+                unoptimized
+              />
+            </picture>
+          )}
+          <p className="lp-sr-only">
+            Dos celulares con la app de Bursa flotan y giran sobre una cinta naranja. Uno muestra cuánto sube el precio
+            del almuerzo entre 2015 y 2025; el otro compara una predicción con la curva real del interés compuesto.
+          </p>
         </div>
       </div>
+
+      <div className="lp-wrap">
+        <ul className="asi-actividades">
+          {ACTIVIDADES.map((a) => (
+            <li key={a.id} className="asi-actividad">
+              <span className="asi-actividad-titulo">{a.titulo}</span>
+              <span className="asi-actividad-cuerpo">{a.cuerpo}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
-  );
-}
-
-function FlechaIcono({ direccion }: { direccion: 'izquierda' | 'derecha' }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path
-        d={direccion === 'izquierda' ? 'M11 3l-6 6 6 6' : 'M7 3l6 6-6 6'}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function PausaIcono() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <rect x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor" />
-      <rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor" />
-    </svg>
-  );
-}
-
-function ReproducirIcono() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M3 1.5v11l9-5.5-9-5.5z" fill="currentColor" />
-    </svg>
   );
 }

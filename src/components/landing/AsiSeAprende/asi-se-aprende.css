@@ -1,269 +1,97 @@
 /* ============================================================
    asi-se-aprende.css — capítulo "Así se aprende en Bursa."
-   Carrusel horizontal "Highlights" (PLAN-LANDING-V3.md §3 fila 6). Solo valores
-   de tokens.css. Prefijo `asi-`, propio de este componente: no toca ni redefine
-   `lp-`, `met-` ni `cam-`.
+   Titular arriba y, debajo, los dos celulares girando sobre la cinta (video movido por
+   el scroll en escritorio, imagen fija en celular). El papel del video está igualado a
+   --paper-sunk y sus bordes de arriba y abajo se difuminan: la cinta nunca se ve
+   cortada en seco. Solo valores de tokens.css. Prefijo `asi-`.
    ============================================================ */
 
 .asi-section {
   background: var(--paper-sunk);
+  padding-top: 0;
 }
 
-.asi-wrap {
-  display: grid;
-  gap: var(--space-8);
-}
-
-.asi-heading {
-  max-width: 60ch;
-}
-
-/* ─── Pista de scroll: fuente de verdad del carrusel, nativa (touch y trackpad) ─── */
-.asi-pista {
+.asi-pin {
   display: flex;
-  gap: var(--space-6);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-padding-left: 0;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  margin-inline: calc(var(--space-4) * -1);
-  padding-inline: var(--space-4);
-  padding-block: var(--space-2);
-}
-.asi-pista::-webkit-scrollbar {
-  display: none;
-}
-.asi-pista:focus-visible {
-  outline: 2px solid var(--brand-600);
-  outline-offset: 4px;
+  flex-direction: column;
 }
 
-.asi-tarjeta {
-  flex: 0 0 auto;
-  width: 86vw;
-  scroll-snap-align: start;
-  display: grid;
-  gap: var(--space-2);
-  padding: var(--space-8);
-  background: var(--surface-raised);
-  border-radius: var(--radius-card-lg);
+.asi-encabezado {
+  width: 100%;
+  padding-top: var(--space-12);
+}
+.asi-encabezado .lp-lead {
+  max-width: 34ch;
 }
 
-.asi-tarjeta-num {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--brand-700);
-  letter-spacing: var(--tracking-wide);
-}
-
-.asi-tarjeta-titulo {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--font-size-display-3);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-display);
-  line-height: var(--line-height-display);
-  color: var(--ink);
-}
-
-.asi-tarjeta-cuerpo {
-  margin: 0;
-  max-width: 48ch;
-  font-size: var(--font-size-lead);
-  font-weight: var(--font-weight-light);
-  line-height: var(--line-height-normal);
-  color: var(--ink-soft);
-}
-
-/* ─── Capturas: solo celular en móvil; escritorio + celular superpuesto desde 900px ─── */
-.asi-capturas {
+.asi-escena {
   position: relative;
-  margin-top: var(--space-6);
 }
 
-.asi-marco-escritorio {
-  display: none;
-}
-
-.asi-marco-celular {
-  position: relative;
-  width: min(220px, 62vw);
-  margin-inline: auto;
-  padding: var(--space-2);
-  background: var(--ink);
-  border-radius: calc(var(--radius-lg) * 1.4);
-}
-
-.asi-marco-celular-notch {
-  position: absolute;
-  top: var(--space-2);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 34%;
-  height: var(--space-2);
-  background: var(--ink);
-  border-radius: var(--radius-pill);
-  z-index: 1;
-}
-
-.asi-marco-celular-pantalla {
-  overflow: hidden;
-  border-radius: calc(var(--radius-lg) * 0.9);
-  background: var(--surface);
-}
-.asi-marco-celular-pantalla img {
+.asi-media {
   display: block;
   width: 100%;
   height: auto;
+  aspect-ratio: 1;
+  /* En celular el cuadro se ve entero: su papel es el de la sección, así que el
+     espacio que sobra no se nota. */
+  object-fit: contain;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 95%, transparent 100%);
+}
+
+.asi-actividades {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asi-actividad {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.asi-actividad-titulo {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+}
+.asi-actividad-cuerpo {
+  font-size: var(--font-size-base);
+  color: var(--ink-soft);
 }
 
 @media (min-width: 900px) {
-  .asi-tarjeta {
-    width: min(1000px, 84vw);
+  .asi-encabezado {
+    padding-top: var(--band-gap);
+  }
+  .asi-media {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .asi-actividades {
+    grid-template-columns: repeat(2, minmax(0, 32ch));
+    gap: var(--space-8);
   }
 
-  .asi-capturas {
-    margin-top: var(--space-8);
-  }
-
-  .asi-marco-escritorio {
-    display: block;
-    width: min(760px, 100%);
-    margin-inline: auto;
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-  }
-
-  .asi-marco-barra {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-3);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .asi-marco-punto {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--radius-pill);
-    background: var(--border);
-  }
-
-  .asi-marco-pantalla img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  /* El celular se superpone en la esquina inferior derecha, inclinado (idea de Tomorro). */
-  .asi-marco-celular {
-    position: absolute;
-    right: calc(var(--space-8) * -1);
-    bottom: calc(var(--space-8) * -1);
-    width: 180px;
-    transform: rotate(-4deg);
-  }
 }
 
-/* ─── Controles: píldora con puntos, pausa y flechas (estilo Apple "playback control") ─── */
-.asi-controles {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
+/* Anclada (con video, en cualquier pantalla): el cuadro mide lo que se ve bajo la
+   barra y el video llena lo que deja el titular. */
+.asi-pin[data-video='true'] {
+  height: calc(100svh - var(--lp-nav-h));
 }
-
-.asi-pildora {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-4);
-  background: color-mix(in srgb, var(--ink) 6%, transparent);
-  border-radius: var(--radius-pill);
+.asi-pin[data-video='true'] .asi-encabezado {
+  padding-top: var(--space-6);
 }
-
-.asi-punto {
-  padding: 0;
-  width: var(--space-2);
-  height: var(--space-2);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--ink-soft);
-  cursor: pointer;
-  transform: scaleX(1);
-  transform-origin: center;
-  transition: transform var(--duration-micro) var(--ease-out-quart),
-    background var(--duration-micro) var(--ease-out-quart);
+.asi-pin[data-video='true'] .asi-escena {
+  flex: 1 1 auto;
+  min-height: 0;
 }
-.asi-punto[data-active='true'] {
-  background: var(--brand-600);
-  transform: scaleX(3);
-}
-.asi-punto:focus-visible {
-  outline: 2px solid var(--brand-600);
-  outline-offset: 3px;
-}
-.asi-punto:active {
-  transform: scaleX(3) scale(var(--press-scale));
-}
-
-.asi-pausa {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--space-6);
-  height: var(--space-6);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform var(--duration-micro) var(--ease-out-quart);
-}
-.asi-pausa:focus-visible {
-  outline: 2px solid var(--brand-600);
-  outline-offset: 3px;
-}
-.asi-pausa:active {
-  transform: scale(var(--press-scale));
-}
-
-.asi-flecha {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--touch-min);
-  height: var(--touch-min);
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--surface-raised);
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform var(--duration-micro) var(--ease-out-quart),
-    border-color var(--duration-micro) var(--ease-out-quart),
-    opacity var(--duration-micro) var(--ease-out-quart);
-}
-.asi-flecha:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-.asi-flecha:not(:disabled):active {
-  transform: scale(var(--press-scale));
-}
-.asi-flecha:focus-visible {
-  outline: 2px solid var(--brand-600);
-  outline-offset: 3px;
-}
-@media (hover: hover) and (pointer: fine) {
-  .asi-flecha:not(:disabled):hover {
-    border-color: var(--ink);
-  }
+.asi-pin[data-video='true'] .asi-media {
+  height: 100%;
+  aspect-ratio: auto;
 }
