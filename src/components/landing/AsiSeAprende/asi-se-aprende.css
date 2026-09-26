@@ -1,8 +1,9 @@
 /* ============================================================
    asi-se-aprende.css — capítulo "Así se aprende en Bursa."
-   Titular arriba y, debajo, un video a sangre (dos celulares girando sobre la cinta).
-   El papel del video está igualado a --paper-sunk y sus bordes de arriba y abajo se
-   difuminan: la cinta nunca se ve cortada en seco. Solo valores de tokens.css. Prefijo `asi-`.
+   Titular arriba y, debajo, los dos celulares girando sobre la cinta (video movido por
+   el scroll en escritorio, imagen fija en celular). El papel del video está igualado a
+   --paper-sunk y sus bordes de arriba y abajo se difuminan: la cinta nunca se ve
+   cortada en seco. Solo valores de tokens.css. Prefijo `asi-`.
    ============================================================ */
 
 .asi-section {
@@ -10,24 +11,12 @@
   padding-top: 0;
 }
 
-.asi-escena {
-  position: relative;
+.asi-pin {
   display: flex;
-  flex-direction: column-reverse;
-}
-
-.asi-video {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 88%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 88%, transparent 100%);
+  flex-direction: column;
 }
 
 .asi-encabezado {
-  /* En la columna flexible, `.lp-wrap` (margen automático) se encogería a su texto. */
   width: 100%;
   padding-top: var(--space-12);
 }
@@ -35,16 +24,23 @@
   max-width: 34ch;
 }
 
-.asi-pie {
-  display: grid;
-  gap: var(--space-6);
-  justify-items: center;
+.asi-escena {
+  position: relative;
+}
+
+.asi-media {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 95%, transparent 100%);
 }
 
 .asi-actividades {
   display: grid;
   gap: var(--space-4);
-  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -67,49 +63,31 @@
 }
 
 @media (min-width: 900px) {
-  .asi-video {
-    aspect-ratio: 16 / 9;
-  }
   .asi-encabezado {
     padding-top: var(--band-gap);
   }
-
-  .asi-pie {
-    position: relative;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    justify-items: start;
+  .asi-media {
+    aspect-ratio: 16 / 9;
   }
   .asi-actividades {
     grid-template-columns: repeat(2, minmax(0, 32ch));
     gap: var(--space-8);
   }
-}
 
-.asi-pausa {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--touch-min);
-  height: var(--touch-min);
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--surface-raised);
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform var(--duration-micro) var(--ease-out-quart),
-    border-color var(--duration-micro) var(--ease-out-quart);
-}
-.asi-pausa:focus-visible {
-  outline: 2px solid var(--brand-600);
-  outline-offset: 3px;
-}
-.asi-pausa:active {
-  transform: scale(var(--press-scale));
-}
-@media (hover: hover) and (pointer: fine) {
-  .asi-pausa:hover {
-    border-color: var(--ink);
+  /* Anclada: el cuadro mide lo que se ve bajo la barra; el video llena lo que deja
+     el titular. */
+  .asi-pin[data-video='true'] {
+    height: calc(100svh - var(--lp-nav-h));
+  }
+  .asi-pin[data-video='true'] .asi-encabezado {
+    padding-top: var(--space-8);
+  }
+  .asi-pin[data-video='true'] .asi-escena {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .asi-pin[data-video='true'] .asi-media {
+    height: 100%;
+    aspect-ratio: auto;
   }
 }

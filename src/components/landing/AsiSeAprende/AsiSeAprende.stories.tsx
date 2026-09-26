@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capítulo "Así se aprende en Bursa.": video a sangre de dos celulares con pantallas reales de la app flotando y girando sobre la cinta de la marca (tres giros generados con Higgsfield, unidos en un bucle). Se reproduce solo mientras la sección está en pantalla; un botón lo pausa. Con movimiento reducido no arranca solo: queda el póster y el botón para reproducir.',
+          'Capítulo "Así se aprende en Bursa.": dos celulares con pantallas reales de la app flotan y giran sobre la cinta de la marca (tres giros generados con Higgsfield). En escritorio la sección se ancla y el video avanza con el scroll, como la moneda del héroe; en celular, con movimiento reducido o ahorro de datos se ve el último cuadro como imagen fija.',
       },
     },
   },
