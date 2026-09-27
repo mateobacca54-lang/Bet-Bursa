@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../components/ui/ui.css";
 
 @theme inline {
   /* ─── Map tokens to Tailwind ─── */
@@ -25,7 +26,7 @@
   --color-feedback-wrong:   var(--feedback-wrong);
 
   --font-sans: var(--font-family);
-  --font-editorial: var(--font-serif);
+  --font-display: var(--font-display);
 
   --radius-sm:   var(--radius-sm);
   --radius-md:   var(--radius-md);
@@ -37,7 +38,7 @@
 }
 
 body {
-  background: var(--surface);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--font-family);
   line-height: var(--line-height-normal);
@@ -45,7 +46,7 @@ body {
 
 /* ─── Global utilities ─── */
 
-/* Uppercase tracking for buttons, chips, wordmark */
+/* Solo para rótulos (Eyebrow). Nunca en botones — DESIGN.md §3. */
 .uppercase-tracking {
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
@@ -55,6 +56,17 @@ body {
 .touch-target {
   min-width: var(--touch-min);
   min-height: var(--touch-min);
+}
+
+/* Un elemento enfocado por código (el título de un paso, `Heading focusOnMount`) no muestra
+   anillo: recibe el foco para lectores de pantalla, no para marcar que alguien lo tocó con
+   el teclado. Va ANTES de `:focus-visible` (DESIGN.md §11). */
+[tabindex='-1']:focus {
+  outline: none;
+}
+h1[tabindex='-1']:focus-visible,
+h2[tabindex='-1']:focus-visible {
+  outline: none;
 }
 
 /* Focus visible ring */

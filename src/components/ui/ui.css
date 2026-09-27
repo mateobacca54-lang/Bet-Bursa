@@ -1,0 +1,292 @@
+/* ============================================================
+   ui.css — componentes base de src/components/ui/
+   Ver DESIGN.md §5. Solo tokens de src/styles/tokens.css: nada de
+   valores crudos aquí. Solo se anima transform y opacity
+   (AGENTS.md § Movimiento).
+   ============================================================ */
+
+/* ─── Button (ui-btn) ─── */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-min);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform var(--duration-micro) var(--ease-out-quart);
+}
+.ui-btn:active {
+  transform: scale(var(--press-scale));
+}
+.ui-btn--lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--font-size-lg);
+}
+.ui-btn--full {
+  width: 100%;
+}
+.ui-btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-btn--primary {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--on-brand);
+}
+.ui-btn--secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
+}
+.ui-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-secondary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-btn--primary:hover {
+    background: var(--brand-500);
+    border-color: var(--brand-500);
+  }
+  .ui-btn--secondary:hover {
+    border-color: var(--ink);
+  }
+  .ui-btn--ghost:hover {
+    color: var(--ink);
+  }
+}
+
+/* ─── Card (ui-card) ─── */
+.ui-card {
+  border-radius: var(--radius-lg);
+}
+.ui-card--lg {
+  border-radius: var(--radius-card-lg);
+}
+.ui-card--raised {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-soft);
+}
+.ui-card--sunk {
+  background: var(--paper-sunk);
+}
+.ui-card--ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+.ui-card--pad-sm {
+  padding: var(--space-4);
+}
+.ui-card--pad-md {
+  padding: var(--space-6);
+}
+.ui-card--pad-lg {
+  padding: var(--space-8);
+}
+
+/* ─── Eyebrow (ui-eyebrow) ─── */
+.ui-eyebrow {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+.ui-eyebrow--brand {
+  color: var(--brand-700);
+}
+.ui-eyebrow--muted {
+  color: var(--ink-secondary);
+}
+
+/* ─── Heading (ui-heading) ─── */
+.ui-heading {
+  margin: 0;
+  color: var(--ink);
+  line-height: var(--line-height-tight);
+  text-wrap: balance;
+}
+.ui-heading--display {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+.ui-heading--display.ui-heading--xl {
+  letter-spacing: var(--tracking-display);
+}
+.ui-heading--title {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-bold);
+}
+.ui-heading--xl {
+  font-size: var(--font-size-display-3);
+}
+.ui-heading--lg {
+  font-size: var(--font-size-3xl);
+}
+@media (min-width: 768px) {
+  .ui-heading--lg {
+    font-size: var(--font-size-4xl);
+  }
+}
+.ui-heading--md {
+  font-size: var(--font-size-2xl);
+}
+.ui-heading--sm {
+  font-size: var(--font-size-xl);
+}
+
+/* ─── Choice (ui-choice) ─── */
+.ui-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--duration-micro) var(--ease-out-quart),
+    border-color var(--duration-micro) var(--ease-out-quart),
+    background var(--duration-micro) var(--ease-out-quart);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-choice:hover {
+    transform: translateY(-2px);
+  }
+}
+.ui-choice:active {
+  transform: scale(var(--press-scale));
+}
+.ui-choice--selected {
+  border-color: var(--ink);
+  background: var(--brand-50);
+}
+.ui-choice--correct {
+  border-color: var(--feedback-correct);
+  background: var(--brand-50);
+}
+.ui-choice--wrong {
+  border-color: var(--feedback-wrong);
+  background: var(--paper-sunk);
+}
+.ui-choice--disabled,
+.ui-choice[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.ui-choice__leading {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+.ui-choice__label {
+  flex: 1 1 auto;
+}
+.ui-choice__check {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--feedback-correct);
+}
+
+/* ─── Pill (ui-pill) ─── */
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+.ui-pill--brand {
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+.ui-pill--gold {
+  background: var(--gold-100);
+  color: var(--gold-700);
+}
+.ui-pill--muted {
+  background: var(--paper-sunk);
+  color: var(--ink-secondary);
+}
+.ui-pill__icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ─── Stat (ui-stat) ─── */
+.ui-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.ui-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+.ui-stat__label {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  color: var(--ink-secondary);
+}
+
+/* ─── ProgressBar (ui-progress) ─── */
+.ui-progress-track {
+  width: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--paper-sunk);
+  overflow: hidden;
+}
+.ui-progress-track--thin {
+  height: 6px;
+}
+.ui-progress-track--medium {
+  height: 10px;
+}
+.ui-progress-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  background: var(--brand-600);
+  border-radius: var(--radius-pill);
+  transition: transform var(--duration-scene) var(--ease-out-expo);
+}
+
+/* ─── Movimiento reducido: mismas reglas de AnimatedComparator ─── */
+@media (prefers-reduced-motion: reduce) {
+  .ui-btn,
+  .ui-choice,
+  .ui-progress-fill {
+    transition: none;
+  }
+}

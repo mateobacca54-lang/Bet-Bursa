@@ -25,13 +25,18 @@
   --feedback-correct: var(--brand-600);
   --feedback-wrong:   var(--brand-800);
 
-  /* ─── Superficies ─── */
-  --surface:        #F2F4F7;
+  /* ─── Superficies ───
+     Manual de marca (Figma, 05 · Color): "Papel es el fondo de la app. Blanco, tarjetas
+     sobre papel." El gris frío #F2F4F7 hacía que la app se viera como otro producto
+     al salir de la portada; desde el 2026-09-27 --surface ES el papel. */
+  --surface:        #FBF7F1;  /* = --paper */
   --surface-raised: #FFFFFF;
 
-  /* ─── Tinta ─── */
+  /* ─── Tinta ───
+     --ink-secondary era un gris frío (#5B6478) que sobre papel cálido se ve sucio.
+     Ahora es la misma tinta al 66 %, igual que --ink-soft (contraste 6,05 sobre papel). */
   --ink:           #0A0F1C;
-  --ink-secondary: #5B6478;
+  --ink-secondary: color-mix(in srgb, #0A0F1C 66%, transparent);
   --on-brand:      #0A0F1C;
 
   /* ─── Tonos de Monedita (añadidos 2026-09-21, aprobados por el dueño) ───
@@ -83,7 +88,8 @@
   --ink-soft:    color-mix(in srgb, var(--ink) 66%, transparent);
 
   /* ─── Bordes ─── */
-  --border: #D7DCE3;
+  /* Antes #D7DCE3 (gris frío). Ahora la tinta al 14 %: se tiñe del fondo que tenga debajo. */
+  --border: color-mix(in srgb, #0A0F1C 14%, transparent);
   --border-warm: #E3D6C3;
   /* Filo apenas visible para tarjetas blancas sobre papel: sin él flotan sin apoyarse;
      con una sombra fuerte parecen recortadas y pegadas encima. */
@@ -115,10 +121,10 @@
   /* ─── Tipografía ─── */
   --font-family: var(--font-montserrat), 'Montserrat', sans-serif;
   --font-serif: Georgia, Cambria, 'Times New Roman', serif;
-  /* Titulares grandes de la landing, y NADA más (añadido 2026-09-26). Montserrat sigue
-     siendo la voz de todo el producto; esta es la voz de portada. Se deja fuera del
-     producto a propósito: dentro de una lección, dos tipografías compiten por atención
-     que le pertenece al ejercicio. */
+  /* Titulares y cifras grandes EN TODA LA APP (manual de marca, Figma 06 · Tipografía:
+     "Bricolage Grotesque: titulares, cifras grandes y el wordmark. Montserrat: texto,
+     botones y etiquetas"). Hasta el 2026-09-26 solo la usaba la landing, y por eso la
+     app se sentía otra marca. Ver DESIGN.md §3. */
   --font-display: var(--font-bricolage), 'Bricolage Grotesque', var(--font-family);
   --font-size-xs:   0.75rem;   /* 12px */
   --font-size-sm:   0.875rem;  /* 14px */
@@ -167,7 +173,8 @@
   /* ─── Landing v3: "La galería de tu plata" (añadido 2026-09-26) ───
      Aprobado por el dueño el 26 de septiembre ("desarrolla todo" sobre
      docs/PLAN-LANDING-V3.md §4). PENDIENTE de reconciliar con Claude Design.
-     Solo la landing los usa: la app sigue con su escala. */
+     Desde el 2026-09-27 la app también los usa para sus titulares de pantalla
+     (DESIGN.md §3): la misma voz de portada en todo el recorrido. */
   --font-size-display-1: clamp(3.5rem, 7.5vw, 7.5rem);   /* 56–120px, titular del héroe */
   --font-size-display-2: clamp(2.75rem, 5vw, 5rem);      /* 44–80px, titulares de capítulo */
   --font-size-display-3: clamp(2rem, 3.2vw, 3rem);       /* 32–48px, titulares de tarjeta */
