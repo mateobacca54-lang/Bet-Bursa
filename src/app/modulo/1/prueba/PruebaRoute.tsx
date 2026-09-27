@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MODULO_1 } from '@/content/modulo-1/temario';
 import { nombreModulo } from '@/content/modulos';
@@ -8,6 +7,7 @@ import { PRUEBA_MODULO_1 } from '@/content/modulo-1/prueba';
 import { getNextLesson } from '@/lib/progress';
 import { useProgress } from '@/lib/useProgress';
 import { PruebaDePaso } from '@/components/prueba';
+import { Button, Heading } from '@/components/ui';
 
 const PATH_HREF = '/modulo/1';
 
@@ -20,28 +20,15 @@ function Aside({ title, body }: { title: string; body: string }) {
         display: 'grid',
         placeItems: 'center',
         padding: 'var(--space-8) var(--space-4)',
-        background: 'var(--surface)',
+        background: 'var(--paper)',
       }}
     >
-      <div style={{ maxWidth: 480, textAlign: 'center' }}>
-        <h1 style={{ margin: '0 0 var(--space-3) 0', fontSize: 'var(--font-size-2xl)', color: 'var(--ink)' }}>{title}</h1>
-        <p style={{ margin: '0 0 var(--space-6) 0', color: 'var(--ink-secondary)', lineHeight: 'var(--line-height-normal)' }}>{body}</p>
-        <Link
-          href={PATH_HREF}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            minHeight: 'var(--touch-min)',
-            padding: 'var(--space-3) var(--space-8)',
-            borderRadius: 'var(--radius-pill)',
-            background: 'var(--brand-600)',
-            color: 'var(--on-brand)',
-            fontWeight: 'var(--font-weight-semibold)',
-            textDecoration: 'none',
-          }}
-        >
-          Volver al camino
-        </Link>
+      <div style={{ maxWidth: 480, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', alignItems: 'center' }}>
+        <Heading level={1} variant="display" size="md">
+          {title}
+        </Heading>
+        <p style={{ margin: 0, color: 'var(--ink-soft)', lineHeight: 'var(--line-height-normal)' }}>{body}</p>
+        <Button href={PATH_HREF}>Volver al camino</Button>
       </div>
     </main>
   );

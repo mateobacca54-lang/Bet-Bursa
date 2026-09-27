@@ -31,9 +31,21 @@
   align-items: center;
   gap: var(--space-2) var(--space-4);
   padding: var(--space-3) var(--space-4);
-  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  background: var(--paper);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.bursa-header-module-label {
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--ink);
+}
+
+.bursa-header-module-count {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  color: var(--ink-soft);
 }
 
 .bursa-header-brand {
@@ -100,7 +112,7 @@
 /* En táctil el :hover se queda pegado tras el toque: solo con puntero fino. */
 @media (hover: hover) and (pointer: fine) {
   .bursa-nav-item:hover:not([aria-disabled='true']) {
-    background: var(--surface);
+    background: var(--paper-sunk);
     color: var(--ink);
   }
 }
@@ -129,8 +141,8 @@
     height: 100vh;
     height: 100dvh;
     padding: var(--space-4) var(--space-3);
-    background: var(--surface-raised);
-    border-right: 1px solid var(--border);
+    background: var(--paper);
+    border-right: 1px solid var(--border-hairline);
   }
 
   .bursa-header-brand {
@@ -153,4 +165,32 @@
   .bursa-content {
     padding: var(--space-12) var(--space-8) var(--space-16);
   }
+}
+
+/* ─── Titular de pantalla de app (DESIGN.md §3): Bricolage, display-3, tracking-display ─── */
+.bursa-screen-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-display-3);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.bursa-screen-title em {
+  font-style: normal;
+  color: var(--brand-700);
+}
+
+/* ─── Título de sección dentro de una pantalla de app (más chico que el titular
+   de pantalla: "Módulo en curso", "Tu camino") ─── */
+.bursa-section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-2xl);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--line-height-tight);
+  color: var(--ink);
 }

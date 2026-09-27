@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import type { GreetingData } from '@/lib/greeting';
 import type { TemarioEntry } from '@/content/modulo-1/temario';
 import { variants } from '@/lib/motion';
 import { Reveal } from '@/components/motion';
+import { Button } from '@/components/ui';
 import RollingNumber from './RollingNumber';
 import SpacedReview from './SpacedReview';
 import Mision from './Mision';
@@ -62,17 +62,7 @@ export default function Greeting({ data, lessons, ctaHref, onReviewed, mision, o
         margin: '0 auto',
       }}
     >
-      <h1
-        id="saludo-titulo"
-        style={{
-          margin: 0,
-          fontSize: 'clamp(var(--font-size-3xl), 5vw, var(--font-size-4xl))',
-          fontWeight: 'var(--font-weight-bold)',
-          lineHeight: 'var(--line-height-tight)',
-          color: 'var(--ink)',
-          textWrap: 'balance',
-        }}
-      >
+      <h1 id="saludo-titulo" className="bursa-screen-title">
         <Reveal
           as="span"
           style={{ display: title.name ? 'inline-block' : 'inline', whiteSpace: title.name ? 'pre' : 'normal' }}
@@ -147,37 +137,25 @@ export default function Greeting({ data, lessons, ctaHref, onReviewed, mision, o
           <motion.div
             whileHover={reduced ? undefined : variants.hoverLift}
             whileTap={reduced ? undefined : { scale: 0.98 }}
+            style={{ display: 'inline-block' }}
           >
-            <Link
+            <Button
               href={ctaHref}
-              className="uppercase-tracking"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-3)',
-                minHeight: 'var(--touch-min)',
-                padding: 'var(--space-3) var(--space-8)',
-                background: 'var(--brand-600)',
-                color: 'var(--on-brand)',
-                borderRadius: 'var(--radius-pill)',
-                boxShadow: 'var(--shadow-md)',
-                fontSize: 'var(--font-size-base)',
-                fontWeight: 'var(--font-weight-semibold)',
-                textDecoration: 'none',
-              }}
+              size="lg"
+              iconRight={
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+                  <path
+                    d="M5 12h14m-5-6 6 6-6 6"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
             >
               {copy.cta}
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-                <path
-                  d="M5 12h14m-5-6 6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
+            </Button>
           </motion.div>
         </Reveal>
       </motion.div>

@@ -17,11 +17,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Lección 1 — clasificar trueque vs. dinero. Al final pregunta el nombre (solo la primera vez). */
+/**
+ * Lección 1 — seis pasos (DESIGN.md §8): gancho → tu apuesta → la idea → un ejemplo de
+ * tu día → ahora tú (clasificar trueque vs. dinero) → lo que te llevas. Al final pregunta
+ * el nombre (solo la primera vez).
+ */
 export const Leccion1: Story = { args: { entry: entry(1), content: content(1), askName: true, onName: () => {} } };
 
-/** Lección 2 — slider de inflación. */
+/** Lección 2 — slider de inflación en "Ahora tú"; el esquema de "Un ejemplo de tu día" se arma en dos etapas. */
 export const Leccion2: Story = { args: { entry: entry(2), content: content(2) } };
 
-/** Lección 3 — predecir el interés compuesto antes de verlo. */
+/** Lección 3 — apuesta por interés simple vs. compuesto antes de verlo; el esquema dibuja la recta y la curva. */
 export const Leccion3: Story = { args: { entry: entry(3), content: content(3) } };

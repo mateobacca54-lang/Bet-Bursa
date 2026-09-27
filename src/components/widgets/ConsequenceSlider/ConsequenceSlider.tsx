@@ -2,8 +2,12 @@
 
 import { Objeto } from '@/components/illus';
 import { useState, useMemo, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import type { BursaWidgetProps, ConsequenceSliderConfig, WidgetState } from '@/lib/types';
 import { calculateInflatedPrice, formatCOP } from '@/lib/format';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { SPRING_SOFT } from '@/lib/motion';
+import { Button } from '@/components/ui';
 import { WidgetShell } from '../shared';
 import SliderTrack from './SliderTrack';
 import LiveVisualization from './LiveVisualization';
@@ -23,6 +27,7 @@ export default function ConsequenceSlider({
   onAttempt,
   disabled = false,
 }: BursaWidgetProps<ConsequenceSliderConfig, number>) {
+  const reduced = usePrefersReducedMotion();
   const [currentValue, setCurrentValue] = useState(config.startValue);
 
   // Pre-calcular los datos de inflación
@@ -83,12 +88,22 @@ export default function ConsequenceSlider({
       hintMessage={`Pista: fíjate en el precio cuando se acerca a ${formatCOP(config.targetPrice)}.`}
       onStateChange={onStateChange}
     >
-      {({ state, setState }) => (
+      {({ state, setState }) => {
+        // Cuánto ha subido el precio respecto al inicio: el objeto crece un poco con él,
+        // así se VE que cuesta más, no solo se lee (tope 1.5x para que no se desborde).
+        const growth = Math.min(1.5, Math.max(1, currentPrice / config.basePrice));
+        return (
         <div>
           {/* El objeto cuyo precio sube: se ve QUÉ se está comprando, no solo una cifra */}
           {config.visual && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-2)' }}>
-              <Objeto id={config.visual} size={64} />
+              <motion.div
+                aria-hidden="true"
+                animate={{ scale: reduced ? 1 : growth }}
+                transition={SPRING_SOFT}
+              >
+                <Objeto id={config.visual} size={64} />
+              </motion.div>
             </div>
           )}
 
@@ -116,51 +131,17 @@ export default function ConsequenceSlider({
             />
           </div>
 
-          {/* Botón Verificar */}
+          {/* Botón Comprobar */}
           {state !== 'correct' && state !== 'revealed' && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginTop: 'var(--space-6)',
-              }}
-            >
-              <button
-                onClick={() => handleVerify(setState)}
-                disabled={disabled}
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--font-size-base)',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  color: 'var(--on-brand)',
-                  background: 'var(--brand-600)',
-                  border: 'none',
-                  borderRadius: 'var(--radius-pill)',
-                  padding: 'var(--space-3) var(--space-8)',
-                  cursor: disabled ? 'not-allowed' : 'pointer',
-                  transition: 'background var(--transition-fast), transform var(--transition-fast)',
-                  minHeight: 'var(--touch-min)',
-                  letterSpacing: 'var(--tracking-wide)',
-                  textTransform: 'uppercase' as const,
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-                onMouseEnter={(e) => {
-                  if (!disabled) {
-                    e.currentTarget.style.background = 'var(--brand-700)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'var(--brand-600)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                Verificar
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-6)' }}>
+              <Button onClick={() => handleVerify(setState)} disabled={disabled}>
+                Comprobar
+              </Button>
             </div>
           )}
         </div>
-      )}
+        );
+      }}
     </WidgetShell>
   );
 }

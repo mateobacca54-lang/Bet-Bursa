@@ -1,0 +1,22 @@
+/* ============================================================
+   path.css — el camino de aprendizaje (/modulo/1).
+   Solo valores de tokens.css. El héroe oscuro (--ink) es el único bloque
+   así en esta pantalla (DESIGN.md §2); este archivo solo le da el aire
+   generoso y el radio grande que tiene el héroe de la portada.
+   ============================================================ */
+
+.path-ink-hero {
+  padding: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .path-ink-hero {
+    padding: var(--space-6);
+  }
+}
+
+@media (min-width: 900px) {
+  .path-ink-hero {
+    padding: var(--space-8);
+  }
+}

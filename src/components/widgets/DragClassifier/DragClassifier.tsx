@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion, useAnimationControls } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { AnimatePresence, motion, useAnimationControls } from 'framer-motion';
 import type { BursaWidgetProps, DragClassifierConfig, DragItem, WidgetState } from '@/lib/types';
-import { DURATION, EASE_OUT_EXPO, SPRING_DRAG, variants } from '@/lib/motion';
+import { DURATION, EASE_OUT_EXPO, EASE_OUT_QUART, SPRING_DRAG, variants } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { MAX_MISSES_PER_ITEM, correctZoneId, pickZoneAt, type ZoneRect } from '@/lib/widget-math';
 import { WidgetShell } from '../shared';
@@ -238,7 +238,7 @@ function Board({ config, state, setState, onAttempt, disabled }: BoardProps) {
                 padding: 'var(--space-3)',
                 borderRadius: 'var(--radius-md)',
                 border: `2px dashed ${highlighted || armed ? 'var(--brand-600)' : 'var(--border)'}`,
-                background: highlighted ? 'var(--brand-50)' : 'var(--surface)',
+                background: highlighted ? 'var(--brand-50)' : 'var(--paper-sunk)',
                 color: 'var(--ink)',
                 cursor: armed ? 'pointer' : 'default',
                 transition: 'background var(--transition-fast), border-color var(--transition-fast)',
@@ -258,20 +258,40 @@ function Board({ config, state, setState, onAttempt, disabled }: BoardProps) {
       </div>
 
       {/* Feedback por ítem (también lo anuncia el lector de pantalla) */}
-      <p
-        role="status"
-        aria-live="polite"
-        style={{
-          margin: 'var(--space-4) 0 0 0',
-          minHeight: '3em',
-          fontSize: 'var(--font-size-base)',
-          lineHeight: 'var(--line-height-normal)',
-          color: 'var(--ink-secondary)',
-        }}
-      >
-        {message}
-      </p>
+      <div role="status" aria-live="polite" style={{ margin: 'var(--space-4) 0 0 0', minHeight: '3em' }}>
+        <AnimatePresence mode="wait">
+          {message && (
+            <ExplanationPop key={message}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 'var(--font-size-base)',
+                  lineHeight: 'var(--line-height-normal)',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                {message}
+              </p>
+            </ExplanationPop>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
+  );
+}
+
+/** La explicación de cada ítem "pop-in": entra con un salto corto, se lee como un logro chico. */
+function ExplanationPop({ children }: { children: ReactNode }) {
+  const reduced = usePrefersReducedMotion();
+  return (
+    <motion.div
+      initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 4 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+      transition={{ duration: reduced ? 0 : DURATION.element, ease: EASE_OUT_QUART }}
+    >
+      {children}
+    </motion.div>
   );
 }
 
@@ -292,6 +312,7 @@ interface ItemCardProps {
 function ItemCard({ item, selected, disabled, shakeSignal, registerRef, onSelect, onDragStart, onDragMove, onDragEnd }: ItemCardProps) {
   const reduced = usePrefersReducedMotion();
   const controls = useAnimationControls();
+  const [isDragging, setIsDragging] = useState(false);
 
   // Cada tarjeta nueva entra desde abajo (12 px); con reduced-motion aparece sin moverse.
   useEffect(() => {
@@ -318,9 +339,15 @@ function ItemCard({ item, selected, disabled, shakeSignal, registerRef, onSelect
       whileDrag={{ scale: 1.04, zIndex: 20 }}
       initial={{ opacity: 0, y: reduced ? 0 : 12 }}
       animate={controls}
-      onDragStart={onDragStart}
+      onDragStart={() => {
+        setIsDragging(true);
+        onDragStart();
+      }}
       onDrag={(_, info) => onDragMove(info.point.x - window.scrollX, info.point.y - window.scrollY)}
-      onDragEnd={(_, info) => onDragEnd(info.point.x - window.scrollX, info.point.y - window.scrollY)}
+      onDragEnd={(_, info) => {
+        setIsDragging(false);
+        onDragEnd(info.point.x - window.scrollX, info.point.y - window.scrollY);
+      }}
       style={{
         fontFamily: 'var(--font-family)',
         fontSize: 'var(--font-size-base)',
@@ -330,7 +357,7 @@ function ItemCard({ item, selected, disabled, shakeSignal, registerRef, onSelect
         background: selected ? 'var(--brand-50)' : 'var(--surface-raised)',
         border: `2px solid ${selected ? 'var(--brand-600)' : 'var(--border)'}`,
         borderRadius: 'var(--radius-md)',
-        boxShadow: 'var(--shadow-sm)',
+        boxShadow: isDragging ? 'var(--shadow-md)' : 'var(--shadow-sm)',
         padding: 'var(--space-3) var(--space-4)',
         minHeight: 'var(--touch-min)',
         maxWidth: '100%',

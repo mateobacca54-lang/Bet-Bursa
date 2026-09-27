@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import type { BursaWidgetProps, ElegirConfig } from '@/lib/types';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { DURATION, EASE_OUT_QUART } from '@/lib/motion';
+import { Card } from '@/components/ui';
 import { MoneditaGuide } from '@/components/widgets/shared';
 
 /**
@@ -62,17 +63,7 @@ export default function Elegir({
   const opcionElegida = elegida ? config.options.find((o) => o.id === elegida) : null;
 
   return (
-    <div
-      style={{
-        background: 'var(--surface-raised)',
-        borderRadius: 'var(--radius-md)',
-        boxShadow: 'var(--shadow-md)',
-        padding: 'var(--space-8)',
-        maxWidth: 640,
-        width: '100%',
-        margin: '0 auto',
-      }}
-    >
+    <Card variant="raised" pad="lg" style={{ maxWidth: 640, width: '100%', margin: '0 auto' }}>
       <MoneditaGuide
         compact
         state={elegida ? 'correct' : 'idle'}
@@ -126,7 +117,7 @@ export default function Elegir({
                 background: activa ? 'var(--brand-50)' : 'var(--surface)',
                 cursor: !armed && !activa ? 'default' : 'pointer',
                 opacity: !armed && !activa ? 0.5 : 1,
-                boxShadow: activa ? '0 8px 18px rgba(244, 80, 27, 0.14)' : 'none',
+                boxShadow: activa ? 'var(--shadow-sm)' : 'none',
                 transition: 'border-color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast)',
               }}
             >
@@ -159,7 +150,7 @@ export default function Elegir({
             padding: 'var(--space-4) var(--space-5)',
             borderRadius: 'var(--radius-md)',
             borderLeft: '4px solid var(--brand-600)',
-            background: 'var(--sand-100, var(--surface))',
+            background: 'var(--brand-50)',
             color: 'var(--ink)',
             fontSize: 'var(--font-size-sm)',
             lineHeight: 'var(--line-height-normal)',
@@ -168,6 +159,6 @@ export default function Elegir({
           {opcionElegida.reflexion}
         </motion.p>
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import NumberFlow from '@number-flow/react';
 import type { Indicador, IndicadorId } from '@/lib/indicadores/types';
 import { RESPALDO, META_INFLACION } from '@/lib/indicadores/respaldo';
 import { formatearPorcentaje, formatearValorIndicador } from '@/lib/indicadores/formato';
@@ -81,7 +82,13 @@ export default function DatoReal({ indicadores }: { indicadores: IndicadorId[] }
           return (
             <li key={ind.id} className="dato-real-tarjeta">
               <p className="dato-real-etiqueta">{ETIQUETA[ind.id]}</p>
-              <p className="dato-real-valor">{v}</p>
+              <p className="dato-real-valor">
+                {ind.id === 'trm' ? (
+                  <NumberFlow value={ind.valor as number} format={{ style: 'currency', currency: 'COP', maximumFractionDigits: 0 }} locales="es-CO" />
+                ) : (
+                  <NumberFlow value={ind.valor as number} format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }} locales="es-CO" suffix=" %" />
+                )}
+              </p>
               <p className="dato-real-frase">{frase(ind, v)}</p>
               <p className="dato-real-fuente">
                 {ind.periodo} ·{' '}

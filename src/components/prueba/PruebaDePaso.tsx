@@ -9,6 +9,7 @@ import { evaluarPrueba, barajar, umbralAprobar, type ResultadoPrueba } from '@/l
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { DURATION, EASE_OUT_EXPO, variants } from '@/lib/motion';
 import ProgressBar from '@/components/shell/ProgressBar';
+import { Button, Choice, Eyebrow, Stat } from '@/components/ui';
 import './prueba.css';
 
 interface PruebaDePasoProps {
@@ -124,15 +125,13 @@ export default function PruebaDePaso({ situaciones, moduleNumber, moduleTitle, e
               transition={transition}
               className="pp-intro"
             >
-              <span className="pp-etiqueta">Prueba de {moduleTitle}</span>
+              <Eyebrow tone="brand">Prueba de {moduleTitle}</Eyebrow>
               <h1 className="pp-titulo">¿Qué tanto quedó de «{moduleTitle}»?</h1>
               <p className="pp-lead">
                 Son {total} situaciones reales, no preguntas de examen. Sin reloj. Si alguna falla, te digo
                 exactamente qué repasar y puedes volver a intentarlo cuando quieras — sin límite.
               </p>
-              <button type="button" className="pp-btn pp-btn--principal" onClick={empezar}>
-                Empezar
-              </button>
+              <Button onClick={empezar}>Empezar</Button>
             </motion.div>
           )}
 
@@ -145,23 +144,18 @@ export default function PruebaDePaso({ situaciones, moduleNumber, moduleTitle, e
               transition={transition}
             >
               <p className="pp-situacion">{actual.situacion}</p>
-              <div role="radiogroup" aria-label={actual.situacion} className="pp-opciones">
+              <div role="group" aria-label={actual.situacion} className="pp-opciones">
                 {actual.opciones.map((op) => {
                   const marcada = elegidaActual === op.id;
+                  const bloqueada = elegidaActual !== null && !marcada;
                   return (
-                    <button
+                    <Choice
                       key={op.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={marcada}
-                      disabled={elegidaActual !== null && !marcada}
-                      className="pp-opcion"
-                      data-elegida={marcada}
+                      state={bloqueada ? 'disabled' : marcada ? 'selected' : 'idle'}
                       onClick={() => elegir(op.id)}
                     >
-                      <span className="pp-punto" aria-hidden="true" />
                       {op.texto}
-                    </button>
+                    </Choice>
                   );
                 })}
               </div>
@@ -224,13 +218,11 @@ function Aprobado({
         <Image src="/monedita/monedita.webp" alt="" width={96} height={102} style={{ height: 'auto' }} />
       </motion.div>
       <h1 className="pp-titulo">Aprobaste la prueba de {moduleTitle}.</h1>
+      <Stat value={aciertos} suffix={` de ${total}`} label="Respondiste bien" />
       <p className="pp-lead">
-        Respondiste bien {aciertos} de {total}. Ya entiendes cómo funciona esto — no de memoria: lo pensaste en
-        situaciones reales.
+        Ya entiendes cómo funciona esto — no de memoria: lo pensaste en situaciones reales.
       </p>
-      <button type="button" className="pp-btn pp-btn--principal" onClick={onContinuar}>
-        Seguir
-      </button>
+      <Button onClick={onContinuar}>Seguir</Button>
     </div>
   );
 }
@@ -262,9 +254,9 @@ function NoAprobado({
 
   return (
     <div className="pp-resultado">
-      <span className="pp-etiqueta">
+      <Eyebrow tone="brand">
         {resultado.aciertos} de {resultado.total} · se necesitaban {umbral}
-      </span>
+      </Eyebrow>
       <h1 className="pp-titulo">Todavía no. Repasemos esto antes de volver a intentarlo.</h1>
       <p className="pp-lead">
         No se trata de acertar de una vez: se trata de que quede claro. Esto es lo que conviene mirar de nuevo.
@@ -273,7 +265,7 @@ function NoAprobado({
       <div className="pp-repasos">
         {temas.map((t) => (
           <div key={t.leccion} className="pp-repaso">
-            <span className="pp-etiqueta">Repaso de 30 segundos · lección {t.leccion}</span>
+            <Eyebrow tone="brand">Repaso de 30 segundos · lección {t.leccion}</Eyebrow>
             <p className="pp-repaso-tema">{t.tema}</p>
             {conceptoDe(t.leccion) && <p className="pp-repaso-situacion">{conceptoDe(t.leccion)}</p>}
           </div>
@@ -281,12 +273,10 @@ function NoAprobado({
       </div>
 
       <div className="pp-acciones">
-        <button type="button" className="pp-btn pp-btn--principal" onClick={onReintentar}>
-          Reintentar
-        </button>
-        <Link href={exitHref} className="pp-btn">
+        <Button onClick={onReintentar}>Reintentar</Button>
+        <Button href={exitHref} variant="secondary">
           Volver más tarde
-        </Link>
+        </Button>
       </div>
     </div>
   );

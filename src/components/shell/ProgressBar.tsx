@@ -30,7 +30,7 @@ export default function ProgressBar({ value, max, label, height = 8 }: ProgressB
       style={{
         height,
         width: '100%',
-        background: 'var(--border)',
+        background: 'var(--paper-sunk)',
         borderRadius: 'var(--radius-pill)',
         overflow: 'hidden',
       }}
@@ -43,7 +43,7 @@ export default function ProgressBar({ value, max, label, height = 8 }: ProgressB
           height: '100%',
           width: '100%',
           transformOrigin: 'left center',
-          background: 'linear-gradient(90deg, var(--brand-500), var(--brand-600))',
+          background: 'var(--brand-600)',
           borderRadius: 'var(--radius-pill)',
         }}
       />

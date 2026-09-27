@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { variants } from '@/lib/motion';
 import type { InicioModuleCard } from '@/lib/inicio';
 import { ProgressBar } from '@/components/shell';
+import { Button, Pill } from '@/components/ui';
 import './inicio.css';
 
 interface ModuleCardProps {
@@ -47,24 +47,30 @@ export default function ModuleCard({ card, title, blurb }: ModuleCardProps) {
       <p className="ini-card-blurb">{blurb}</p>
 
       <div className="ini-card-foot">
-        {status === 'soon' && <span className="ini-chip" style={{ alignSelf: 'flex-start' }}>Próximamente</span>}
+        {status === 'soon' && (
+          <Pill tone="muted" className="ini-card-pill">
+            Próximamente
+          </Pill>
+        )}
 
         {(status === 'in-progress' || status === 'complete') && completed !== null && total !== null && (
           <div className="ini-card-progress">
-            <span className="ini-chip">{status === 'complete' ? 'Módulo completo' : `Llevas ${completed} de ${total}`}</span>
+            <Pill tone={status === 'complete' ? 'gold' : 'brand'}>
+              {status === 'complete' ? 'Módulo completo' : `Llevas ${completed} de ${total}`}
+            </Pill>
             <ProgressBar value={completed} max={total} label={`Progreso de ${title}`} />
           </div>
         )}
 
         {status !== 'soon' && href && (
           <div>
-            <Link
+            <Button
               href={href}
-              className={`ini-btn uppercase-tracking ${status === 'complete' ? 'ini-btn--quiet' : ''}`}
+              variant={status === 'complete' ? 'secondary' : 'primary'}
               aria-label={`${CTA_LABEL[status]}: ${title}`}
             >
               {CTA_LABEL[status]}
-            </Link>
+            </Button>
           </div>
         )}
       </div>

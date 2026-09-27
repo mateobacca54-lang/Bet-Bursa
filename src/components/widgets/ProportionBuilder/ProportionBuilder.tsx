@@ -2,10 +2,12 @@
 
 import { useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import NumberFlow from '@number-flow/react';
 import type { BursaWidgetProps, ProportionBuilderConfig } from '@/lib/types';
 import { initialProportions, proportionLimits, redistributeProportions, savingsIndex } from '@/lib/proporciones';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { DURATION, EASE_OUT_QUART } from '@/lib/motion';
+import { Button } from '@/components/ui';
 import { WidgetShell } from '../shared';
 
 /** Repartir. Arrastrar una fila cambia su porcentaje respecto al inicio del gesto.
@@ -33,7 +35,9 @@ export default function ProportionBuilder({ config, disabled = false, locale = '
         };
         return (
           <div style={{ display: 'grid', gap: 'var(--space-4)', color: 'var(--ink)', fontFamily: 'var(--font-family)' }}>
-            <strong data-testid="proportion-total">{money(100)} · {values.reduce((a, b) => a + b, 0)} %</strong>
+            <strong data-testid="proportion-total" style={{ fontFamily: 'var(--font-display)' }}>
+              {money(100)} · {values.reduce((a, b) => a + b, 0)} %
+            </strong>
             <div aria-hidden="true" style={{ position: 'relative', height: 'var(--touch-min)', overflow: 'hidden', borderRadius: 'var(--radius-sm)' }}>
               {config.categories.map((category, i) => (
                 <motion.div key={category.id} initial={false}
@@ -80,21 +84,28 @@ export default function ProportionBuilder({ config, disabled = false, locale = '
                     }}
                     onLostPointerCapture={() => { drag.current = null; setDragging(false); }}
                     onPointerCancel={() => { drag.current = null; setDragging(false); }}
-                    style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', width: '100%', minHeight: 'var(--touch-min)', padding: 'var(--space-3)', border: 0, borderLeft: `var(--space-2) solid var(${category.colorToken})`, borderRadius: 'var(--radius-sm)', background: 'var(--surface)', color: 'var(--ink)', fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-base)', textAlign: 'left', cursor: locked ? 'default' : 'ew-resize', touchAction: 'pan-y', userSelect: 'none', overflowWrap: 'anywhere' }}>
+                    style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', width: '100%', minHeight: 'var(--touch-min)', padding: 'var(--space-3)', border: 0, borderLeft: `var(--space-2) solid var(${category.colorToken})`, borderRadius: 'var(--radius-sm)', background: 'var(--paper-sunk)', color: 'var(--ink)', fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-base)', textAlign: 'left', cursor: locked ? 'default' : 'ew-resize', touchAction: 'pan-y', userSelect: 'none', overflowWrap: 'anywhere' }}>
                     <span>{category.label}</span>
-                    <span style={{ fontWeight: 'var(--font-weight-semibold)', fontVariantNumeric: 'tabular-nums' }}>{values[i]} % · {money(values[i])}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--space-1)', fontWeight: 'var(--font-weight-semibold)', fontVariantNumeric: 'tabular-nums' }}>
+                      <NumberFlow value={values[i]} format={{ maximumFractionDigits: 0 }} locales={locale} suffix=" %" />
+                      <span aria-hidden="true">·</span>
+                      <NumberFlow value={(config.totalAmount * values[i]) / 100} format={{ style: 'currency', currency: 'COP', maximumFractionDigits: 0 }} locales={locale} />
+                    </span>
                   </button>
                 );
               })}
             </div>
-            <button type="button" disabled={locked} onClick={() => {
-              if (locked) return;
-              const correct = values[savings] >= config.savingsMinPercent;
-              setState(correct ? 'correct' : 'wrong');
-              onAttempt?.(Object.fromEntries(config.categories.map((c, i) => [c.id, values[i]])), correct);
-            }} style={{ minHeight: 'var(--touch-min)', padding: 'var(--space-3) var(--space-4)', border: 0, borderRadius: 'var(--radius-pill)', background: 'var(--brand-600)', color: 'var(--on-brand)', fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)', cursor: locked ? 'default' : 'pointer' }}>
+            <Button
+              disabled={locked}
+              onClick={() => {
+                if (locked) return;
+                const correct = values[savings] >= config.savingsMinPercent;
+                setState(correct ? 'correct' : 'wrong');
+                onAttempt?.(Object.fromEntries(config.categories.map((c, i) => [c.id, values[i]])), correct);
+              }}
+            >
               {state === 'correct' ? 'Reparto confirmado' : 'Confirmar reparto'}
-            </button>
+            </Button>
           </div>
         );
       }}

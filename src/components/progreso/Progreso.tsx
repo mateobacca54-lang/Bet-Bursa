@@ -9,6 +9,7 @@ import { getCurrentStreak, type ModuleProgress } from '@/lib/progress';
 import { getProgresoView, type ModuloResumen } from '@/lib/progreso';
 import { Reveal } from '@/components/motion';
 import { AppShell, Mision } from '@/components/shell';
+import { Button, Eyebrow, Pill } from '@/components/ui';
 
 const SIGUIENTE = { number: MODULO_2_PREVIEW.number, title: MODULO_2_PREVIEW.title };
 
@@ -16,7 +17,7 @@ const ESTILO_NODO: Record<ModuloResumen['status'], { background: string; border:
   complete: { background: 'var(--brand-600)', border: '2px solid var(--brand-400)' },
   'in-progress': { background: 'var(--surface-raised)', border: '3px solid var(--brand-500)' },
   start: { background: 'var(--surface-raised)', border: '2px solid var(--border)' },
-  soon: { background: 'var(--ink)', border: '2px dashed var(--ink-secondary)' },
+  soon: { background: 'var(--paper-sunk)', border: '2px dashed var(--ink-soft)' },
 };
 
 interface ProgresoProps {
@@ -31,18 +32,10 @@ interface ProgresoProps {
 
 function SeccionTitulo({ children }: { children: string }) {
   return (
-    <h2
-      className="uppercase-tracking"
-      style={{
-        margin: '0 0 var(--space-4)',
-        fontSize: 'var(--font-size-xs)',
-        fontWeight: 'var(--font-weight-semibold)',
-        color: 'var(--brand-700)',
-        borderTop: '1px solid var(--border)',
-        paddingTop: 'var(--space-6)',
-      }}
-    >
-      {children}
+    <h2 style={{ margin: '0 0 var(--space-4)', borderTop: '1px solid var(--border-hairline)', paddingTop: 'var(--space-6)' }}>
+      <Eyebrow as="span" tone="brand">
+        {children}
+      </Eyebrow>
     </h2>
   );
 }
@@ -81,7 +74,7 @@ function NodoModulo({ modulo }: { modulo: ModuloResumen }) {
         style={{
           fontSize: 'var(--font-size-xs)',
           fontWeight: 'var(--font-weight-semibold)',
-          color: modulo.status === 'soon' ? 'var(--ink-secondary)' : 'var(--ink)',
+          color: modulo.status === 'soon' ? 'var(--ink-soft)' : 'var(--ink)',
         }}
       >
         {modulo.status === 'soon' ? 'Próximamente' : modulo.title}
@@ -107,20 +100,18 @@ function FilaModulo({ modulo }: { modulo: ModuloResumen }) {
         justifyContent: 'space-between',
         gap: 'var(--space-4)',
         padding: 'var(--space-3) 0',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border-hairline)',
       }}
     >
       <span style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--ink)' }}>
         {modulo.title}
       </span>
       {modulo.status === 'soon' ? (
-        <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--ink-secondary)' }}>Próximamente</span>
+        <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--ink-soft)' }}>Próximamente</span>
       ) : (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--ink-secondary)' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--ink-soft)' }}>
           {modulo.completed}/{modulo.total}
-          {modulo.pruebaAprobada && (
-            <span style={{ color: 'var(--brand-700)', fontWeight: 'var(--font-weight-semibold)' }}>prueba ✓</span>
-          )}
+          {modulo.pruebaAprobada && <Pill tone="brand">prueba ✓</Pill>}
         </span>
       )}
     </li>
@@ -148,19 +139,12 @@ export default function Progreso({ progress, now, hydrated, onMisionHecha }: Pro
       {!hydrated ? (
         <div
           aria-hidden="true"
-          style={{ height: 480, background: 'var(--ink)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}
+          style={{ height: 480, background: 'var(--paper-sunk)', borderRadius: 'var(--radius-card-lg)' }}
         />
       ) : (
         <div style={{ maxWidth: 640 }}>
           <Reveal>
-            <h1
-              style={{
-                margin: '0 0 var(--space-6)',
-                fontSize: 'var(--font-size-2xl)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--ink)',
-              }}
-            >
+            <h1 className="bursa-screen-title" style={{ marginBottom: 'var(--space-6)' }}>
               Tu camino
             </h1>
           </Reveal>
@@ -178,13 +162,17 @@ export default function Progreso({ progress, now, hydrated, onMisionHecha }: Pro
                 <div key={modulo.number} style={{ display: 'flex', alignItems: 'center', flex: i < view.modulos.length - 1 ? 1 : undefined }}>
                   <NodoModulo modulo={modulo} />
                   {i < view.modulos.length - 1 && (
-                    <span aria-hidden="true" style={{ flex: 1, height: 2, background: 'var(--border)', margin: '0 var(--space-2)', marginBottom: 40 }} />
+                    <span aria-hidden="true" style={{ flex: 1, height: 2, background: 'var(--border-hairline)', margin: '0 var(--space-2)', marginBottom: 40 }} />
                   )}
                 </div>
               ))}
             </div>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--ink-secondary)' }}>
-              Llevas {view.totalHechas} de {view.totalLecciones} lecciones.
+            <p style={{ margin: 0, fontSize: 'var(--font-size-base)', color: 'var(--ink)' }}>
+              Llevas{' '}
+              <strong style={{ fontFamily: 'var(--font-display)', fontWeight: 'var(--font-weight-bold)' }}>
+                {view.totalHechas}
+              </strong>{' '}
+              de {view.totalLecciones} lecciones.
             </p>
           </Reveal>
 
@@ -207,29 +195,14 @@ export default function Progreso({ progress, now, hydrated, onMisionHecha }: Pro
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/modulo/1"
-                style={{
-                  display: 'inline-block',
-                  minHeight: 'var(--touch-min)',
-                  lineHeight: 'var(--touch-min)',
-                  padding: '0 var(--space-6)',
-                  fontSize: 'var(--font-size-sm)',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  color: 'var(--ink)',
-                  background: 'transparent',
-                  border: '2px solid var(--brand-600)',
-                  borderRadius: 'var(--radius-pill)',
-                  textDecoration: 'none',
-                }}
-              >
+              <Button href="/modulo/1" variant="secondary">
                 Repasar en 30 segundos
-              </Link>
+              </Button>
             </Reveal>
           )}
 
           {view.mision && !view.mision.hecha && (
-            <Reveal delay={0.4} style={{ marginTop: 'var(--space-8)', borderTop: '1px solid var(--border)', paddingTop: 'var(--space-6)' }}>
+            <Reveal delay={0.4} style={{ marginTop: 'var(--space-8)', borderTop: '1px solid var(--border-hairline)', paddingTop: 'var(--space-6)' }}>
               <Mision texto={view.mision.texto} onDone={onMisionHecha} />
             </Reveal>
           )}

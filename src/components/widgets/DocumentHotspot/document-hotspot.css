@@ -13,6 +13,25 @@
   cursor: pointer;
   /* solo color/opacity: nada de layout */
   transition: border-color var(--transition-fast), background var(--transition-fast);
+  /* Pulso sutil (opacity + transform) hasta que se toca: nadie sabe qué es tocable en un
+     documento que por lo demás parece de solo lectura. Se detiene apenas hay respuesta. */
+  animation: dh-pulse 2.4s ease-in-out infinite;
+}
+
+.dh-zona:disabled,
+.dh-zona[data-elegida] {
+  animation: none;
+}
+
+@keyframes dh-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-zona {
+    animation: none;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

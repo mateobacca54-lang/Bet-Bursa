@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { DURATION, EASE_OUT_QUART } from '@/lib/motion';
+import { Button, Eyebrow } from '@/components/ui';
 
 interface MisionProps {
   /** La tarea, literal del temario (ver src/content/modulo-1/mision.ts) */
@@ -49,16 +50,7 @@ export default function Mision({ texto, onDone, delay = 0 }: MisionProps) {
         gap: 'var(--space-3)',
       }}
     >
-      <span
-        className="uppercase-tracking"
-        style={{
-          fontSize: 'var(--font-size-xs)',
-          fontWeight: 'var(--font-weight-semibold)',
-          color: 'var(--brand-700)',
-        }}
-      >
-        Tu misión de este módulo
-      </span>
+      <Eyebrow tone="brand">Tu misión de este módulo</Eyebrow>
       <p
         style={{
           margin: 0,
@@ -71,25 +63,9 @@ export default function Mision({ texto, onDone, delay = 0 }: MisionProps) {
         {texto}
       </p>
       <div>
-        <motion.button
-          type="button"
-          onClick={onDone}
-          whileTap={reduced ? undefined : { scale: 0.97 }}
-          style={{
-            minHeight: 'var(--touch-min)',
-            padding: 'var(--space-2) var(--space-6)',
-            fontFamily: 'var(--font-family)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-weight-semibold)',
-            color: 'var(--ink)',
-            background: 'transparent',
-            border: '2px solid var(--brand-600)',
-            borderRadius: 'var(--radius-pill)',
-            cursor: 'pointer',
-          }}
-        >
+        <Button variant="secondary" onClick={onDone}>
           Ya lo hice
-        </motion.button>
+        </Button>
       </div>
     </motion.section>
   );

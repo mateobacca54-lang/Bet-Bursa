@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import { Reveal } from '@/components/motion';
+import { Eyebrow } from '@/components/ui';
 import { useTapaAyuda } from '@/lib/useEvitarAyuda';
 
 interface PruebaCheckpointProps {
@@ -78,13 +79,10 @@ export default function PruebaCheckpoint({ moduleName, href, delay = 0 }: Prueba
             />
           </svg>
         </span>
-        <span style={{ flex: 1 }}>
-          <span
-            className="uppercase-tracking"
-            style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--brand-700)' }}
-          >
+        <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <Eyebrow as="span" tone="brand">
             Prueba de {moduleName}
-          </span>
+          </Eyebrow>
           <span style={{ display: 'block', fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--ink)' }}>
             Ya viste las 10 lecciones. Falta comprobar qué tanto quedó.
           </span>

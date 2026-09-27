@@ -63,9 +63,9 @@ const STATE_STYLE = {
     boxShadow: 'var(--shadow-md)',
   },
   locked: {
-    background: onDark(8),
-    color: onDark(45),
-    border: `2px solid ${onDark(22)}`,
+    background: onDark(10),
+    color: onDark(60),
+    border: `2px dashed ${onDark(28)}`,
     boxShadow: 'none',
   },
 } as const;
@@ -78,21 +78,13 @@ function CheckIcon() {
   );
 }
 
-function LockIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="5" y="11" width="14" height="9.5" rx="2.5" fill="currentColor" />
-      <path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 /**
  * LessonNode — un punto sobre la gráfica.
  *
  *   completed  relleno naranja + check
  *   current    blanco con borde naranja y un halo que pulsa (la siguiente lección)
- *   locked     apagado con candado; al pulsarlo hace shake y NO navega
+ *   locked     el número apagado con borde punteado: "por abrir", no "prohibido".
+ *              Al pulsarlo hace shake y NO navega.
  *
  * Es un <Link> o un <button> real, nunca un div con onClick.
  */
@@ -170,9 +162,9 @@ export default function LessonNode({
               if (!reduced) shake.start(variants.shake);
               onLockedAttempt(number);
             }}
-            style={{ ...style, cursor: 'not-allowed' }}
+            style={{ ...style, cursor: 'pointer' }}
           >
-            <LockIcon />
+            {number}
           </button>
         ) : (
           <Link

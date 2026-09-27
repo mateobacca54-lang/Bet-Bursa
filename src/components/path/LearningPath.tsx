@@ -20,6 +20,7 @@ import { timeForProgress } from '@/lib/motion-math';
 import { Reveal } from '@/components/motion';
 import { Estampa } from '@/components/illus';
 import { escenaDeLeccion } from '@/content/modulo-1/escenas';
+import './path.css';
 import PathLine from './PathLine';
 import LessonNode, { type NodeState } from './LessonNode';
 import LessonPeek, { PEEK_WIDTH } from './LessonPeek';
@@ -255,25 +256,31 @@ export default function LearningPath({
 
   return (
     <div
-      ref={ref}
-      onPointerDownCapture={() => setInstant(true)}
-      onKeyDownCapture={(e) => {
-        setInstant(true);
-        if (e.key === 'Escape') {
-          setHovered(null);
-          setPinned(null);
-        }
-      }}
+      className="path-ink-hero"
       style={{
-        position: 'relative',
-        width: '100%',
-        height: layout?.height ?? fallbackHeight,
         background: 'var(--ink)',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-md)',
-        overflow: 'hidden',
+        borderRadius: 'var(--radius-card-lg)',
+        boxShadow: 'var(--shadow-soft)',
       }}
     >
+      <div
+        ref={ref}
+        onPointerDownCapture={() => setInstant(true)}
+        onKeyDownCapture={(e) => {
+          setInstant(true);
+          if (e.key === 'Escape') {
+            setHovered(null);
+            setPinned(null);
+          }
+        }}
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: layout?.height ?? fallbackHeight,
+          overflow: 'hidden',
+          borderRadius: 'var(--radius-md)',
+        }}
+      >
       {layout && (
         <>
           <PathLine
@@ -333,7 +340,15 @@ export default function LearningPath({
               >
                 {ticker}
               </span>
-              <span aria-hidden="true" style={{ color: completed.size > 0 ? 'var(--brand-400)' : 'var(--ink-secondary)' }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  color:
+                    completed.size > 0
+                      ? 'var(--brand-400)'
+                      : 'color-mix(in srgb, var(--surface-raised) 55%, transparent)',
+                }}
+              >
                 {completed.size > 0 ? '▲' : '—'} {Math.round((completed.size / count) * 100)} %
               </span>
             </Reveal>
@@ -397,6 +412,7 @@ export default function LearningPath({
           </AnimatePresence>
         </>
       )}
+      </div>
     </div>
   );
 }

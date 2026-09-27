@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { DURATION, EASE_OUT_EXPO, EASE_OUT_QUART, variants, motionSafe } from '@/lib/motion';
+import { shouldOfferReveal } from '@/lib/widget-feedback';
+import { Button } from '@/components/ui';
 import type { WidgetState } from '@/lib/types';
 
 interface FeedbackOverlayProps {
@@ -10,63 +13,61 @@ interface FeedbackOverlayProps {
   correctMessage: string;
   wrongMessage: string;
   hintMessage?: string;
+  /** Intentos fallidos hasta ahora (para decidir si ofrecer "Ver la respuesta"). */
+  attempts?: number;
+  /** Tope de intentos del widget (WidgetShell revela solo al llegarlo). */
+  maxAttempts?: number;
   onRetry?: () => void;
+  /** Revela la respuesta de inmediato, sin esperar el auto-reveal de WidgetShell. */
+  onReveal?: () => void;
 }
 
 /**
  * FeedbackOverlay — overlay animado de feedback para todos los widgets.
  *
- * - Correcto: icono ✓ con fondo --feedback-correct, escala animada.
- * - Incorrecto: icono ✗ con borde --feedback-wrong, shake horizontal 120ms.
- * - Respeta prefers-reduced-motion: sin animaciones, solo cambio visual.
- * - aria-live="assertive" para anunciar resultado a lectores de pantalla.
+ * - Correcto: círculo --feedback-correct con un check dibujado (`pathLength`, DESIGN.md §7).
+ * - Incorrecto: `shake` de 0,32 s, ink-toned (nunca rojo agresivo), explicación y reintento.
+ * - Revelado: calmo, sin temblor, muestra la respuesta correcta.
+ * - Respeta prefers-reduced-motion (usePrefersReducedMotion, no el de framer-motion).
+ * - `aria-live="polite"`: la celebración se anuncia sin interrumpir al lector de pantalla.
  */
 export default function FeedbackOverlay({
   state,
   correctMessage,
   wrongMessage,
   hintMessage,
+  attempts = 0,
+  maxAttempts = Infinity,
   onRetry,
+  onReveal,
 }: FeedbackOverlayProps) {
-  const shouldReduceMotion = usePrefersReducedMotion();
+  const reduced = usePrefersReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
 
   // El resultado puede quedar bajo la barra fija de la lección: se trae a la vista.
   useEffect(() => {
     if (state === 'correct' || state === 'wrong' || state === 'revealed') {
-      ref.current?.scrollIntoView({ block: 'nearest', behavior: shouldReduceMotion ? 'auto' : 'smooth' });
+      ref.current?.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
     }
-  }, [state, shouldReduceMotion]);
+  }, [state, reduced]);
 
   if (state !== 'correct' && state !== 'wrong' && state !== 'revealed') {
     return null;
   }
 
   const isCorrect = state === 'correct';
-  const isRevealed = state === 'revealed';
-
-  const correctAnimation = shouldReduceMotion
-    ? {}
-    : {
-        initial: { scale: 0, opacity: 0 },
-        animate: { scale: [0, 1.15, 1], opacity: 1 },
-        transition: { duration: 0.3, ease: 'easeOut' as const },
-      };
-
-  const wrongAnimation = shouldReduceMotion
-    ? {}
-    : {
-        initial: { x: 0 },
-        animate: { x: [0, -6, 6, -6, 6, 0] },
-        transition: { duration: 0.12 },
-      };
+  const isWrong = state === 'wrong';
+  const shakeVariant = motionSafe(variants, reduced).shake;
+  const offerReveal = isWrong && onReveal && shouldOfferReveal(maxAttempts) && attempts >= maxAttempts - 1;
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      aria-live="assertive"
+      aria-live="polite"
       role="status"
       className="feedback-overlay"
+      initial={isWrong && !reduced ? { x: 0 } : undefined}
+      animate={isWrong ? shakeVariant : undefined}
       style={{
         scrollMarginBottom: 'calc(var(--space-16) * 2)',
         display: 'flex',
@@ -76,19 +77,17 @@ export default function FeedbackOverlay({
         padding: 'var(--space-6)',
         marginTop: 'var(--space-4)',
         borderRadius: 'var(--radius-md)',
-        background: isCorrect
-          ? 'var(--surface-raised)'
-          : 'var(--surface-raised)',
-        border: isCorrect
-          ? '2px solid var(--feedback-correct)'
-          : '2px solid var(--feedback-wrong)',
+        background: 'var(--surface-raised)',
+        border: `2px solid ${isCorrect ? 'var(--feedback-correct)' : 'var(--feedback-wrong)'}`,
         boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Icono animado */}
+      {/* Icono */}
       {isCorrect ? (
         <motion.div
-          {...correctAnimation}
+          initial={reduced ? false : { scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: reduced ? 0 : DURATION.element, ease: EASE_OUT_QUART }}
           style={{
             width: 48,
             height: 48,
@@ -100,23 +99,21 @@ export default function FeedbackOverlay({
             flexShrink: 0,
           }}
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--on-brand)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="20 6 9 17 4 12" />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <motion.polyline
+              points="20 6 9 17 4 12"
+              stroke="var(--on-brand)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={reduced ? false : { pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: reduced ? 0 : DURATION.element, ease: EASE_OUT_EXPO, delay: reduced ? 0 : 0.1 }}
+            />
           </svg>
         </motion.div>
       ) : (
-        <motion.div
-          {...wrongAnimation}
+        <div
           style={{
             width: 48,
             height: 48,
@@ -143,7 +140,7 @@ export default function FeedbackOverlay({
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
-        </motion.div>
+        </div>
       )}
 
       {/* Mensaje */}
@@ -158,20 +155,16 @@ export default function FeedbackOverlay({
           margin: 0,
         }}
       >
-        {isCorrect
-          ? correctMessage
-          : isRevealed
-          ? correctMessage
-          : wrongMessage}
+        {isCorrect || state === 'revealed' ? correctMessage : wrongMessage}
       </p>
 
       {/* Pista (solo en wrong, no en revealed) */}
-      {state === 'wrong' && hintMessage && (
+      {isWrong && hintMessage && (
         <p
           style={{
             fontFamily: 'var(--font-family)',
             fontSize: 'var(--font-size-sm)',
-            color: 'var(--ink-secondary)',
+            color: 'var(--ink-soft)',
             lineHeight: 'var(--line-height-normal)',
             textAlign: 'center',
             margin: 0,
@@ -181,35 +174,21 @@ export default function FeedbackOverlay({
         </p>
       )}
 
-      {/* Botón de reintento (solo en wrong) */}
-      {state === 'wrong' && onRetry && (
-        <button
-          onClick={onRetry}
-          style={{
-            fontFamily: 'var(--font-family)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-weight-semibold)',
-            color: 'var(--ink)',
-            background: 'var(--surface-raised)',
-            border: '1.5px solid var(--border)',
-            borderRadius: 'var(--radius-pill)',
-            padding: 'var(--space-2) var(--space-6)',
-            cursor: 'pointer',
-            transition: 'background var(--transition-fast)',
-            minHeight: 'var(--touch-min)',
-            letterSpacing: 'var(--tracking-wide)',
-            textTransform: 'uppercase' as const,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--brand-50)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--surface-raised)';
-          }}
-        >
-          Intentar de nuevo
-        </button>
+      {/* Botones (solo en wrong) */}
+      {isWrong && (onRetry || offerReveal) && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--space-3)' }}>
+          {onRetry && (
+            <Button variant="secondary" onClick={onRetry}>
+              Intentar de nuevo
+            </Button>
+          )}
+          {offerReveal && (
+            <Button variant="ghost" onClick={onReveal}>
+              Ver la respuesta
+            </Button>
+          )}
+        </div>
       )}
-    </div>
+    </motion.div>
   );
 }

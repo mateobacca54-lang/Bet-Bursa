@@ -2,12 +2,12 @@
 
 import { nombreModulo } from '@/content/modulos';
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import { MODULO_1, TEMARIO_MODULO_1 } from '@/content/modulo-1/temario';
 import { COMPLETE_CTA, MODULO_1_BLURB, MODULO_2_PREVIEW, MONEDITA_INTRO, WARM_UP } from '@/content/inicio';
 import { getInicioView, PATH_HREF } from '@/lib/inicio';
 import { getCurrentStreak, type ModuleProgress } from '@/lib/progress';
 import { Reveal } from '@/components/motion';
+import { Button } from '@/components/ui';
 import { AppShell, RollingNumber, getGreetingCopy } from '@/components/shell';
 import Monedita from './Monedita';
 import WarmUp from './WarmUp';
@@ -99,14 +99,13 @@ export default function Inicio({ progress, now, hydrated }: InicioProps) {
               </Reveal>
               <Reveal delay={0.24}>
                 <div className="ini-actions">
-                  <Link href={view.ctaHref} className="ini-btn uppercase-tracking">
+                  <Button href={view.ctaHref} iconRight={<Arrow />}>
                     {ctaLabel}
-                    <Arrow />
-                  </Link>
+                  </Button>
                   {showPathLink && (
-                    <Link href={PATH_HREF} className="ini-btn ini-btn--quiet uppercase-tracking">
+                    <Button href={PATH_HREF} variant="secondary">
                       Ver el camino
-                    </Link>
+                    </Button>
                   )}
                 </div>
               </Reveal>

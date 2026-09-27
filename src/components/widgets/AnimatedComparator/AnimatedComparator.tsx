@@ -2,11 +2,14 @@
 
 import { Pila } from '@/components/illus';
 import { MoneditaGuide } from '@/components/widgets/shared';
+import { Button } from '@/components/ui';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react';
 import { motion } from 'framer-motion';
+import NumberFlow from '@number-flow/react';
 import type { AnimatedComparatorConfig, BursaWidgetProps, ComparatorSeries } from '@/lib/types';
 import { formatCOP } from '@/lib/format';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { SPRING_DRAG } from '@/lib/motion';
 import { niceTicks, percentOff, snapToStep, valueToY, yToValue } from '@/lib/widget-math';
 import './animated-comparator.css';
 
@@ -157,15 +160,15 @@ export default function AnimatedComparator({
     <motion.div layout
       className="bursa-comparator"
       style={{
-        borderRadius: 'var(--radius-xl)',
-        boxShadow: 'var(--shadow-lg)',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-md)',
         padding: 'var(--space-6)',
         maxWidth: 640,
         width: '100%',
         margin: '0 auto',
         boxSizing: 'border-box',
         background: 'var(--surface-raised)',
-        border: '1px solid var(--border-light)'
+        border: '1px solid var(--border-hairline)'
       }}
     >
       <h2 id={titleId} className="bursa-comparator__title" style={{ margin: '0 0 var(--space-2) 0', color: 'var(--ink)', lineHeight: 'var(--line-height-tight)' }}>
@@ -213,7 +216,7 @@ export default function AnimatedComparator({
           {/* Cuadrícula eleganó.e (dotted) */}
           {ticks.map((t) => (
             <g key={t}>
-              <line x1={PLOT.left} x2={PLOT.right} y1={yOf(t)} y2={yOf(t)} stroke="var(--border-light)" strokeWidth={1} strokeDasharray="4 4" />
+              <line x1={PLOT.left} x2={PLOT.right} y1={yOf(t)} y2={yOf(t)} stroke="var(--border-hairline)" strokeWidth={1} strokeDasharray="4 4" />
               <text className="bursa-comparator__axis-label" x={PLOT.left - 10} y={yOf(t) + 5} textAnchor="end" fontSize={15} fontWeight="500" fill="var(--ink-secondary)">
                 {tickLabel(t)}
               </text>
@@ -226,7 +229,7 @@ export default function AnimatedComparator({
               {x}
             </text>
           ))}
-          <text className="bursa-comparator__axis-label" x={(PLOT.left + PLOT.right) / 2} y={H - 2} textAnchor="middle" fontSize={14} fontWeight="600" fill="var(--ink-tertiary)" style={{ textTransform: "uppercase" }} letterSpacing={1}>
+          <text className="bursa-comparator__axis-label" x={(PLOT.left + PLOT.right) / 2} y={H - 2} textAnchor="middle" fontSize={14} fontWeight="600" fill="var(--ink-soft)" style={{ textTransform: "uppercase" }} letterSpacing={1}>
             {config.xAxisLabel}
           </text>
 
@@ -297,17 +300,12 @@ export default function AnimatedComparator({
               onPointerDown={onPointerDown}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              animate={{ 
-                x: atXpx, 
+              animate={{
+                x: atXpx,
                 y: yOf(guess),
                 scale: isDragging ? 1.15 : focused ? 1.05 : 1
               }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 25,
-                mass: 0.8
-              }}
+              transition={SPRING_DRAG}
               style={{ cursor: locked ? 'default' : 'grab' }}
               className="bursa-comparator-handle"
             >
@@ -350,10 +348,10 @@ export default function AnimatedComparator({
             >
               {/* Conexión visual si hubo fallo grande */}
               {!close && (
-                <line 
-                  x1={atXpx} y1={yOf(guess)} 
-                  x2={atXpx} y2={yOf(actual)} 
-                  stroke="var(--error-300)" strokeWidth={2} strokeDasharray="4 4" 
+                <line
+                  x1={atXpx} y1={yOf(guess)}
+                  x2={atXpx} y2={yOf(actual)}
+                  stroke="var(--feedback-wrong)" strokeWidth={2} strokeDasharray="4 4"
                 />
               )}
               
@@ -382,33 +380,14 @@ export default function AnimatedComparator({
       </ul>
 
       {prediction && !locked && (
-        <motion.div 
+        <motion.div
           initial={false}
           animate={{ y: touched ? 0 : 10, opacity: 1 }}
           style={{ marginTop: 'var(--space-6)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}
         >
-          <motion.button
-            whileHover={touched && !disabled ? { scale: 1.05 } : {}}
-            whileTap={touched && !disabled ? { scale: 0.95 } : {}}
-            type="button"
-            onClick={() => touched && commit()}
-            disabled={disabled || !touched}
-            aria-disabled={!touched}
-            className="bursa-comparator__action"
-            style={{ 
-              opacity: touched ? 1 : 0.5,
-              background: touched ? 'var(--brand-600)' : 'var(--surface-disabled)',
-              color: touched ? 'var(--on-brand)' : 'var(--ink-tertiary)',
-              border: 'none',
-              padding: 'var(--space-3) var(--space-8)',
-              borderRadius: 'var(--radius-pill)',
-              fontWeight: 700,
-              cursor: touched ? 'pointer' : 'default',
-              boxShadow: touched ? '0 4px 14px rgba(0,0,0,0.1)' : 'none'
-            }}
-          >
+          <Button onClick={() => touched && commit()} disabled={disabled || !touched}>
             Fijar mi predicción
-          </motion.button>
+          </Button>
         </motion.div>
       )}
 
@@ -423,7 +402,7 @@ export default function AnimatedComparator({
               marginTop: 'var(--space-6)',
               padding: 'var(--space-5)',
               borderRadius: 'var(--radius-lg)',
-              border: `2px solid ${close ? 'var(--brand-400)' : 'var(--border-light)'}`,
+              border: `2px solid ${close ? 'var(--brand-400)' : 'var(--border-hairline)'}`,
               background: close ? 'var(--brand-50)' : 'var(--sand-50)',
             }}
           >
@@ -431,7 +410,8 @@ export default function AnimatedComparator({
               {close ? prediction.feedbackClose : prediction.feedbackFar}
             </p>
             <p style={{ margin: 0, color: 'var(--ink-secondary)', fontSize: 'var(--font-size-sm)' }}>
-              Pensaste {formatCOP(guess)} y la realidad fue {formatCOP(actual)} 
+              Pensaste <NumberFlow value={guess} format={{ style: 'currency', currency: 'COP', maximumFractionDigits: 0 }} locales="es-CO" /> y la realidad fue{' '}
+              <NumberFlow value={actual} format={{ style: 'currency', currency: 'COP', maximumFractionDigits: 0 }} locales="es-CO" />
               <strong style={{ color: 'var(--ink)' }}> ({off < 1 ? '¡Casi exacto!' : `${Math.round(off)}% de diferencia`})</strong>
             </p>
             
@@ -460,7 +440,7 @@ export default function AnimatedComparator({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 }}
-                  style={{ margin: 'var(--space-4) 0 0', textAlign: 'center', fontSize: 'var(--font-size-xs)', color: 'var(--ink-tertiary)', textTransform: 'uppercase', letterSpacing: 1 }}
+                  style={{ margin: 'var(--space-4) 0 0', textAlign: 'center', fontSize: 'var(--font-size-xs)', color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: 1 }}
                 >
                   Cada moneda vale {formatCOP(coinUnit)}.
                 </motion.p>

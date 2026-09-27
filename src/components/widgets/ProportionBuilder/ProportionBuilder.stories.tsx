@@ -68,6 +68,6 @@ export const Deshabilitado: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const slider of canvas.getAllByRole('slider')) await expect(slider).toBeDisabled();
-    await expect(canvas.getByRole('button', { name: 'Confirmar reparto' })).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: 'Confirmar reparto' })).toHaveAttribute('aria-disabled', 'true');
   },
 };

@@ -1,24 +1,31 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { TemarioEntry } from '@/content/modulo-1/temario';
+import { MODULO_1 } from '@/content/modulo-1/temario';
 import type { LessonContent } from '@/content/modulo-1/lecciones';
+import { apuestaDeLeccion } from '@/content/modulo-1/apuestas';
+import { escenaDeLeccion } from '@/content/modulo-1/escenas';
 import type { WidgetState } from '@/lib/types';
-import ProgressBar from '@/components/shell/ProgressBar';
+import { Button, ProgressBar } from '@/components/ui';
 import { DURATION, EASE_OUT_EXPO } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { useReservarEsquina } from '@/lib/useReservarEsquina';
-import { StepHook, StepConcept, StepExample, StepPractice, StepSummary } from './LessonSteps';
-import { escenaDeLeccion } from '@/content/modulo-1/escenas';
+import { dividirEnFrases, faltanPorRevelar, siguienteRevelacion } from '@/lib/leccion-pasos';
+import { StepHook, StepApuesta, StepIdea, StepEjemplo, StepPractice, StepResumen } from './LessonSteps';
 import PracticeWidget from './PracticeWidget';
 import NamePrompt from './NamePrompt';
 import EmailPrompt from './EmailPrompt';
 
-const STEP_NAMES = ['Gancho', 'Concepto', 'Ejemplo', 'Práctica', 'Resumen'] as const;
-const LAST = STEP_NAMES.length - 1;
-const PRACTICE = 3;
+const STEP_NAMES = ['Gancho', 'Tu apuesta', 'La idea', 'Un ejemplo', 'Ahora tú', 'Lo que te llevas'] as const;
+const HOOK = 0;
+const APUESTA = 1;
+const IDEA = 2;
+const EJEMPLO = 3;
+const PRACTICE = 4;
+const RESUMEN = STEP_NAMES.length - 1; // 5
 /** Desplazamiento horizontal de la transición entre pasos (px) */
 const SHIFT = 24;
 
@@ -38,12 +45,15 @@ interface LessonPlayerProps {
 }
 
 /**
- * LessonPlayer — máquina de 5 pasos del temario: gancho → concepto → ejemplo →
- * práctica → resumen. Cada paso entra desplazándose 24 px desde el lado hacia el que
- * avanzas y sale en espejo. Bajo reduced-motion solo hay un cross-fade.
+ * LessonPlayer — máquina de seis pasos (DESIGN.md §8): gancho → tu apuesta → la idea →
+ * un ejemplo de tu día → ahora tú → lo que te llevas. Cada paso entra desplazándose
+ * 24 px desde el lado hacia el que avanzas y sale en espejo. Bajo reduced-motion solo
+ * hay un cross-fade.
  *
- * El paso de práctica no deja avanzar hasta acertar o ver la respuesta (tras 3 fallos
- * el widget la revela): así nadie sigue sin haber intentado, pero nadie queda atascado.
+ * "La idea" y "Un ejemplo de tu día" revelan su texto frase por frase: mientras faltan,
+ * el botón principal dice "Seguir" y solo revela la próxima; cuando ya se vieron todas,
+ * pasa a hacer lo de siempre ("Continuar"). "Tu apuesta" y "Ahora tú" bloquean el avance
+ * (sin elegir, o sin resolver el ejercicio) en vez de reetiquetar el botón.
  */
 export default function LessonPlayer({
   entry,
@@ -56,7 +66,7 @@ export default function LessonPlayer({
   onEmailAnswered,
 }: LessonPlayerProps) {
   const reduced = usePrefersReducedMotion();
-  // El botón de ayuda (fijo, misma esquina) sube para no montarse sobre "Continuar".
+  // El botón de ayuda (fijo, misma esquina) sube para no montarse sobre el pie.
   const pieRef = useReservarEsquina<HTMLElement>();
   // Se deciden al montar: si cambiaran a mitad de camino, el formulario que ya se
   // está mostrando desaparecería antes de mostrar su propia confirmación.
@@ -67,10 +77,21 @@ export default function LessonPlayer({
   const [nameDone, setNameDone] = useState(!showName);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
+  const [apuestaPick, setApuestaPick] = useState<string | null>(null);
+  const [ideaReveal, setIdeaReveal] = useState(1);
+  const [ejemploReveal, setEjemploReveal] = useState(1);
   const [practiceDone, setPracticeDone] = useState(false);
   const [finishing, setFinishing] = useState(false);
 
+  const apuesta = useMemo(() => apuestaDeLeccion(entry.number), [entry.number]);
+  const ideaFrases = useMemo(() => dividirEnFrases(content.explanation), [content.explanation]);
+  const ejemploFrases = useMemo(() => dividirEnFrases(content.example), [content.example]);
+
   const go = (next: number) => {
+    // Cada visita al paso empieza mostrando solo la primera frase, para que revelar
+    // "frase por frase" tenga siempre el mismo sentido, incluso volviendo con "Atrás".
+    if (next === IDEA) setIdeaReveal(1);
+    if (next === EJEMPLO) setEjemploReveal(1);
     setDirection(next > step ? 1 : -1);
     setStep(next);
   };
@@ -79,55 +100,55 @@ export default function LessonPlayer({
     if (state === 'correct' || state === 'revealed') setPracticeDone(true);
   };
 
-  const blocked = step === PRACTICE && !practiceDone;
-  const isLast = step === LAST;
+  const idaFaltan = step === IDEA && faltanPorRevelar(ideaReveal, ideaFrases.length);
+  const ejemploFaltan = step === EJEMPLO && faltanPorRevelar(ejemploReveal, ejemploFrases.length);
+  const blocked = (step === APUESTA && apuestaPick === null) || (step === PRACTICE && !practiceDone);
+  const isLast = step === RESUMEN;
+
+  const primaryLabel = idaFaltan || ejemploFaltan ? 'Seguir' : isLast ? 'Terminar lección' : 'Continuar';
+  const hintText =
+    step === PRACTICE && blocked
+      ? 'Resuelve el ejercicio para seguir'
+      : step === APUESTA && blocked
+        ? 'Elige una opción para seguir'
+        : null;
 
   const handleNext = () => {
-    if (blocked || finishing) return;
+    if (finishing || blocked) return;
+    if (idaFaltan) {
+      setIdeaReveal((r) => siguienteRevelacion(r, ideaFrases.length));
+      return;
+    }
+    if (ejemploFaltan) {
+      setEjemploReveal((r) => siguienteRevelacion(r, ejemploFrases.length));
+      return;
+    }
     if (isLast) {
       setFinishing(true);
       onFinish();
-    } else {
-      go(step + 1);
+      return;
     }
+    go(step + 1);
   };
 
   const stepTransition = reduced ? { duration: 0.1 } : { duration: DURATION.scene, ease: EASE_OUT_EXPO };
   const shift = reduced ? 0 : SHIFT;
 
-  const primary: CSSProperties = {
-    fontFamily: 'var(--font-family)',
-    fontSize: 'var(--font-size-base)',
-    fontWeight: 'var(--font-weight-semibold)',
-    letterSpacing: 'var(--tracking-wide)',
-    textTransform: 'uppercase',
-    minHeight: 'var(--touch-min)',
-    padding: 'var(--space-3) var(--space-8)',
-    borderRadius: 'var(--radius-pill)',
-    border: 'none',
-    color: 'var(--on-brand)',
-    background: 'var(--brand-600)',
-    boxShadow: 'var(--shadow-sm)',
-    cursor: blocked ? 'not-allowed' : 'pointer',
-    opacity: blocked ? 0.5 : 1,
-    transition: 'opacity var(--transition-fast)',
+  const headerStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-4)',
+    padding: 'var(--space-4)',
+    paddingTop: 'calc(var(--space-4) + env(safe-area-inset-top, 0px))',
+    maxWidth: 720,
+    width: '100%',
+    margin: '0 auto',
+    boxSizing: 'border-box',
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--surface)' }}>
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-4)',
-          padding: 'var(--space-4)',
-          paddingTop: 'calc(var(--space-4) + env(safe-area-inset-top, 0px))',
-          maxWidth: 720,
-          width: '100%',
-          margin: '0 auto',
-          boxSizing: 'border-box',
-        }}
-      >
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--paper)' }}>
+      <header style={headerStyle}>
         <Link
           href={exitHref}
           aria-label="Salir de la lección"
@@ -153,7 +174,7 @@ export default function LessonPlayer({
         >
           {STEP_NAMES.map((name, i) => (
             <div key={name} style={{ flex: 1 }}>
-              <ProgressBar value={i <= step ? 1 : 0} max={1} label={`${name}${i <= step ? ' (visto)' : ''}`} height={6} />
+              <ProgressBar value={i <= step ? 1 : 0} max={1} label={`${name}${i <= step ? ' (visto)' : ''}`} size="thin" />
             </div>
           ))}
         </div>
@@ -179,16 +200,42 @@ export default function LessonPlayer({
             exit={{ opacity: 0, x: -shift * direction }}
             transition={stepTransition}
           >
-            {step === 0 && <StepHook lessonNumber={entry.number} title={entry.title} hook={entry.hook} scene={escenaDeLeccion(entry.number)} />}
-            {step === 1 && <StepConcept keyConcept={entry.keyConcept} explanation={content.explanation} />}
-            {step === 2 && <StepExample example={content.example} lesson={entry.number} datoReal={content.datoReal} />}
-            {step === 3 && (
+            {step === HOOK && (
+              <StepHook lessonNumber={entry.number} title={entry.title} hook={entry.hook} scene={escenaDeLeccion(entry.number)} />
+            )}
+            {step === APUESTA && apuesta && (
+              <StepApuesta apuesta={apuesta} picked={apuestaPick} onPick={setApuestaPick} />
+            )}
+            {step === IDEA && (
+              <StepIdea
+                keyConcept={entry.keyConcept}
+                frases={ideaFrases}
+                revealCount={ideaReveal}
+                onReveal={() => setIdeaReveal((r) => siguienteRevelacion(r, ideaFrases.length))}
+              />
+            )}
+            {step === EJEMPLO && (
+              <StepEjemplo
+                frases={ejemploFrases}
+                lesson={entry.number}
+                datoReal={content.datoReal}
+                revealCount={ejemploReveal}
+                onReveal={() => setEjemploReveal((r) => siguienteRevelacion(r, ejemploFrases.length))}
+              />
+            )}
+            {step === PRACTICE && (
               <StepPractice>
                 <PracticeWidget spec={content.practice} onStateChange={onPracticeState} />
               </StepPractice>
             )}
-            {step === 4 && (
-              <StepSummary summary={content.summary}>
+            {step === RESUMEN && (
+              <StepResumen
+                summary={content.summary}
+                apuesta={apuesta}
+                apuestaPick={apuestaPick}
+                leccionNumero={entry.number}
+                totalLecciones={MODULO_1.lessonCount}
+              >
                 {showName && onName && !nameDone ? (
                   <NamePrompt
                     onAnswer={(name) => {
@@ -199,7 +246,7 @@ export default function LessonPlayer({
                 ) : showEmail && onEmailAnswered ? (
                   <EmailPrompt onAnswer={onEmailAnswered} />
                 ) : null}
-              </StepSummary>
+              </StepResumen>
             )}
           </motion.div>
         </AnimatePresence>
@@ -210,15 +257,15 @@ export default function LessonPlayer({
         style={{
           position: 'sticky',
           bottom: 0,
-          background: 'var(--surface-raised)',
-          borderTop: '1px solid var(--border)',
+          background: 'var(--paper)',
+          borderTop: '1px solid var(--border-hairline)',
           padding: 'var(--space-4)',
           paddingBottom: 'calc(var(--space-4) + env(safe-area-inset-bottom, 0px))',
         }}
       >
-        {blocked && (
+        {hintText && (
           <p
-            id="practice-hint"
+            id="lesson-hint"
             style={{
               margin: '0 auto var(--space-3)',
               maxWidth: 640,
@@ -227,7 +274,7 @@ export default function LessonPlayer({
               color: 'var(--ink-secondary)',
             }}
           >
-            Resuelve el ejercicio para seguir
+            {hintText}
           </p>
         )}
         <div
@@ -241,38 +288,21 @@ export default function LessonPlayer({
           }}
         >
           {step > 0 ? (
-            <button
-              type="button"
-              onClick={() => go(step - 1)}
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--font-size-base)',
-                fontWeight: 'var(--font-weight-semibold)',
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                minHeight: 'var(--touch-min)',
-                padding: '0 var(--space-3)',
-                cursor: 'pointer',
-              }}
-            >
+            <Button variant="ghost" onClick={() => go(step - 1)}>
               Atrás
-            </button>
+            </Button>
           ) : (
             <span />
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-            <button
-              type="button"
-              onClick={handleNext}
-              aria-disabled={blocked || finishing}
-              aria-describedby={blocked ? 'practice-hint' : undefined}
-              style={primary}
-            >
-              {isLast ? 'Terminar lección' : 'Continuar'}
-            </button>
-          </div>
+          <Button
+            variant="primary"
+            onClick={handleNext}
+            disabled={blocked || finishing}
+            aria-describedby={hintText ? 'lesson-hint' : undefined}
+          >
+            {primaryLabel}
+          </Button>
         </div>
       </footer>
     </div>

@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import NumberFlow from '@number-flow/react';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { formatCOP } from '@/lib/format';
-import { DURATION, EASE_OUT_QUART, staggerDelay } from '@/lib/motion';
+import { DURATION, EASE_OUT_EXPO, EASE_OUT_QUART, staggerDelay } from '@/lib/motion';
 import type { DataPoint } from '@/lib/types';
 import './LiveVisualization.css';
 
@@ -79,6 +80,14 @@ export default function LiveVisualization({
 
   const exceeds = currentPrice >= targetPrice;
 
+  // La curva: une la punta de cada barra hasta el año actual, al estilo Brilliant — se ve
+  // la trayectoria completa, no solo el valor suelto de hoy.
+  const curvePath = useMemo(() => {
+    const upTo = bars.slice(0, currentIndex + 1);
+    if (upTo.length < 2) return '';
+    return upTo.map((bar, i) => `${i === 0 ? 'M' : 'L'}${(bar.x + bar.width / 2).toFixed(1)} ${bar.y.toFixed(1)}`).join(' ');
+  }, [bars, currentIndex]);
+
   return (
     <div
       className="bursa-price-visual"
@@ -95,22 +104,21 @@ export default function LiveVisualization({
           marginBottom: 'var(--space-4)',
         }}
       >
-        <motion.div
-          key={currentPrice}
-          initial={shouldReduceMotion ? false : { y: 8, opacity: 0.5 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: shouldReduceMotion ? 0 : DURATION.micro, ease: EASE_OUT_QUART }}
+        <div
           style={{
-            fontFamily: 'var(--font-family)',
+            fontFamily: 'var(--font-display)',
             fontSize: 'var(--font-size-3xl)',
             fontWeight: 'var(--font-weight-bold)',
             color: exceeds ? 'var(--brand-700)' : 'var(--ink)',
             lineHeight: 'var(--line-height-tight)',
-            fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {formatCOP(currentPrice)}
-        </motion.div>
+          <NumberFlow
+            value={currentPrice}
+            format={{ style: 'currency', currency: 'COP', maximumFractionDigits: 0 }}
+            locales="es-CO"
+          />
+        </div>
         <div
           style={{
             fontFamily: 'var(--font-family)',
@@ -232,6 +240,23 @@ export default function LiveVisualization({
             </g>
           );
         })}
+
+        {/* La curva: se dibuja hasta el año actual (pathLength, DESIGN.md §7) */}
+        {curvePath && (
+          <motion.path
+            key={curvePath}
+            d={curvePath}
+            fill="none"
+            stroke="var(--brand-700)"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pointerEvents="none"
+            initial={shouldReduceMotion ? false : { pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: shouldReduceMotion ? 0 : DURATION.scene, ease: EASE_OUT_EXPO }}
+          />
+        )}
       </svg>
       <div className="bursa-price-legend">
         <span>Precio inicial<strong>{formatCOP(basePrice)}</strong></span>

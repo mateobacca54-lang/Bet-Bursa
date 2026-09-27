@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { DURATION, EASE_OUT_QUART } from '@/lib/motion';
+import { Button, Eyebrow } from '@/components/ui';
 
 interface SpacedReviewProps {
   /** Número de la lección que se repasa */
@@ -52,16 +53,7 @@ export default function SpacedReview({ lesson, concept, onDone, delay = 0 }: Spa
         gap: 'var(--space-3)',
       }}
     >
-      <span
-        className="uppercase-tracking"
-        style={{
-          fontSize: 'var(--font-size-xs)',
-          fontWeight: 'var(--font-weight-semibold)',
-          color: 'var(--brand-700)',
-        }}
-      >
-        Repaso de 10 segundos · lección {lesson}
-      </span>
+      <Eyebrow tone="brand">Repaso de 10 segundos · lección {lesson}</Eyebrow>
       <p
         style={{
           margin: 0,
@@ -74,25 +66,9 @@ export default function SpacedReview({ lesson, concept, onDone, delay = 0 }: Spa
         {concept}
       </p>
       <div>
-        <motion.button
-          type="button"
-          onClick={onDone}
-          whileTap={reduced ? undefined : { scale: 0.97 }}
-          style={{
-            minHeight: 'var(--touch-min)',
-            padding: 'var(--space-2) var(--space-6)',
-            fontFamily: 'var(--font-family)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-weight-semibold)',
-            color: 'var(--ink)',
-            background: 'transparent',
-            border: '2px solid var(--brand-600)',
-            borderRadius: 'var(--radius-pill)',
-            cursor: 'pointer',
-          }}
-        >
+        <Button variant="secondary" onClick={onDone}>
           Lo tengo
-        </motion.button>
+        </Button>
       </div>
     </motion.section>
   );

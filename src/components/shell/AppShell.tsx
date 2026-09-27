@@ -49,16 +49,9 @@ export default function AppShell({
           </Link>
 
           <div className="bursa-header-progress">
-            <span
-              style={{
-                whiteSpace: 'nowrap',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: 'var(--font-weight-semibold)',
-                color: 'var(--ink)',
-              }}
-            >
+            <span className="bursa-header-module-label">
               {moduleLabel}
-              <span style={{ color: 'var(--ink-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
+              <span className="bursa-header-module-count">
                 {' · '}
                 <RollingNumber value={completed} /> de {total}
               </span>

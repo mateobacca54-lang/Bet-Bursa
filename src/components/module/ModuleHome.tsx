@@ -12,6 +12,7 @@ import { AppShell, Greeting } from '@/components/shell';
 import { LearningPath } from '@/components/path';
 import { FloatingPapers } from '@/components/decor';
 import { PruebaCheckpoint } from '@/components/prueba';
+import { Eyebrow } from '@/components/ui';
 
 interface ModuleHomeProps {
   progress: ModuleProgress;
@@ -34,7 +35,7 @@ function LegendDot({ kind }: { kind: 'done' | 'current' | 'locked' }) {
       ? { background: 'var(--brand-600)', border: '2px solid var(--brand-400)' }
       : kind === 'current'
         ? { background: 'var(--surface-raised)', border: '3px solid var(--brand-500)' }
-        : { background: 'var(--ink)', border: '2px dashed var(--ink-secondary)' };
+        : { background: 'var(--paper-sunk)', border: '2px dashed var(--ink-soft)' };
   return (
     <span
       aria-hidden="true"
@@ -101,26 +102,8 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
             }}
           >
             <div>
-              <span
-                className="uppercase-tracking"
-                style={{
-                  fontSize: 'var(--font-size-xs)',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  color: 'var(--brand-700)',
-                }}
-              >
-                Módulo en curso
-              </span>
-              <h2
-                id="camino-titulo"
-                style={{
-                  margin: 0,
-                  fontSize: 'var(--font-size-2xl)',
-                  fontWeight: 'var(--font-weight-bold)',
-                  lineHeight: 'var(--line-height-tight)',
-                  color: 'var(--ink)',
-                }}
-              >
+              <Eyebrow tone="brand">Módulo en curso</Eyebrow>
+              <h2 id="camino-titulo" className="bursa-section-title">
                 {nombreModulo(1)}
               </h2>
             </div>
@@ -165,7 +148,7 @@ export default function ModuleHome({ progress, now, hydrated, onReviewed, onMisi
         ) : (
           <div
             aria-hidden="true"
-            style={{ height: 420, background: 'var(--ink)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}
+            style={{ height: 420, background: 'var(--ink)', borderRadius: 'var(--radius-card-lg)', boxShadow: 'var(--shadow-soft)' }}
           />
         )}
 
