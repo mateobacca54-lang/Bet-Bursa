@@ -269,11 +269,13 @@ export default function EjemploVisual({ lesson, step }: EjemploVisualProps) {
     <div
       aria-hidden="true"
       style={{
-        display: 'inline-block',
+        // Bloque hundido a todo lo ancho, con el esquema al centro (DESIGN.md §4): pegado a la
+        // izquierda dejaba media pantalla vacía y se leía como una imagen suelta.
+        display: 'flex',
+        justifyContent: 'center',
         marginTop: 'var(--space-8)',
-        padding: 'var(--space-6)',
-        background: 'var(--sand-100)',
-        border: '1px solid var(--border-warm)',
+        padding: 'var(--space-8) var(--space-6)',
+        background: 'var(--paper-sunk)',
         borderRadius: 'var(--radius-lg)',
       }}
     >

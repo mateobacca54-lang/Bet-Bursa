@@ -10,3 +10,13 @@
   height: auto;
   background: var(--surface-raised);
 }
+
+/* Sobre papel (DESIGN.md §4): sin lienzo blanco. Las ilustraciones generadas traen su
+   propio fondo blanco; `multiply` lo funde con el papel, que es el mismo tono cálido
+   sobre el que están dibujadas. */
+.estampa--papel {
+  background: transparent;
+}
+.estampa--papel image {
+  mix-blend-mode: multiply;
+}

@@ -107,9 +107,9 @@ export function StepHook({
       {scene && (
         <Reveal
           delay={0.2}
-          style={{ marginTop: 'var(--space-8)', position: 'relative', display: 'inline-block', maxWidth: 380, width: '100%' }}
+          style={{ marginTop: 'var(--space-6)', position: 'relative', maxWidth: 420, width: '100%', marginInline: 'auto' }}
         >
-          <Estampa scene={scene} style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <Estampa scene={scene} className="estampa--papel" style={{ width: '100%', height: 'auto', display: 'block' }} />
           <Image
             src="/monedita/monedita.webp"
             alt=""
@@ -117,10 +117,9 @@ export function StepHook({
             height={64}
             style={{
               position: 'absolute',
-              right: -8,
-              bottom: -8,
+              right: 0,
+              bottom: 0,
               display: 'block',
-              filter: 'drop-shadow(var(--shadow-soft))',
             }}
           />
         </Reveal>
