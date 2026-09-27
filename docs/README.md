@@ -13,6 +13,7 @@ en pesos, para aprender a leer las decisiones que mueven la plata. Este repo es 
 En este orden:
 
 1. [`AGENTS.md`](../AGENTS.md) — las reglas del repo (diseño, movimiento, código, contenido, verificación).
+   [`DESIGN.md`](../DESIGN.md) — la identidad visual de toda la app: color, tipografía, componentes, movimiento y anatomía de una lección.
 2. [`PLAN-MODULO-1.md`](./PLAN-MODULO-1.md) — qué se construye.
 3. [`ANTIGRAVITY-WORKPLAN.md`](./ANTIGRAVITY-WORKPLAN.md) — cómo se ejecuta y qué artefactos entregar.
 4. [`trabajo/REGLAS-DE-TRABAJO.md`](./trabajo/REGLAS-DE-TRABAJO.md) — cómo se trabaja con la IA.
@@ -23,7 +24,11 @@ En este orden:
 
 | Carpeta | Qué hay |
 |---|---|
-| `app/` | Rutas de Next.js (App Router): la portada (`page.tsx`), `/inicio`, `/modulo/1` y sus lecciones, `/progreso`, `/privacidad`, `/sobre`, y `/dev/*` (banco de pruebas interno, apagado en producción). |
+| `app/(portada)/` | Lo público: la portada (`page.tsx`), `/privacidad`, `/sobre`. Los paréntesis agrupan sin cambiar la URL. |
+| `app/(app)/` | El producto: `/inicio`, `/modulo/1` con sus lecciones y la prueba, `/progreso`. |
+| `app/dev/` | Banco de pruebas interno (`/dev/camino`, `/dev/widgets`), apagado en producción. |
+| `app/api/` | Rutas del servidor: indicadores, suscripción, reportes. |
+| `components/ui/` | Las piezas base de [`DESIGN.md`](../DESIGN.md): `Button`, `Card`, `Eyebrow`, `Heading`, `Choice`, `Pill`, `Stat`, `ProgressBar`. Todo lo demás se arma con estas. |
 | `components/landing/` | La landing pública: héroe (`HeroGaleria`), capítulos, `LeeLaLetra`, "Así se aprende" (`AsiSeAprende`), `CaminoParadas`, `DatosDeHoy`, navegación (`NavPildora`) y sus estilos. |
 | `components/widgets/` | Los widgets interactivos de las lecciones: los 6 arquetipos cerrados en `WidgetType` (`src/lib/types.ts`) — `ConsequenceSlider`, `DragClassifier`, `ProportionBuilder`, `DocumentHotspot`, `AnimatedComparator`, `Elegir`. |
 | `components/lesson/` | El reproductor de lecciones (`LessonPlayer`, `LessonSteps`, `PracticeWidget`) y los prompts de nombre/correo. |

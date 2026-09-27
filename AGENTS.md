@@ -27,6 +27,8 @@ Antes de trabajar, lee `docs/PLAN-MODULO-1.md` (qué se construye) y
 
 ## Diseño
 
+- **[`DESIGN.md`](./DESIGN.md) manda en cómo se ve y se mueve la app.** Toda pantalla nueva se
+  arma con `src/components/ui/` y se revisa con la lista de su §12.
 - **`src/styles/tokens.css` es la única fuente de valores.** Ningún color, espaciado,
   radio, duración o curva se escribe a mano en un componente. Si necesitas un valor que
   no existe: **párate y pregunta**. No lo inventes.
