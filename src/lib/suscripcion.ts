@@ -29,10 +29,7 @@ export function validarSolicitudSuscripcion(datos: unknown): ValidacionSuscripci
     return { ok: false, error: 'falta el consentimiento' };
   }
 
-  const versionPolitica =
-    typeof objeto.versionPolitica === 'string' && objeto.versionPolitica.trim()
-      ? objeto.versionPolitica.trim()
-      : VERSION_POLITICA_ACTUAL;
-
-  return { ok: true, datos: { correo, consentimiento: true, versionPolitica } };
+  // La versión de la política la decide el servidor, nunca el cliente:
+  // así evitamos que una solicitud manipulada declare haber aceptado una versión distinta.
+  return { ok: true, datos: { correo, consentimiento: true, versionPolitica: VERSION_POLITICA_ACTUAL } };
 }

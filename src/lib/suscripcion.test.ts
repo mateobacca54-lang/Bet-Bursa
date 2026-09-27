@@ -6,20 +6,30 @@ describe('validarSolicitudSuscripcion', () => {
     const r = validarSolicitudSuscripcion({
       correo: 'persona@ejemplo.com',
       consentimiento: true,
-      versionPolitica: '2026-09-25',
+      versionPolitica: VERSION_POLITICA_ACTUAL,
     });
     expect(r.ok).toBe(true);
     if (r.ok) {
       expect(r.datos).toEqual({
         correo: 'persona@ejemplo.com',
         consentimiento: true,
-        versionPolitica: '2026-09-25',
+        versionPolitica: VERSION_POLITICA_ACTUAL,
       });
     }
   });
 
   it('usa la versión de política vigente si no la mandan', () => {
     const r = validarSolicitudSuscripcion({ correo: 'persona@ejemplo.com', consentimiento: true });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.datos.versionPolitica).toBe(VERSION_POLITICA_ACTUAL);
+  });
+
+  it('ignora la versión de política que mande el cliente y usa siempre la vigente', () => {
+    const r = validarSolicitudSuscripcion({
+      correo: 'persona@ejemplo.com',
+      consentimiento: true,
+      versionPolitica: 'otra',
+    });
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.datos.versionPolitica).toBe(VERSION_POLITICA_ACTUAL);
   });
